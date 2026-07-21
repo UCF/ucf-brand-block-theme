@@ -1,0 +1,136 @@
+@use "sass:map";
+@use "variables" as *;
+
+// Section treatments registered as core/group block styles in functions.php.
+
+.is-style-gold-edge {
+	border-top: 5px solid map.get($color, "gold");
+}
+
+// Halftone dot field, used over black sections in the prototype.
+.is-style-halftone {
+	position: relative;
+
+	> * {
+		position: relative;
+		z-index: 1;
+	}
+
+	&::before {
+		background-image: radial-gradient(rgb(255 255 255 / 4.5%) 1px, transparent 1px);
+		background-size: 14px 14px;
+		content: "";
+		inset: 0;
+		pointer-events: none;
+		position: absolute;
+		z-index: 0;
+	}
+}
+
+// ── Color swatches (Identity → Color) ────────────────────────────────────────
+
+.brand-swatches {
+	display: grid;
+	gap: 1px;
+	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.brand-swatch {
+	background: map.get($color, "paper-alt");
+	border: 1px solid map.get($color, "line");
+}
+
+.brand-swatch__chip {
+	display: block;
+	height: 118px;
+	width: 100%;
+}
+
+.brand-swatch__body {
+	padding: map.get($space, "30");
+}
+
+.brand-swatch__name {
+	font-family: map.get($font, "display");
+	font-size: 1.05rem;
+	font-weight: 700;
+	margin: 0 0 0.2rem;
+	text-transform: uppercase;
+}
+
+.brand-swatch__value {
+	color: map.get($color, "text-secondary");
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "meta");
+	letter-spacing: 0.03em;
+	line-height: 1.8;
+	margin: 0;
+}
+
+.brand-swatch__ratio {
+	display: inline-block;
+	font-family: map.get($font, "mono");
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	margin-top: map.get($space, "20");
+	padding: 0.2rem 0.5rem;
+	text-transform: uppercase;
+
+	&.is-pass {
+		background: map.get($color, "success");
+		color: map.get($color, "white");
+	}
+
+	&.is-warn {
+		background: map.get($color, "danger");
+		color: map.get($color, "white");
+	}
+}
+
+// ── Type specimens (Identity → Typography) ───────────────────────────────────
+//
+// A specimen row is a plain core Group carrying this block style; its contents are an
+// eyebrow paragraph and a sample paragraph whose face and size are set through ordinary
+// block controls. No bespoke classes, so editors can build one from the inserter.
+
+.is-style-specimen {
+	border-top: 1px solid map.get($color, "line");
+	padding-block: map.get($space, "40");
+
+	// The sample is the last thing in the row and should sit tight under its label.
+	> :last-child {
+		margin-bottom: 0;
+	}
+}
+
+// ── Do / Don't ───────────────────────────────────────────────────────────────
+
+.brand-dodont {
+	display: grid;
+	gap: map.get($space, "40");
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.brand-dodont__panel {
+	border: 1px solid map.get($color, "line");
+}
+
+.brand-dodont__head {
+	color: map.get($color, "white");
+	font-family: map.get($font, "display");
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	margin: 0;
+	padding: 0.6rem map.get($space, "30");
+	text-transform: uppercase;
+
+	.brand-dodont__panel--do & {
+		background: map.get($color, "success");
+	}
+
+	.brand-dodont__panel--dont & {
+		background: map.get($color, "danger");
+	}
+}

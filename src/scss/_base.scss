@@ -1,0 +1,84 @@
+@use "sass:map";
+@use "variables" as *;
+
+// `clip` rather than `hidden`: an `overflow: hidden` ancestor silently disables
+// `position: sticky` on every descendant, which would break the drawer.
+html {
+	overflow-x: clip;
+	scroll-behavior: smooth;
+	scroll-padding-top: calc(#{$header-height} + 12px);
+}
+
+body {
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+// Core's constrained layout emits
+// `.wp-container-* > :where(…) { margin-left: auto !important; margin-right: auto }`,
+// which centers every child. Anything that sets a max-width narrower than the container
+// therefore drifts to the middle — never what this layout wants, since the brand guide
+// is left-aligned throughout (and, in the drawer layout, anchored beside the sidebar).
+//
+// `!important` is the only thing that can beat `!important`. Kept in one place, scoped
+// to the specific elements that need it, rather than sprinkled through the components.
+.brand-content > *,
+.lead,
+.is-style-lead {
+	margin-inline: 0 !important;
+}
+
+// Brand rule: square corners everywhere. Buttons opt back in via theme.json only if
+// a future component needs it.
+button,
+input,
+select,
+textarea,
+.wp-block-button__link {
+	border-radius: 0;
+}
+
+:focus-visible {
+	outline: 3px solid map.get($color, "horizon-blue");
+	outline-offset: 2px;
+}
+
+.has-black-background-color,
+.has-ink-background-color,
+.is-style-on-dark {
+	:focus-visible {
+		outline-color: map.get($color, "gold");
+	}
+}
+
+.brand-skip-link {
+	background: map.get($color, "gold");
+	color: map.get($color, "black");
+	font-family: map.get($font, "body");
+	font-size: map.get($size, "ui");
+	font-weight: 800;
+	left: map.get($space, "20");
+	padding: map.get($space, "20") map.get($space, "30");
+	position: absolute;
+	text-transform: uppercase;
+	top: -100vh;
+	z-index: 2000;
+
+	&:focus {
+		top: map.get($space, "20");
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

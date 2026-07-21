@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "ucf-brand/color-swatch",
+	"title": "Color Swatch",
+	"category": "design",
+	"icon": "color-picker",
+	"parent": [ "ucf-brand/color-swatches" ],
+	"description": "One brand color: chip, name, and its published values.",
+	"textdomain": "ucf-brand-block-theme",
+	"keywords": [ "color", "swatch", "hex", "token" ],
+	"attributes": {
+		"colorSlug": { "type": "string", "default": "gold" },
+		"name": { "type": "string", "source": "html", "selector": ".brand-swatch__name", "default": "" },
+		"hex": { "type": "string", "default": "" },
+		"rgb": { "type": "string", "default": "" },
+		"cmyk": { "type": "string", "default": "" },
+		"pantone": { "type": "string", "default": "" },
+		"usage": { "type": "string", "default": "" },
+		"ratio": { "type": "string", "default": "" },
+		"ratioStatus": { "type": "string", "default": "pass" }
+	},
+	"supports": {
+		"html": false,
+		"reusable": false
+	},
+	"editorScript": "file:./index.js"
+}

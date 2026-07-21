@@ -1,0 +1,69 @@
+// Sass-level aliases for theme.json presets.
+//
+// Values are always `--wp--preset--*` / `--wp--custom--*` custom properties, never
+// literals. A token that does not exist in theme.json does not belong here — add it
+// there first. See CLAUDE.md.
+
+$color: (
+	"gold": var(--wp--preset--color--gold),
+	"gold-deep": var(--wp--preset--color--gold-deep),
+	"black": var(--wp--preset--color--black),
+	"white": var(--wp--preset--color--white),
+	"ink": var(--wp--preset--color--ink),
+	"paper-alt": var(--wp--preset--color--paper-alt),
+	"card-dark": var(--wp--preset--color--card-dark),
+	"horizon-blue": var(--wp--preset--color--horizon-blue),
+	"blue-tint": var(--wp--preset--color--blue-tint),
+	"link-blue": var(--wp--preset--color--link-blue),
+	"link-blue-hover": var(--wp--preset--color--link-blue-hover),
+	"text-body": var(--wp--preset--color--text-body),
+	"text-secondary": var(--wp--preset--color--text-secondary),
+	"text-secondary-dark": var(--wp--preset--color--text-secondary-dark),
+	"text-meta-dark": var(--wp--preset--color--text-meta-dark),
+	"line": var(--wp--preset--color--line),
+	"line-dark": var(--wp--preset--color--line-dark),
+	"success": var(--wp--preset--color--success),
+	"danger": var(--wp--preset--color--danger),
+);
+
+$font: (
+	"display": var(--wp--preset--font-family--display),
+	"body": var(--wp--preset--font-family--body),
+	"mono": var(--wp--preset--font-family--mono),
+);
+
+// Keys match theme.json slugs exactly. Note that WordPress kebab-cases slugs when it
+// generates CSS variables and `has-*-font-size` classes, so a slug like `h1` becomes
+// `--wp--preset--font-size--h-1`. Every slug here is already kebab-stable, which keeps
+// the two names identical and the mapping obvious.
+$size: (
+	"meta": var(--wp--preset--font-size--meta),
+	"eyebrow": var(--wp--preset--font-size--eyebrow),
+	"ui": var(--wp--preset--font-size--ui),
+	"body": var(--wp--preset--font-size--body),
+	"lead": var(--wp--preset--font-size--lead),
+	"heading-4": var(--wp--preset--font-size--heading-4),
+	"heading-3": var(--wp--preset--font-size--heading-3),
+	"heading-2": var(--wp--preset--font-size--heading-2),
+	"heading-1": var(--wp--preset--font-size--heading-1),
+);
+
+$space: (
+	"10": var(--wp--preset--spacing--10),
+	"20": var(--wp--preset--spacing--20),
+	"30": var(--wp--preset--spacing--30),
+	"40": var(--wp--preset--spacing--40),
+	"50": var(--wp--preset--spacing--50),
+	"60": var(--wp--preset--spacing--60),
+);
+
+// High-emphasis text on the black drawer. Not a palette color — it must not show up
+// in the editor's color picker, so it lives in settings.custom.
+$text-on-dark: var(--wp--custom--text-on-dark);
+
+$sidebar-width: var(--wp--custom--sidebar-width);
+$header-height: var(--wp--custom--header-height);
+$wrap: var(--wp--custom--wrap);
+
+// The single breakpoint where the drawer becomes off-canvas. Mirrors the prototype.
+$breakpoint-drawer: 960px;

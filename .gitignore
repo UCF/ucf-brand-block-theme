@@ -1,0 +1,12 @@
+# OS files
+.DS_Store
+
+# Dependency directories
+node_modules/
+
+# Local environment files
+.env
+.env.*
+
+# Note: build/ and assets/css/main.css are compiled but ARE committed, so the theme
+# can be deployed without running a build. Rebuild with `npm run build`.

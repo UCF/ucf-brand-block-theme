@@ -1,0 +1,79 @@
+@use "sass:map";
+@use "variables" as *;
+
+// Each rule is paired with its `.is-style-*` selector so a registered block style and
+// a hand-applied class share one definition. Matches ucf-wordpress-block-theme.
+
+.lead,
+.is-style-lead {
+	color: map.get($color, "text-body");
+	font-family: map.get($font, "body");
+	font-size: map.get($size, "lead");
+	font-weight: 600;
+	line-height: 1.6;
+	max-width: 62ch;
+	text-transform: none;
+}
+
+// Mono, letterspaced, rule-prefixed label. Reserved for eyebrows, meta and numbers —
+// never body copy.
+.eyebrow,
+.is-style-eyebrow {
+	align-items: center;
+	color: map.get($color, "link-blue");
+	display: flex;
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "eyebrow");
+	font-weight: 700;
+	gap: 0.7rem;
+	letter-spacing: 0.22em;
+	margin-bottom: map.get($space, "30");
+	text-transform: uppercase;
+
+	&::before {
+		background: currentcolor;
+		content: "";
+		display: inline-block;
+		height: 2px;
+		width: 26px;
+	}
+}
+
+.meta,
+.is-style-meta {
+	color: map.get($color, "text-secondary");
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "meta");
+	letter-spacing: 0.03em;
+	line-height: 1.9;
+	text-transform: none;
+}
+
+// On-dark inversions.
+.has-black-background-color,
+.has-ink-background-color,
+.is-style-on-dark {
+	.eyebrow,
+	.is-style-eyebrow {
+		color: map.get($color, "gold");
+	}
+
+	.lead,
+	.is-style-lead {
+		color: map.get($color, "white");
+	}
+
+	.meta,
+	.is-style-meta {
+		color: map.get($color, "text-meta-dark");
+	}
+
+	p,
+	li {
+		color: map.get($color, "text-secondary-dark");
+	}
+
+	a:where(:not(.wp-block-button__link)) {
+		color: map.get($color, "blue-tint");
+	}
+}

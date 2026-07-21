@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "ucf-brand/color-swatches",
+	"title": "Color Swatches",
+	"category": "design",
+	"icon": "art",
+	"description": "A grid of brand color swatches. Add Color Swatch blocks inside it.",
+	"textdomain": "ucf-brand-block-theme",
+	"keywords": [ "color", "swatch", "palette", "brand" ],
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"spacing": { "margin": true, "padding": false }
+	},
+	"editorScript": "file:./index.js"
+}

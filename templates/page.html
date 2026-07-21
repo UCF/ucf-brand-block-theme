@@ -1,0 +1,29 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:html -->
+<div class="brand-mobile-bar">
+	<button class="brand-mobile-bar__toggle" type="button" aria-expanded="false" aria-controls="brand-sidebar" aria-label="Open navigation">&#9776;</button>
+	<p class="brand-mobile-bar__label">Brand Central</p>
+</div>
+<div class="brand-scrim" hidden></div>
+<!-- /wp:html -->
+
+<!-- wp:group {"tagName":"main","className":"brand-shell","style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}}},"layout":{"type":"default"}} -->
+<main class="wp-block-group brand-shell" style="padding-top:0;padding-right:0;padding-bottom:0;padding-left:0">
+	<!-- wp:group {"tagName":"aside","metadata":{"name":"Brand Sidebar"},"anchor":"brand-sidebar","className":"brand-sidebar","layout":{"type":"default"}} -->
+	<aside id="brand-sidebar" class="wp-block-group brand-sidebar">
+		<!-- wp:template-part {"slug":"brand-sidebar"} /-->
+	</aside>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"className":"brand-content","layout":{"type":"constrained","contentSize":"720px","wideSize":"100%"}} -->
+	<div class="wp-block-group brand-content">
+		<!-- wp:post-title {"level":1,"fontSize":"heading-1"} /-->
+
+		<!-- wp:post-content /-->
+	</div>
+	<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
