@@ -17,7 +17,10 @@
 	}
 
 	&::before {
-		background-image: radial-gradient(rgb(255 255 255 / 4.5%) 1px, transparent 1px);
+		background-image: radial-gradient(
+			rgb(255 255 255 / 4.5%) 1px,
+			transparent 1px
+		);
 		background-size: 14px 14px;
 		content: "";
 		inset: 0;

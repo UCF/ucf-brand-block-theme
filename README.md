@@ -19,18 +19,40 @@ Both `build/` and `assets/css/main.css` are compiled **and committed**, so the t
 be deployed without running a build. Never edit either by hand — edit the source and
 rebuild.
 
+## Linting and formatting
+
+```bash
+npm run lint:js       # ESLint over blocks/            (wp-scripts)
+npm run lint:css      # stylelint over src/scss/        (wp-scripts)
+npm run format        # Prettier: JS, JSON, SCSS, Markdown, YAML
+npm run format:check  # verify formatting, write nothing
+
+composer install      # one-time: pull PHPCS + WordPress Coding Standards
+composer run lint     # PHPCS over the theme's PHP
+composer run lint:fix # auto-fix what phpcbf can
+```
+
+PHP follows the WordPress Coding Standards, configured in `phpcs.xml.dist` (the `WordPress`
+ruleset, `ucf_brand` global prefix, theme text domain). JS/JSON/SCSS/Markdown follow the
+shared `@wordpress/prettier-config`.
+
+Block-markup files — `parts/`, `templates/`, the `patterns/` PHP and `tools/seed/` content —
+are deliberately excluded from Prettier in `.prettierignore`. Their canonical form is whatever
+the block editor emits; reformatting the serialized markup diverges from each block's `save()`
+and triggers invalid-block warnings. Leave it as the editor writes it.
+
 ## Design tokens
 
 Everything lives in `theme.json`. Nothing in this theme hard-codes a hex, a font stack or
 a spacing value; SCSS reads tokens through `--wp--preset--*` / `--wp--custom--*` variables
 mapped in `src/scss/_variables.scss`.
 
-- **19 brand colors**, with `defaultPalette: false` and `custom: false`, so the editor
-  offers brand tokens and nothing else — authors cannot pick an off-brand color.
-- **Three typefaces**, self-hosted in `assets/fonts/` and declared as `fontFace` entries.
-  No request ever goes to a third-party font CDN.
-- **Fluid type scale** — every heading size is a `clamp()`, so there is no separate mobile
-  scale to maintain.
+-   **19 brand colors**, with `defaultPalette: false` and `custom: false`, so the editor
+    offers brand tokens and nothing else — authors cannot pick an off-brand color.
+-   **Three typefaces**, self-hosted in `assets/fonts/` and declared as `fontFace` entries.
+    No request ever goes to a third-party font CDN.
+-   **Fluid type scale** — every heading size is a `clamp()`, so there is no separate mobile
+    scale to maintain.
 
 ### Swapping the typefaces
 
@@ -93,10 +115,10 @@ either a custom block, a pattern, or core blocks carrying a registered block sty
 
 ### Custom blocks (`blocks/` → `build/`)
 
-| Block | What it's for |
-|---|---|
-| `ucf-brand/color-swatches` | The swatch grid. Accepts only Color Swatch children. |
-| `ucf-brand/color-swatch` | One color: chip, name, HEX/RGB/CMYK/Pantone, usage note, measured contrast. |
+| Block                      | What it's for                                                               |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `ucf-brand/color-swatches` | The swatch grid. Accepts only Color Swatch children.                        |
+| `ucf-brand/color-swatch`   | One color: chip, name, HEX/RGB/CMYK/Pantone, usage note, measured contrast. |
 
 Every block is **static** — `save()` emits real markup and there is no `render.php`, so
 nothing renders on the server. The swatch chip takes its color from a palette **slug**
@@ -109,18 +131,18 @@ loop in `functions.php`.
 
 ### Patterns (`patterns/`)
 
-| Pattern | Built from |
-|---|---|
+| Pattern                    | Built from                                                 |
+| -------------------------- | ---------------------------------------------------------- |
 | `ucf-brand/color-swatches` | The two blocks above, pre-filled with the six core colors. |
-| `ucf-brand/type-specimens` | Core Group + Paragraph. One row per typeface. |
-| `ucf-brand/type-scale` | Core Group + Paragraph, generated from a PHP array. |
+| `ucf-brand/type-specimens` | Core Group + Paragraph. One row per typeface.              |
+| `ucf-brand/type-scale`     | Core Group + Paragraph, generated from a PHP array.        |
 
 The type patterns use **no custom markup at all** — a specimen row is a Group with the
 `Type Specimen` block style, an eyebrow paragraph, and a sample paragraph whose face and
 size are set through ordinary block controls (`fontFamily`, `fontSize`). An editor can
 build one from the inserter without touching code.
 
-`type-scale.php` renders each row *using the preset it documents*, so the page is a live
+`type-scale.php` renders each row _using the preset it documents_, so the page is a live
 read of `theme.json` rather than a transcription of it — change a size there and the demo
 follows.
 
@@ -131,13 +153,13 @@ follows.
 
 ## Architecture notes
 
-- **Nothing is server-rendered.** No `render.php`, no `render_callback`, and no
-  `core/pattern` references in seeded content — pages hold real block markup an editor
-  can change.
-- **Distribution.** Blocks live in the theme for now because the design is still moving.
-  See the note above on lifting them into a plugin.
-- Follows the conventions in `ucf-wordpress-block-theme/CLAUDE.md`: tokens first, then
-  existing classes, then core block controls, and only then something new.
+-   **Nothing is server-rendered.** No `render.php`, no `render_callback`, and no
+    `core/pattern` references in seeded content — pages hold real block markup an editor
+    can change.
+-   **Distribution.** Blocks live in the theme for now because the design is still moving.
+    See the note above on lifting them into a plugin.
+-   Follows the conventions in `ucf-wordpress-block-theme/CLAUDE.md`: tokens first, then
+    existing classes, then core block controls, and only then something new.
 
 ## Local development content
 

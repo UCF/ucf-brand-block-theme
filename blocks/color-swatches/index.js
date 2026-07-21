@@ -21,7 +21,10 @@ const ALLOWED = [ 'ucf-brand/color-swatch' ];
 const TEMPLATE = [
 	[ 'ucf-brand/color-swatch', { colorSlug: 'gold', name: 'Bold Gold' } ],
 	[ 'ucf-brand/color-swatch', { colorSlug: 'black', name: 'UCF Black' } ],
-	[ 'ucf-brand/color-swatch', { colorSlug: 'horizon-blue', name: 'Horizon Blue' } ],
+	[
+		'ucf-brand/color-swatch',
+		{ colorSlug: 'horizon-blue', name: 'Horizon Blue' },
+	],
 ];
 
 registerBlockType( metadata.name, {
@@ -37,7 +40,9 @@ registerBlockType( metadata.name, {
 	},
 
 	save() {
-		const blockProps = useBlockProps.save( { className: 'brand-swatches' } );
+		const blockProps = useBlockProps.save( {
+			className: 'brand-swatches',
+		} );
 		const innerProps = useInnerBlocksProps.save( blockProps );
 
 		return <div { ...innerProps } />;

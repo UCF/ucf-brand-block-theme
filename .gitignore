@@ -1,12 +1,33 @@
 # OS files
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
 # Dependency directories
 node_modules/
+vendor/
+composer.lock
 
 # Local environment files
 .env
 .env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Source maps / Sass cache
+*.map
+.sass-cache/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*~
 
 # Note: build/ and assets/css/main.css are compiled but ARE committed, so the theme
 # can be deployed without running a build. Rebuild with `npm run build`.

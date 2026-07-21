@@ -1,0 +1,30 @@
+{
+	"name": "ucf/ucf-brand-block-theme",
+	"description": "Foundation-first block theme for UCF brand documentation.",
+	"type": "wordpress-theme",
+	"license": "GPL-2.0-or-later",
+	"homepage": "https://brand.ucf.edu/",
+	"authors": [
+		{
+			"name": "UCF Web Communications",
+			"homepage": "https://www.ucf.edu/"
+		}
+	],
+	"require": {
+		"composer/installers": "~1.0"
+	},
+	"require-dev": {
+		"wp-coding-standards/wpcs": "^3.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+	},
+	"scripts": {
+		"lint": "phpcs",
+		"lint:fix": "phpcbf"
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}

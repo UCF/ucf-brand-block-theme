@@ -22,23 +22,23 @@ Corollary: don't ship near-duplicate patterns for color variants.
 
 ## Gotchas that have already bitten
 
-- **Preset slugs get kebab-cased.** A slug of `h1` produces
-  `--wp--preset--font-size--h-1` and `has-h-1-font-size`. Keep slugs kebab-stable
-  (`heading-1`, `display-1`, `ui`, `meta`) so the slug and the generated name match.
-- **Don't reuse core's default preset slugs** (`small`, `medium`, `large`, `x-large`).
-  `defaultFontSizes` is `false`, but same-slug collisions are still confusing.
-- **`ch` is font-relative.** Never use `ch` for `layout.contentSize` — the measure would
-  scale with each element's own font size, so an H1 would get a wildly wider column than
-  a paragraph. Content sizes are in px.
-- **`overflow-x: clip`, never `hidden`.** An `overflow: hidden` ancestor silently kills
-  `position: sticky` on every descendant, which would break the drawer.
-- **`align-items: start` on `.brand-shell` is load-bearing.** The grid default of
-  `stretch` makes the sticky sidebar full-height and sticky a no-op.
-- **Core's constrained layout uses `margin-left: auto !important`.** Anything setting a
-  narrower `max-width` gets centered as a side effect. The single override lives in
-  `src/scss/_base.scss` — put new cases there rather than scattering `!important`.
-- **The footer must stay outside `<main>`.** That is the only thing making the drawer
-  stop at the footer.
+-   **Preset slugs get kebab-cased.** A slug of `h1` produces
+    `--wp--preset--font-size--h-1` and `has-h-1-font-size`. Keep slugs kebab-stable
+    (`heading-1`, `display-1`, `ui`, `meta`) so the slug and the generated name match.
+-   **Don't reuse core's default preset slugs** (`small`, `medium`, `large`, `x-large`).
+    `defaultFontSizes` is `false`, but same-slug collisions are still confusing.
+-   **`ch` is font-relative.** Never use `ch` for `layout.contentSize` — the measure would
+    scale with each element's own font size, so an H1 would get a wildly wider column than
+    a paragraph. Content sizes are in px.
+-   **`overflow-x: clip`, never `hidden`.** An `overflow: hidden` ancestor silently kills
+    `position: sticky` on every descendant, which would break the drawer.
+-   **`align-items: start` on `.brand-shell` is load-bearing.** The grid default of
+    `stretch` makes the sticky sidebar full-height and sticky a no-op.
+-   **Core's constrained layout uses `margin-left: auto !important`.** Anything setting a
+    narrower `max-width` gets centered as a side effect. The single override lives in
+    `src/scss/_base.scss` — put new cases there rather than scattering `!important`.
+-   **The footer must stay outside `<main>`.** That is the only thing making the drawer
+    stop at the footer.
 
 ## Blocks
 
@@ -50,43 +50,43 @@ registered block style — not raw markup pasted into a page. There is currently
 Custom blocks live in `blocks/<name>/`, built by `wp-scripts` to `build/<name>/`, and
 registered by the loop in `ucf_brand_register_blocks()`.
 
-- **Static only.** `save()` must emit real markup. No `render.php`, no `render_callback`.
-- Take colors by palette **slug** and apply core's `has-{slug}-background-color` /
-  `has-{slug}-color` classes — never write an inline hex into `save()`.
-- Don't reference theme functions or paths from block sources; they must lift into a
-  plugin unchanged.
-- `ucf-news-block-theme` uses `render.php` server rendering. That is **not** a precedent
-  for this theme.
+-   **Static only.** `save()` must emit real markup. No `render.php`, no `render_callback`.
+-   Take colors by palette **slug** and apply core's `has-{slug}-background-color` /
+    `has-{slug}-color` classes — never write an inline hex into `save()`.
+-   Don't reference theme functions or paths from block sources; they must lift into a
+    plugin unchanged.
+-   `ucf-news-block-theme` uses `render.php` server rendering. That is **not** a precedent
+    for this theme.
 
 ### Hand-writing block markup in patterns
 
 Pattern PHP must serialize **exactly** what `save()` would produce or the editor flags
-the block invalid. Class and inline-style *order* doesn't matter (Gutenberg compares
+the block invalid. Class and inline-style _order_ doesn't matter (Gutenberg compares
 class tokens as a set and parses style declarations), but presence and values do.
 
 Verify by opening a seeded page in the block editor and asking the store directly:
 
 ```js
-wp.data.select( 'core/block-editor' ).getBlocks()  // walk innerBlocks, check isValid
+wp.data.select( 'core/block-editor' ).getBlocks(); // walk innerBlocks, check isValid
 ```
 
 A page render is not a sufficient check — invalid blocks still render on the front end.
 
 ## Build and content
 
-- `npm run build` runs both halves: `wp-scripts` for `blocks/` → `build/`, and `sass` for
-  `src/scss/main.scss` → `assets/css/main.css`. Both outputs are committed; never edit
-  either directly. New SCSS partials must be `@use`d in `src/scss/main.scss`.
-  Declarations alphabetical.
-- **Block CSS goes in `src/scss/`, not in the block folder.** One stylesheet pipeline —
-  `wp-scripts` builds JS only. This keeps block styles in the editor automatically via
-  `add_editor_style()`.
-- Webfonts come from `theme.json` `fontFace`, never from SCSS or `wp_enqueue_style`.
-- `add_editor_style()` loads the same `main.css` in the editor, so front-end and editor
-  stay in parity. Keep it that way.
-- Pattern categories are `ucf-brand-sections` / `ucf-brand-blocks`. **Avoid the bare
-  `ucf-sections` slug** — it is reserved by the UCF Section plugin.
-- `tools/seed/` is dev-only local content, not part of the distributed theme.
+-   `npm run build` runs both halves: `wp-scripts` for `blocks/` → `build/`, and `sass` for
+    `src/scss/main.scss` → `assets/css/main.css`. Both outputs are committed; never edit
+    either directly. New SCSS partials must be `@use`d in `src/scss/main.scss`.
+    Declarations alphabetical.
+-   **Block CSS goes in `src/scss/`, not in the block folder.** One stylesheet pipeline —
+    `wp-scripts` builds JS only. This keeps block styles in the editor automatically via
+    `add_editor_style()`.
+-   Webfonts come from `theme.json` `fontFace`, never from SCSS or `wp_enqueue_style`.
+-   `add_editor_style()` loads the same `main.css` in the editor, so front-end and editor
+    stay in parity. Keep it that way.
+-   Pattern categories are `ucf-brand-sections` / `ucf-brand-blocks`. **Avoid the bare
+    `ucf-sections` slug** — it is reserved by the UCF Section plugin.
+-   `tools/seed/` is dev-only local content, not part of the distributed theme.
 
 ## H2s are structural
 

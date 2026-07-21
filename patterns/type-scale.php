@@ -13,7 +13,7 @@
  * Each row's sample uses the preset it documents, so this page is a live read of
  * theme.json rather than a transcription of it. Change a size there and this updates.
  */
-$ucf_scale = array(
+$ucf_brand_scale = array(
 	array( 'display-1', 'Display', 'clamp(2.6rem, 9vw, 6.4rem)', 'display', true ),
 	array( 'heading-1', 'Heading 1', 'clamp(2.4rem, 5vw, 4.2rem)', 'display', true ),
 	array( 'heading-2', 'Heading 2', 'clamp(1.9rem, 3.6vw, 2.8rem)', 'display', true ),
@@ -26,7 +26,7 @@ $ucf_scale = array(
 	array( 'meta', 'Meta', '0.68rem', 'mono', false ),
 );
 
-$ucf_samples = array(
+$ucf_brand_samples = array(
 	'display-1' => __( 'Knights', 'ucf-brand-block-theme' ),
 	'heading-1' => __( 'Page title', 'ucf-brand-block-theme' ),
 	'heading-2' => __( 'Section heading', 'ucf-brand-block-theme' ),
@@ -39,29 +39,29 @@ $ucf_samples = array(
 	'meta'      => __( 'Captions, credits and fine print.', 'ucf-brand-block-theme' ),
 );
 
-foreach ( $ucf_scale as $ucf_row ) {
-	list( $ucf_slug, $ucf_label, $ucf_value, $ucf_family, $ucf_caps ) = $ucf_row;
+foreach ( $ucf_brand_scale as $ucf_brand_row ) {
+	list( $ucf_brand_slug, $ucf_brand_label, $ucf_brand_value, $ucf_brand_family, $ucf_brand_caps ) = $ucf_brand_row;
 
-	$ucf_style = $ucf_caps ? array( 'typography' => array( 'textTransform' => 'uppercase' ) ) : array();
-	$ucf_attrs = array(
-		'fontFamily' => $ucf_family,
-		'fontSize'   => $ucf_slug,
+	$ucf_brand_style = $ucf_brand_caps ? array( 'typography' => array( 'textTransform' => 'uppercase' ) ) : array();
+	$ucf_brand_attrs = array(
+		'fontFamily' => $ucf_brand_family,
+		'fontSize'   => $ucf_brand_slug,
 	);
-	if ( $ucf_style ) {
-		$ucf_attrs['style'] = $ucf_style;
+	if ( $ucf_brand_style ) {
+		$ucf_brand_attrs['style'] = $ucf_brand_style;
 	}
 
-	$ucf_classes = sprintf( 'has-%s-font-family has-%s-font-size', $ucf_family, $ucf_slug );
-	$ucf_inline  = $ucf_caps ? ' style="text-transform:uppercase"' : '';
+	$ucf_brand_classes = sprintf( 'has-%s-font-family has-%s-font-size', $ucf_brand_family, $ucf_brand_slug );
+	$ucf_brand_inline  = $ucf_brand_caps ? ' style="text-transform:uppercase"' : '';
 	?>
 <!-- wp:group {"className":"is-style-specimen","layout":{"type":"constrained"}} -->
 <div class="wp-block-group is-style-specimen">
 	<!-- wp:paragraph {"className":"is-style-eyebrow"} -->
-	<p class="is-style-eyebrow"><?php echo esc_html( "$ucf_label · $ucf_value" ); ?></p>
+	<p class="is-style-eyebrow"><?php echo esc_html( "$ucf_brand_label · $ucf_brand_value" ); ?></p>
 	<!-- /wp:paragraph -->
 
-	<!-- wp:paragraph <?php echo wp_json_encode( $ucf_attrs ); ?> -->
-	<p class="<?php echo esc_attr( $ucf_classes ); ?>"<?php echo $ucf_inline; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed literal. ?>><?php echo esc_html( $ucf_samples[ $ucf_slug ] ); ?></p>
+	<!-- wp:paragraph <?php echo wp_json_encode( $ucf_brand_attrs ); ?> -->
+	<p class="<?php echo esc_attr( $ucf_brand_classes ); ?>"<?php echo $ucf_brand_inline; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed literal. ?>><?php echo esc_html( $ucf_brand_samples[ $ucf_brand_slug ] ); ?></p>
 	<!-- /wp:paragraph -->
 </div>
 <!-- /wp:group -->

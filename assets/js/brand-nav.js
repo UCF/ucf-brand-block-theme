@@ -20,7 +20,9 @@
 
 	var sidebar = shell.querySelector( '.brand-sidebar' );
 	var content = shell.querySelector( '.brand-content' );
-	var reduceMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+	var reduceMotion = window.matchMedia(
+		'(prefers-reduced-motion: reduce)'
+	).matches;
 
 	/**
 	 * Normalize a path for comparison: strip the trailing slash and lowercase it.
@@ -59,7 +61,8 @@
 			return heading.id;
 		}
 
-		var base = slugify( heading.textContent || '' ) || 'section-' + ( index + 1 );
+		var base =
+			slugify( heading.textContent || '' ) || 'section-' + ( index + 1 );
 		var candidate = base;
 		var suffix = 1;
 
@@ -96,14 +99,18 @@
 		}
 
 		var here = normalizePath( window.location.pathname );
-		var links = Array.prototype.slice.call( nav.querySelectorAll( 'a[href]' ) );
+		var links = Array.prototype.slice.call(
+			nav.querySelectorAll( 'a[href]' )
+		);
 		var match = null;
 
 		links.forEach( function ( link ) {
 			var linkPath;
 
 			try {
-				linkPath = normalizePath( new URL( link.href, window.location.origin ).pathname );
+				linkPath = normalizePath(
+					new URL( link.href, window.location.origin ).pathname
+				);
 			} catch ( e ) {
 				return;
 			}
@@ -122,7 +129,9 @@
 	 * @return {{list: HTMLElement, headings: HTMLElement[]}|null} List and targets.
 	 */
 	function buildSubnav() {
-		var headings = Array.prototype.slice.call( content.querySelectorAll( 'h2' ) );
+		var headings = Array.prototype.slice.call(
+			content.querySelectorAll( 'h2' )
+		);
 
 		if ( ! headings.length ) {
 			return null;
@@ -155,11 +164,16 @@
 	 * @param {HTMLElement}   list     The sub-nav list.
 	 */
 	function watchHeadings( headings, list ) {
-		var links = Array.prototype.slice.call( list.querySelectorAll( '.brand-subnav__link' ) );
+		var links = Array.prototype.slice.call(
+			list.querySelectorAll( '.brand-subnav__link' )
+		);
 
 		function activate( id ) {
 			links.forEach( function ( link ) {
-				link.classList.toggle( 'is-active', link.getAttribute( 'href' ) === '#' + id );
+				link.classList.toggle(
+					'is-active',
+					link.getAttribute( 'href' ) === '#' + id
+				);
 			} );
 		}
 
@@ -254,7 +268,10 @@
 		}
 
 		document.addEventListener( 'keydown', function ( event ) {
-			if ( event.key === 'Escape' && sidebar.classList.contains( 'is-open' ) ) {
+			if (
+				event.key === 'Escape' &&
+				sidebar.classList.contains( 'is-open' )
+			) {
 				closeDrawer( true );
 			}
 		} );
@@ -262,7 +279,10 @@
 		// Following a link inside the drawer navigates or jumps — either way the
 		// drawer has served its purpose and should get out of the way.
 		sidebar.addEventListener( 'click', function ( event ) {
-			if ( event.target.closest( 'a[href]' ) && sidebar.classList.contains( 'is-open' ) ) {
+			if (
+				event.target.closest( 'a[href]' ) &&
+				sidebar.classList.contains( 'is-open' )
+			) {
 				closeDrawer( false );
 			}
 		} );

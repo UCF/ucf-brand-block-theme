@@ -74,9 +74,13 @@ function hexToRgb( hex ) {
 function luminance( [ r, g, b ] ) {
 	const channel = ( value ) => {
 		const c = value / 255;
-		return c <= 0.03928 ? c / 12.92 : Math.pow( ( c + 0.055 ) / 1.055, 2.4 );
+		return c <= 0.03928
+			? c / 12.92
+			: Math.pow( ( c + 0.055 ) / 1.055, 2.4 );
 	};
-	return 0.2126 * channel( r ) + 0.7152 * channel( g ) + 0.0722 * channel( b );
+	return (
+		0.2126 * channel( r ) + 0.7152 * channel( g ) + 0.0722 * channel( b )
+	);
 }
 
 /** WCAG contrast ratio between two relative luminances. */
@@ -159,7 +163,18 @@ function renderLines( lines ) {
 
 registerBlockType( metadata.name, {
 	edit( { attributes, setAttributes } ) {
-		const { colorSlug, customColor, name, hex, rgb, cmyk, pantone, usage, ratio, ratioStatus } = attributes;
+		const {
+			colorSlug,
+			customColor,
+			name,
+			hex,
+			rgb,
+			cmyk,
+			pantone,
+			usage,
+			ratio,
+			ratioStatus,
+		} = attributes;
 		const blockProps = useBlockProps( { className: 'brand-swatch' } );
 
 		// The theme palette, as the editor sees it — the same 19 brand tokens.
@@ -213,7 +228,10 @@ registerBlockType( metadata.name, {
 					<PanelBody title={ __( 'Color', 'ucf-brand-block-theme' ) }>
 						<BaseControl
 							__nextHasNoMarginBottom
-							label={ __( 'Swatch color', 'ucf-brand-block-theme' ) }
+							label={ __(
+								'Swatch color',
+								'ucf-brand-block-theme'
+							) }
 							help={ __(
 								'Pick a brand token to keep tracking it, or choose a custom color for a one-off swatch.',
 								'ucf-brand-block-theme'
@@ -234,7 +252,12 @@ registerBlockType( metadata.name, {
 						</BaseControl>
 					</PanelBody>
 
-					<PanelBody title={ __( 'Published values', 'ucf-brand-block-theme' ) }>
+					<PanelBody
+						title={ __(
+							'Published values',
+							'ucf-brand-block-theme'
+						) }
+					>
 						<TextControl
 							__nextHasNoMarginBottom
 							readOnly
@@ -266,21 +289,34 @@ registerBlockType( metadata.name, {
 							__nextHasNoMarginBottom
 							label={ __( 'Pantone', 'ucf-brand-block-theme' ) }
 							value={ pantone }
-							onChange={ ( v ) => setAttributes( { pantone: v } ) }
+							onChange={ ( v ) =>
+								setAttributes( { pantone: v } )
+							}
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
-							label={ __( 'Usage note', 'ucf-brand-block-theme' ) }
-							placeholder={ __( 'Digital only', 'ucf-brand-block-theme' ) }
+							label={ __(
+								'Usage note',
+								'ucf-brand-block-theme'
+							) }
+							placeholder={ __(
+								'Digital only',
+								'ucf-brand-block-theme'
+							) }
 							value={ usage }
 							onChange={ ( v ) => setAttributes( { usage: v } ) }
 						/>
 					</PanelBody>
 
-					<PanelBody title={ __( 'Contrast', 'ucf-brand-block-theme' ) }>
+					<PanelBody
+						title={ __( 'Contrast', 'ucf-brand-block-theme' ) }
+					>
 						<TextControl
 							__nextHasNoMarginBottom
-							label={ __( 'Contrast ratio', 'ucf-brand-block-theme' ) }
+							label={ __(
+								'Contrast ratio',
+								'ucf-brand-block-theme'
+							) }
 							placeholder="11.46:1 on black"
 							help={ __(
 								'Auto-computed against black or white. Override for surface-only colors (e.g. “Surface only”).',
@@ -294,10 +330,24 @@ registerBlockType( metadata.name, {
 							label={ __( 'Result', 'ucf-brand-block-theme' ) }
 							value={ ratioStatus }
 							options={ [
-								{ label: __( 'Passes', 'ucf-brand-block-theme' ), value: 'pass' },
-								{ label: __( 'Caution', 'ucf-brand-block-theme' ), value: 'warn' },
+								{
+									label: __(
+										'Passes',
+										'ucf-brand-block-theme'
+									),
+									value: 'pass',
+								},
+								{
+									label: __(
+										'Caution',
+										'ucf-brand-block-theme'
+									),
+									value: 'warn',
+								},
 							] }
-							onChange={ ( v ) => setAttributes( { ratioStatus: v } ) }
+							onChange={ ( v ) =>
+								setAttributes( { ratioStatus: v } )
+							}
 						/>
 					</PanelBody>
 				</InspectorControls>
@@ -310,14 +360,19 @@ registerBlockType( metadata.name, {
 							className="brand-swatch__name"
 							value={ name }
 							allowedFormats={ [] }
-							placeholder={ __( 'Color name', 'ucf-brand-block-theme' ) }
+							placeholder={ __(
+								'Color name',
+								'ucf-brand-block-theme'
+							) }
 							onChange={ ( v ) => setAttributes( { name: v } ) }
 						/>
 						<p className="brand-swatch__value">
 							{ renderLines( valueLines( attributes ) ) }
 						</p>
 						{ ratio && (
-							<span className={ `brand-swatch__ratio is-${ ratioStatus }` }>
+							<span
+								className={ `brand-swatch__ratio is-${ ratioStatus }` }
+							>
 								{ ratio }
 							</span>
 						) }
@@ -344,7 +399,9 @@ registerBlockType( metadata.name, {
 						{ renderLines( valueLines( attributes ) ) }
 					</p>
 					{ ratio && (
-						<span className={ `brand-swatch__ratio is-${ ratioStatus }` }>
+						<span
+							className={ `brand-swatch__ratio is-${ ratioStatus }` }
+						>
 							{ ratio }
 						</span>
 					) }
