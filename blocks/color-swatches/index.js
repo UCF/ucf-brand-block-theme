@@ -7,11 +7,17 @@
  */
 
 import { registerBlockType } from '@wordpress/blocks';
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import metadata from './block.json';
 
 const ALLOWED = [ 'ucf-brand/color-swatch' ];
 
+// A starting grid, not a fixed set — the appender below lets an author add a
+// single custom swatch (or remove any of these) at will.
 const TEMPLATE = [
 	[ 'ucf-brand/color-swatch', { colorSlug: 'gold', name: 'Bold Gold' } ],
 	[ 'ucf-brand/color-swatch', { colorSlug: 'black', name: 'UCF Black' } ],
@@ -24,6 +30,7 @@ registerBlockType( metadata.name, {
 		const innerProps = useInnerBlocksProps( blockProps, {
 			allowedBlocks: ALLOWED,
 			template: TEMPLATE,
+			renderAppender: InnerBlocks.ButtonBlockAppender,
 		} );
 
 		return <div { ...innerProps } />;

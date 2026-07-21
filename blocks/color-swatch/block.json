@@ -11,6 +11,7 @@
 	"keywords": [ "color", "swatch", "hex", "token" ],
 	"attributes": {
 		"colorSlug": { "type": "string", "default": "gold" },
+		"customColor": { "type": "string", "default": "" },
 		"name": { "type": "string", "source": "html", "selector": ".brand-swatch__name", "default": "" },
 		"hex": { "type": "string", "default": "" },
 		"rgb": { "type": "string", "default": "" },
