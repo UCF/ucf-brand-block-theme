@@ -1,10 +1,11 @@
 /**
  * Brand drawer navigation.
  *
- * The primary nav is authored one level deep in the Site Editor — one link per
- * top-level brand page. Sub-navigation is never authored: it is derived at runtime
- * from the H2s of the page you are currently on, injected beneath the matching
- * top-level item, and highlighted as those H2s scroll through the viewport.
+ * The primary nav is rendered server-side from the ordered brand sections — one link
+ * per numbered top-level page (see ucf-brand/section-nav in functions.php). Sub-navigation
+ * is never authored: it is derived at runtime from the H2s of the page you are currently
+ * on, injected beneath the matching top-level item, and highlighted as those H2s scroll
+ * through the viewport.
  *
  * The drawer's sticky behavior is pure CSS (see src/scss/_drawer.scss). Nothing here
  * positions it.
@@ -79,9 +80,9 @@
 	/**
 	 * Locate the top-level nav item for the page being viewed.
 	 *
-	 * Core's navigation block already stamps aria-current="page" server-side when a
-	 * link matches the request, so trust that first and only fall back to comparing
-	 * pathnames when it is absent (custom links, home page, unusual permalinks).
+	 * ucf_brand_render_section_nav() already flags the current item server-side with
+	 * `.is-current` / aria-current="page", so trust that first and only fall back to
+	 * comparing pathnames when it is absent (unusual permalinks, cached markup).
 	 *
 	 * @return {HTMLElement|null} The matching <li>, or null.
 	 */
@@ -92,10 +93,12 @@
 			return null;
 		}
 
-		var flagged = nav.querySelector( '[aria-current="page"]' );
+		var flagged = nav.querySelector(
+			'.brand-nav__item.is-current, [aria-current="page"]'
+		);
 
 		if ( flagged ) {
-			return flagged.closest( '.wp-block-navigation-item' );
+			return flagged.closest( '.brand-nav__item' );
 		}
 
 		var here = normalizePath( window.location.pathname );
@@ -116,7 +119,7 @@
 			}
 
 			if ( linkPath === here ) {
-				match = link.closest( '.wp-block-navigation-item' );
+				match = link.closest( '.brand-nav__item' );
 			}
 		} );
 
