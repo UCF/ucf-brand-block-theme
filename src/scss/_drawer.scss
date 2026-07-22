@@ -55,6 +55,8 @@
 	background: map.get($color, "black");
 	border-right: 1px solid map.get($color, "line-dark");
 	color: map.get($color, "white");
+	display: flex;
+	flex-direction: column;
 	height: calc(100vh - #{$header-height});
 	overflow-y: auto;
 	overscroll-behavior: contain;
@@ -114,6 +116,13 @@
 	letter-spacing: 0.03em;
 	line-height: 1.7;
 	margin: map.get($space, "20") 0 0;
+}
+
+// ── Sidebar footer, pushed to the bottom of the scroll area ──────────────────
+
+.brand-sidebar__footer {
+	margin-top: auto;
+	padding: map.get($space, "40") 1.3rem 0;
 }
 
 // ── Primary navigation (core/navigation, one level deep) ─────────────────────
