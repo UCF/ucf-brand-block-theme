@@ -45,6 +45,22 @@ function ucf_brand_enqueue_assets() {
 		file_exists( $css_path ) ? filemtime( $css_path ) : false
 	);
 
+	// Expose the current page's number to CSS so each H2 badge can prefix its subsection
+	// counter with it (01.01, 01.02 …). Unset on pages with no Brand order, which makes the
+	// badge's `content` invalid and hides it — see _sections.scss.
+	if ( is_singular() ) {
+		$section = ucf_brand_format_number(
+			get_post_meta( get_queried_object_id(), 'ucf_brand_number', true )
+		);
+
+		if ( '' !== $section ) {
+			wp_add_inline_style(
+				'ucf-brand-theme',
+				sprintf( '.brand-content{--brand-section:"%s.";}', $section )
+			);
+		}
+	}
+
 	$js_path = get_theme_file_path( 'assets/js/brand-nav.js' );
 	wp_enqueue_script(
 		'ucf-brand-nav',
@@ -130,23 +146,233 @@ function ucf_brand_register_block_styles() {
 add_action( 'init', 'ucf_brand_register_block_styles' );
 
 /**
- * Drop core's page-list fallback for an empty Navigation block.
+ * ── Section numbering ─────────────────────────────────────────────────────────
  *
- * The fallback renders a nested page tree, but the brand drawer is explicitly one level
- * deep — sub-navigation comes from the current page's H2s at runtime, not from page
- * hierarchy. Matches the same filter in ucf-wordpress-block-theme.
- *
- * @param array $blocks Fallback blocks.
- * @return array Fallback blocks, minus core/page-list.
+ * Each brand page carries a `ucf_brand_number` — set by the editor in the Brand panel
+ * (see blocks/index.js). That single value both orders the page in the drawer and prints
+ * as its decimal label (1 → "01"). One PHP source of truth,
+ * `ucf_brand_get_ordered_sections()`, feeds two consumers: the drawer menu (the
+ * `ucf-brand/section-nav` dynamic block) and each page's on-page label (the
+ * `ucf-brand/section-number` block binding), so the two can never disagree.
  */
-function ucf_brand_navigation_fallback( $blocks ) {
-	return array_values(
-		array_filter(
-			(array) $blocks,
-			static function ( $block ) {
-				return ! isset( $block['blockName'] ) || 'core/page-list' !== $block['blockName'];
-			}
+
+/**
+ * Register the per-page order/label field, exposed to the editor and REST.
+ *
+ * @return void
+ */
+function ucf_brand_register_meta() {
+	register_post_meta(
+		'page',
+		'ucf_brand_number',
+		array(
+			'type'              => 'integer',
+			'single'            => true,
+			'default'           => 0,
+			'show_in_rest'      => true,
+			'sanitize_callback' => 'absint',
+			'auth_callback'     => static function () {
+				return current_user_can( 'edit_pages' );
+			},
 		)
 	);
 }
-add_filter( 'block_core_navigation_render_fallback', 'ucf_brand_navigation_fallback' );
+add_action( 'init', 'ucf_brand_register_meta' );
+
+/**
+ * Format a section number as its zero-padded decimal label (1 → "01").
+ *
+ * @param int $number Raw section number.
+ * @return string Two-digit-minimum label, or '' when unset.
+ */
+function ucf_brand_format_number( $number ) {
+	$number = (int) $number;
+
+	if ( $number < 1 ) {
+		return '';
+	}
+
+	return str_pad( (string) $number, 2, '0', STR_PAD_LEFT );
+}
+
+/**
+ * The ordered, numbered list of drawer sections — the single source of truth.
+ *
+ * Published top-level pages that carry a number, minus the front page, sorted by number
+ * then title. Each entry is annotated with its label, permalink and current-page flag.
+ *
+ * @return array<int, array<string, mixed>> Section descriptors.
+ */
+function ucf_brand_get_ordered_sections() {
+	$pages = get_posts(
+		array(
+			'post_type'        => 'page',
+			'post_parent'      => 0,
+			'post_status'      => 'publish',
+			'numberposts'      => -1,
+			'meta_key'         => 'ucf_brand_number',
+			'meta_query'       => array(
+				array(
+					'key'     => 'ucf_brand_number',
+					'value'   => 0,
+					'compare' => '>',
+					'type'    => 'NUMERIC',
+				),
+			),
+			'orderby'          => array(
+				'meta_value_num' => 'ASC',
+				'title'          => 'ASC',
+			),
+			'suppress_filters' => false,
+		)
+	);
+
+	$front_id   = (int) get_option( 'page_on_front' );
+	$current_id = (int) get_queried_object_id();
+	$sections   = array();
+
+	foreach ( $pages as $page ) {
+		if ( $page->ID === $front_id ) {
+			continue;
+		}
+
+		$number = (int) get_post_meta( $page->ID, 'ucf_brand_number', true );
+
+		if ( $number < 1 ) {
+			continue;
+		}
+
+		$sections[] = array(
+			'id'         => $page->ID,
+			'number'     => $number,
+			'label'      => ucf_brand_format_number( $number ),
+			'title'      => get_the_title( $page ),
+			'url'        => get_permalink( $page ),
+			'is_current' => $page->ID === $current_id,
+		);
+	}
+
+	usort(
+		$sections,
+		static function ( $a, $b ) {
+			return $a['number'] <=> $b['number'] ?: strcasecmp( $a['title'], $b['title'] );
+		}
+	);
+
+	return $sections;
+}
+
+/**
+ * Register the block binding that prints the current page's decimal label.
+ *
+ * @return void
+ */
+function ucf_brand_register_bindings() {
+	register_block_bindings_source(
+		'ucf-brand/section-number',
+		array(
+			'label'              => __( 'Brand section number', 'ucf-brand-block-theme' ),
+			'get_value_callback' => 'ucf_brand_binding_section_number',
+			'uses_context'       => array( 'postId' ),
+		)
+	);
+}
+add_action( 'init', 'ucf_brand_register_bindings' );
+
+/**
+ * Resolve the bound value: the queried page's zero-padded number, or '' when unset.
+ *
+ * @param array         $source_args    Binding arguments (unused).
+ * @param WP_Block|null $block_instance The block being rendered.
+ * @return string Decimal label, or ''.
+ */
+function ucf_brand_binding_section_number( $source_args, $block_instance = null ) {
+	$post_id = 0;
+
+	if ( $block_instance instanceof WP_Block && ! empty( $block_instance->context['postId'] ) ) {
+		$post_id = (int) $block_instance->context['postId'];
+	}
+
+	if ( ! $post_id ) {
+		$post_id = (int) get_queried_object_id();
+	}
+
+	return ucf_brand_format_number( get_post_meta( $post_id, 'ucf_brand_number', true ) );
+}
+
+/**
+ * Register the drawer's dynamic navigation block.
+ *
+ * This is theme glue, not a distributable design block — it lives in functions.php rather
+ * than blocks/ precisely because it is server-rendered from live page data. It emits the
+ * `.brand-nav` markup that _drawer.scss styles and brand-nav.js augments (H2 sub-nav,
+ * current-item highlight).
+ *
+ * @return void
+ */
+function ucf_brand_register_section_nav() {
+	register_block_type(
+		'ucf-brand/section-nav',
+		array(
+			'api_version'     => 3,
+			'render_callback' => 'ucf_brand_render_section_nav',
+		)
+	);
+}
+add_action( 'init', 'ucf_brand_register_section_nav' );
+
+/**
+ * Render the drawer navigation from the ordered section list.
+ *
+ * @return string Navigation markup, or '' when there are no numbered sections.
+ */
+function ucf_brand_render_section_nav() {
+	$sections = ucf_brand_get_ordered_sections();
+
+	if ( empty( $sections ) ) {
+		return '';
+	}
+
+	$items = '';
+
+	foreach ( $sections as $section ) {
+		$items .= sprintf(
+			'<li class="brand-nav__item%1$s"><a class="brand-nav__link" href="%2$s"%3$s><span class="brand-nav__num">%4$s</span><span class="brand-nav__text">%5$s</span></a></li>',
+			$section['is_current'] ? ' is-current' : '',
+			esc_url( $section['url'] ),
+			$section['is_current'] ? ' aria-current="page"' : '',
+			esc_html( $section['label'] ),
+			esc_html( $section['title'] )
+		);
+	}
+
+	return sprintf(
+		'<nav class="brand-nav" aria-label="%1$s"><ul class="brand-nav__list">%2$s</ul></nav>',
+		esc_attr__( 'Brand sections', 'ucf-brand-block-theme' ),
+		$items
+	);
+}
+
+/**
+ * Enqueue the block-editor script for the Brand order panel.
+ *
+ * @return void
+ */
+function ucf_brand_enqueue_editor_assets() {
+	$asset_path = get_theme_file_path( 'build/index.asset.php' );
+
+	if ( ! file_exists( $asset_path ) ) {
+		return;
+	}
+
+	$asset = require $asset_path;
+
+	wp_enqueue_script(
+		'ucf-brand-editor',
+		get_theme_file_uri( 'build/index.js' ),
+		$asset['dependencies'],
+		$asset['version'],
+		true
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'ucf_brand_enqueue_editor_assets' );

@@ -75,14 +75,36 @@
 	}
 }
 
+// A full-column band: it fills the grid track (no width cap) so full-width blocks can bleed
+// to the column edges. The horizontal gutter is a token, applied here so the title and all
+// normal content share one inset; the constrained `post-content` inside supplies the
+// reading measure (720/1160). See templates/page.html.
 .brand-content {
-	max-width: $wrap;
+	--brand-gutter: clamp(1.5rem, 4vw, 3.4rem);
+
 	min-width: 0;
 	padding-block: map.get($space, "50") map.get($space, "60");
-	padding-inline: clamp(1.5rem, 4vw, 3.4rem);
+	padding-inline: var(--brand-gutter);
+}
 
-	// Children are left-aligned rather than centered — see the constrained-layout note
-	// in _base.scss.
+// The post title is no longer capped by a constrained parent — hold it to the measure.
+// Children are otherwise left-aligned rather than centered — see the note in _base.scss.
+.brand-content > .wp-block-post-title {
+	max-width: var(--wp--style--global--content-size);
+}
+
+// Full-bleed: cancel the band gutter so image/color backgrounds reach the content-column
+// edges, then restore it as padding so the callout's own inner content keeps the reading
+// inset and lines up with the rest of the page. An editor's own horizontal padding, set
+// inline via the block's dimension controls, still wins over this default.
+.brand-content .wp-block-post-content > .alignfull {
+	margin-inline: calc(-1 * var(--brand-gutter)) !important;
+	max-width: none;
+
+	&.has-background,
+	&.wp-block-cover {
+		padding-inline: var(--brand-gutter);
+	}
 }
 
 // ── Sidebar masthead ─────────────────────────────────────────────────────────
@@ -125,42 +147,57 @@
 	padding: map.get($space, "40") 1.3rem 0;
 }
 
-// ── Primary navigation (core/navigation, one level deep) ─────────────────────
+// ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
 
-.brand-nav {
-	.wp-block-navigation__container,
-	.wp-block-page-list {
-		gap: 0;
-		width: 100%;
-	}
+// Markup is rendered server-side from the ordered section list — see
+// ucf_brand_render_section_nav() in functions.php. Each link is a number + a title;
+// brand-nav.js appends the H2 sub-nav inside the `.is-current` item.
 
-	.wp-block-navigation-item {
-		display: block;
-		width: 100%;
-	}
+.brand-nav__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
 
-	.wp-block-navigation-item__content {
-		border-left: 3px solid transparent;
-		color: $text-on-dark;
-		display: block;
-		font-family: map.get($font, "body");
-		font-size: map.get($size, "ui");
-		font-weight: 700;
-		padding: 0.7rem 1.3rem;
-		text-decoration: none;
-		width: 100%;
+.brand-nav__item {
+	margin: 0;
+}
 
-		&:hover,
-		&:focus {
-			background: map.get($color, "card-dark");
-			color: map.get($color, "white");
-		}
-	}
+.brand-nav__link {
+	align-items: baseline;
+	border-left: 3px solid transparent;
+	color: $text-on-dark;
+	display: flex;
+	font-family: map.get($font, "body");
+	font-size: map.get($size, "ui");
+	font-weight: 700;
+	gap: 0.7rem;
+	padding: 0.7rem 1.3rem;
+	text-decoration: none;
 
-	// Set by brand-nav.js on the item matching the current URL.
-	.is-current > .wp-block-navigation-item__content {
+	&:hover,
+	&:focus {
 		background: map.get($color, "card-dark");
-		border-left-color: map.get($color, "gold");
+		color: map.get($color, "white");
+	}
+}
+
+.brand-nav__num {
+	color: map.get($color, "text-meta-dark");
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "meta");
+	font-weight: 700;
+	min-width: 1.6em;
+}
+
+// Set server-side on the item matching the request (aria-current="page").
+.brand-nav__item.is-current > .brand-nav__link {
+	background: map.get($color, "card-dark");
+	border-left-color: map.get($color, "gold");
+	color: map.get($color, "gold");
+
+	.brand-nav__num {
 		color: map.get($color, "gold");
 	}
 }
@@ -294,6 +331,6 @@
 	}
 
 	.brand-content {
-		padding-inline: 1.2rem;
+		--brand-gutter: 1.2rem;
 	}
 }
