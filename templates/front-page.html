@@ -1,8 +1,26 @@
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
 
-<!-- wp:group {"tagName":"main","backgroundColor":"black","textColor":"white","style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}}},"layout":{"type":"default"}} -->
-<main class="wp-block-group has-white-color has-black-background-color has-text-color has-background" style="padding-top:0;padding-right:0;padding-bottom:0;padding-left:0">
-	<!-- wp:post-content {"layout":{"type":"default"}} /-->
+<!-- wp:html -->
+<div class="brand-mobile-bar">
+	<button class="brand-mobile-bar__toggle" type="button" aria-expanded="false" aria-controls="brand-sidebar" aria-label="Open navigation">&#9776;</button>
+	<p class="brand-mobile-bar__label">Brand Central</p>
+</div>
+<div class="brand-scrim" hidden></div>
+<!-- /wp:html -->
+
+<!-- wp:group {"tagName":"main","textColor":"white","className":"brand-shell is-style-on-dark","style":{"color":{"background":"var:preset|color|black"},"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}}},"layout":{"type":"default"}} -->
+<main class="wp-block-group brand-shell is-style-on-dark has-white-color has-text-color has-background" style="background-color:var(--wp--preset--color--black);padding-top:0;padding-right:0;padding-bottom:0;padding-left:0">
+	<!-- wp:group {"tagName":"aside","metadata":{"name":"Brand Sidebar"},"anchor":"brand-sidebar","className":"brand-sidebar","layout":{"type":"default"}} -->
+	<aside id="brand-sidebar" class="wp-block-group brand-sidebar">
+		<!-- wp:template-part {"slug":"brand-sidebar"} /-->
+	</aside>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"className":"brand-content","layout":{"type":"constrained","contentSize":"720px","wideSize":"100%"}} -->
+	<div class="wp-block-group brand-content">
+		<!-- wp:post-content /-->
+	</div>
+	<!-- /wp:group -->
 </main>
 <!-- /wp:group -->
 
