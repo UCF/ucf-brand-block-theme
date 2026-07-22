@@ -138,42 +138,57 @@
 	margin: map.get($space, "20") 0 0;
 }
 
-// ── Primary navigation (core/navigation, one level deep) ─────────────────────
+// ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
 
-.brand-nav {
-	.wp-block-navigation__container,
-	.wp-block-page-list {
-		gap: 0;
-		width: 100%;
-	}
+// Markup is rendered server-side from the ordered section list — see
+// ucf_brand_render_section_nav() in functions.php. Each link is a number + a title;
+// brand-nav.js appends the H2 sub-nav inside the `.is-current` item.
 
-	.wp-block-navigation-item {
-		display: block;
-		width: 100%;
-	}
+.brand-nav__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
 
-	.wp-block-navigation-item__content {
-		border-left: 3px solid transparent;
-		color: $text-on-dark;
-		display: block;
-		font-family: map.get($font, "body");
-		font-size: map.get($size, "ui");
-		font-weight: 700;
-		padding: 0.7rem 1.3rem;
-		text-decoration: none;
-		width: 100%;
+.brand-nav__item {
+	margin: 0;
+}
 
-		&:hover,
-		&:focus {
-			background: map.get($color, "card-dark");
-			color: map.get($color, "white");
-		}
-	}
+.brand-nav__link {
+	align-items: baseline;
+	border-left: 3px solid transparent;
+	color: $text-on-dark;
+	display: flex;
+	font-family: map.get($font, "body");
+	font-size: map.get($size, "ui");
+	font-weight: 700;
+	gap: 0.7rem;
+	padding: 0.7rem 1.3rem;
+	text-decoration: none;
 
-	// Set by brand-nav.js on the item matching the current URL.
-	.is-current > .wp-block-navigation-item__content {
+	&:hover,
+	&:focus {
 		background: map.get($color, "card-dark");
-		border-left-color: map.get($color, "gold");
+		color: map.get($color, "white");
+	}
+}
+
+.brand-nav__num {
+	color: map.get($color, "text-meta-dark");
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "meta");
+	font-weight: 700;
+	min-width: 1.6em;
+}
+
+// Set server-side on the item matching the request (aria-current="page").
+.brand-nav__item.is-current > .brand-nav__link {
+	background: map.get($color, "card-dark");
+	border-left-color: map.get($color, "gold");
+	color: map.get($color, "gold");
+
+	.brand-nav__num {
 		color: map.get($color, "gold");
 	}
 }

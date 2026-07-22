@@ -49,6 +49,12 @@
 	text-transform: none;
 }
 
+// The bound section label above the page title (templates/page.html) collapses on pages
+// that have no Brand order set, so the binding resolves to an empty string.
+.brand-page-number:empty {
+	display: none;
+}
+
 // On-dark inversions.
 .has-black-background-color,
 .has-ink-background-color,
