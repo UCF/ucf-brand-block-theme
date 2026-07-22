@@ -22,7 +22,15 @@ body {
 //
 // `!important` is the only thing that can beat `!important`. Kept in one place, scoped
 // to the specific elements that need it, rather than sprinkled through the components.
+//
+// The drawer's reading measure lives on the constrained `.wp-block-post-content` and on any
+// constrained group nested inside it (e.g. a full-width callout), so core centers their
+// children — normal blocks and `alignwide` alike. Left-anchor every one of them. `alignfull`
+// is excluded: it needs the negative margin from _drawer.scss, not 0. `:where()` keeps the
+// selector at (0,2,0) so it beats core's centering `!important` but loses to the more
+// specific `.alignfull` breakout rule.
 .brand-content > *,
+.brand-content .is-layout-constrained > :where(:not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter)),
 .lead,
 .is-style-lead {
 	margin-inline: 0 !important;
