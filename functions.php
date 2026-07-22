@@ -210,8 +210,19 @@ function ucf_brand_get_ordered_sections() {
 			'post_parent'      => 0,
 			'post_status'      => 'publish',
 			'numberposts'      => -1,
-			'orderby'          => 'title',
-			'order'            => 'ASC',
+			'meta_key'         => 'ucf_brand_number',
+			'meta_query'       => array(
+				array(
+					'key'     => 'ucf_brand_number',
+					'value'   => 0,
+					'compare' => '>',
+					'type'    => 'NUMERIC',
+				),
+			),
+			'orderby'          => array(
+				'meta_value_num' => 'ASC',
+				'title'          => 'ASC',
+			),
 			'suppress_filters' => false,
 		)
 	);

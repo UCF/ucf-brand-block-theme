@@ -398,6 +398,13 @@
 
 		content.addEventListener( 'click', function ( event ) {
 			var heading = event.target.closest( 'h2' );
+			var link = event.target.closest( 'a[href]' );
+
+			// If the author linked the heading text, do not hijack that navigation.
+			// Only intercept clicks on our appended anchor icon.
+			if ( link && ! link.classList.contains( 'brand-heading__anchor' ) ) {
+				return;
+			}
 
 			if ( ! heading || ! content.contains( heading ) ) {
 				return;
