@@ -45,6 +45,22 @@ function ucf_brand_enqueue_assets() {
 		file_exists( $css_path ) ? filemtime( $css_path ) : false
 	);
 
+	// Expose the current page's number to CSS so each H2 badge can prefix its subsection
+	// counter with it (01.01, 01.02 …). Unset on pages with no Brand order, which makes the
+	// badge's `content` invalid and hides it — see _sections.scss.
+	if ( is_singular() ) {
+		$section = ucf_brand_format_number(
+			get_post_meta( get_queried_object_id(), 'ucf_brand_number', true )
+		);
+
+		if ( '' !== $section ) {
+			wp_add_inline_style(
+				'ucf-brand-theme',
+				sprintf( '.brand-content{--brand-section:"%s.";}', $section )
+			);
+		}
+	}
+
 	$js_path = get_theme_file_path( 'assets/js/brand-nav.js' );
 	wp_enqueue_script(
 		'ucf-brand-nav',

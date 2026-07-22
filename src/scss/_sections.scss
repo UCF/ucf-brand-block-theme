@@ -1,6 +1,45 @@
 @use "sass:map";
 @use "variables" as *;
 
+// ── Subsection badges ────────────────────────────────────────────────────────
+//
+// Every H2 in the content is a subsection (it is also a drawer sub-nav entry). Each gets
+// an automatic gold-on-black badge that pairs the page's number with the H2's position —
+// "01.01", "01.02", … The page number arrives as the `--brand-section` custom property,
+// set inline per page in functions.php (ucf_brand_enqueue_assets). On a page with no Brand
+// order that property is unset, so `content` is invalid and the badge simply does not
+// render — no per-page opt-in needed. Sits beside the heading; stacks above it on mobile.
+.wp-block-post-content {
+	counter-reset: brand-subsection;
+}
+
+.wp-block-post-content h2 {
+	counter-increment: brand-subsection;
+}
+
+.wp-block-post-content h2::before {
+	background: map.get($color, "black");
+	color: map.get($color, "gold");
+	content: var(--brand-section) counter(brand-subsection, decimal-leading-zero);
+	display: inline-block;
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "meta");
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	line-height: 1;
+	margin-right: 0.7rem;
+	padding: 0.3em 0.5em;
+	vertical-align: middle;
+}
+
+@media (max-width: $breakpoint-drawer) {
+	.wp-block-post-content h2::before {
+		display: block;
+		margin: 0 0 0.5rem;
+		width: fit-content;
+	}
+}
+
 // Section treatments registered as core/group block styles in functions.php.
 
 .is-style-gold-edge {
