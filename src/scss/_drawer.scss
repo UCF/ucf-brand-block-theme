@@ -98,7 +98,11 @@
 .brand-content .wp-block-post-content > .alignfull {
 	margin-inline: calc(-1 * var(--brand-gutter)) !important;
 	max-width: none;
-	padding-inline: var(--brand-gutter);
+
+	&.has-background,
+	&.wp-block-cover {
+		padding-inline: var(--brand-gutter);
+	}
 }
 
 // ── Sidebar masthead ─────────────────────────────────────────────────────────

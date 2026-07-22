@@ -30,7 +30,7 @@ body {
 // selector at (0,2,0) so it beats core's centering `!important` but loses to the more
 // specific `.alignfull` breakout rule.
 .brand-content > *,
-.brand-content .is-layout-constrained > :where(:not(.alignfull):not(.alignleft):not(.alignright)),
+.brand-content .is-layout-constrained > :where(:not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter)),
 .lead,
 .is-style-lead {
 	margin-inline: 0 !important;
