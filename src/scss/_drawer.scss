@@ -163,6 +163,23 @@
 	position: sticky;
 }
 
+// Site title (core/site-title) + build version on one meta line. The title carries the
+// dynamic site name; the version rides after it, matching the old static "… - VERSION 1.0".
+.brand-sidebar__version {
+	align-items: baseline;
+	gap: 0.4rem;
+
+	p {
+		margin: 0;
+		text-transform: uppercase;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+}
+
 // ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
 
 // Markup is rendered server-side from the ordered section list — see
