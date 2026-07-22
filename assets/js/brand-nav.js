@@ -25,6 +25,12 @@
 		'(prefers-reduced-motion: reduce)'
 	).matches;
 
+	// Link glyph appended to each H2. aria-hidden — the anchor carries its own label.
+	var LINK_ICON =
+		'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">' +
+		'<path fill="currentColor" d="M3.9 12a3.1 3.1 0 0 1 3.1-3.1h4V7H7a5 5 0 0 0 0 10h4v-1.9H7A3.1 3.1 0 0 1 3.9 12zm4.1 1h8v-2H8v2zm9-6h-4v1.9h4a3.1 3.1 0 0 1 0 6.2h-4V17h4a5 5 0 0 0 0-10z"/>' +
+		'</svg>';
+
 	/**
 	 * Normalize a path for comparison: strip the trailing slash and lowercase it.
 	 *
@@ -291,17 +297,151 @@
 		} );
 	}
 
-	if ( content && sidebar ) {
-		var currentItem = findCurrentNavItem();
+	/**
+	 * Copy text to the clipboard, preferring the async API and falling back to a hidden
+	 * textarea + execCommand for insecure contexts / older browsers.
+	 *
+	 * @param {string}   text   The string to copy.
+	 * @param {Function} onDone Called once, only if the copy succeeded.
+	 */
+	function copyText( text, onDone ) {
+		if ( navigator.clipboard && navigator.clipboard.writeText ) {
+			navigator.clipboard.writeText( text ).then( onDone, function () {
+				if ( fallbackCopy( text ) ) {
+					onDone();
+				}
+			} );
+		} else if ( fallbackCopy( text ) ) {
+			onDone();
+		}
+	}
 
-		if ( currentItem ) {
-			currentItem.classList.add( 'is-current' );
+	/**
+	 * @param {string} text Text to copy.
+	 * @return {boolean} Whether the copy succeeded.
+	 */
+	function fallbackCopy( text ) {
+		var ok = false;
 
-			var subnav = buildSubnav();
+		try {
+			var field = document.createElement( 'textarea' );
+			field.value = text;
+			field.setAttribute( 'readonly', '' );
+			field.style.position = 'fixed';
+			field.style.top = '-1000px';
+			document.body.appendChild( field );
+			field.select();
+			ok = document.execCommand( 'copy' );
+			document.body.removeChild( field );
+		} catch ( e ) {
+			ok = false;
+		}
 
-			if ( subnav ) {
-				currentItem.appendChild( subnav.list );
-				watchHeadings( subnav.headings, subnav.list );
+		return ok;
+	}
+
+	/**
+	 * Turn every content H2 into a jump link: append a link anchor, and make a click on the
+	 * heading (or the anchor) update the URL to the heading's #id and copy that link.
+	 */
+	function initHeadingLinks() {
+		var headings = Array.prototype.slice.call(
+			content.querySelectorAll( 'h2' )
+		);
+
+		if ( ! headings.length ) {
+			return;
+		}
+
+		var live = document.createElement( 'div' );
+		live.className = 'brand-visually-hidden';
+		live.setAttribute( 'aria-live', 'polite' );
+		document.body.appendChild( live );
+
+		headings.forEach( function ( heading, index ) {
+			var id = ensureHeadingId( heading, index );
+			var anchor = document.createElement( 'a' );
+
+			anchor.className = 'brand-heading__anchor';
+			anchor.href = '#' + id;
+			anchor.setAttribute( 'aria-label', 'Copy link to this section' );
+			anchor.innerHTML = LINK_ICON;
+			heading.appendChild( anchor );
+		} );
+
+		function activate( heading ) {
+			var id = heading.id;
+
+			if ( ! id ) {
+				return;
+			}
+
+			var url =
+				window.location.origin + window.location.pathname + '#' + id;
+
+			// Assigning the hash updates the URL and jumps, honouring the CSS
+			// scroll-padding-top and scroll-behavior. Re-scroll when already there.
+			if ( window.location.hash === '#' + id ) {
+				heading.scrollIntoView();
+			} else {
+				window.location.hash = id;
+			}
+
+			copyText( url, function () {
+				live.textContent = 'Link copied to clipboard';
+				heading.classList.add( 'is-link-copied' );
+				window.setTimeout( function () {
+					heading.classList.remove( 'is-link-copied' );
+				}, 1600 );
+			} );
+		}
+
+		content.addEventListener( 'click', function ( event ) {
+			var heading = event.target.closest( 'h2' );
+
+			if ( ! heading || ! content.contains( heading ) ) {
+				return;
+			}
+
+			// Leave modified clicks (open-in-tab, etc.) to the browser.
+			if (
+				event.metaKey ||
+				event.ctrlKey ||
+				event.shiftKey ||
+				event.altKey
+			) {
+				return;
+			}
+
+			// A body click should not fight an in-progress text selection.
+			if ( ! event.target.closest( '.brand-heading__anchor' ) ) {
+				var selection = window.getSelection && window.getSelection();
+
+				if ( selection && ! selection.isCollapsed ) {
+					return;
+				}
+			}
+
+			event.preventDefault();
+			activate( heading );
+		} );
+	}
+
+	if ( content ) {
+		initHeadingLinks();
+
+		if ( sidebar ) {
+			var currentItem = findCurrentNavItem();
+
+			if ( currentItem ) {
+				currentItem.classList.add( 'is-current' );
+
+				var subnav = buildSubnav();
+
+				if ( subnav ) {
+					currentItem.appendChild( subnav.list );
+					watchHeadings( subnav.headings, subnav.list );
+				}
 			}
 		}
 	}

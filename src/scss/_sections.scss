@@ -40,6 +40,60 @@
 	}
 }
 
+// ── Heading anchors ──────────────────────────────────────────────────────────
+//
+// brand-nav.js turns every content H2 into a jump link: clicking the heading (or its
+// anchor icon) updates the URL to the heading's #id and copies that link to the clipboard.
+// The icon fades in on hover/focus; a brief "Link copied" bubble confirms the copy. Scoped
+// to the drawer content, where brand-nav.js actually wires the clicks.
+.brand-content h2 {
+	cursor: pointer;
+}
+
+.brand-heading__anchor {
+	align-items: center;
+	color: inherit;
+	display: inline-flex;
+	margin-left: 0.4rem;
+	opacity: 0;
+	position: relative;
+	transition: opacity 0.15s;
+	vertical-align: middle;
+
+	svg {
+		height: 0.7em;
+		width: 0.7em;
+	}
+}
+
+.wp-block-post-content h2:hover .brand-heading__anchor,
+.wp-block-post-content h2:focus-within .brand-heading__anchor,
+.wp-block-post-content h2.is-link-copied .brand-heading__anchor {
+	opacity: 0.7;
+}
+
+.brand-heading__anchor::after {
+	background: map.get($color, "black");
+	bottom: calc(100% + 0.4rem);
+	color: map.get($color, "white");
+	content: "Link copied";
+	font-family: map.get($font, "mono");
+	font-size: 0.62rem;
+	left: 50%;
+	letter-spacing: 0.05em;
+	opacity: 0;
+	padding: 0.2rem 0.45rem;
+	pointer-events: none;
+	position: absolute;
+	transform: translateX(-50%);
+	transition: opacity 0.15s;
+	white-space: nowrap;
+}
+
+.wp-block-post-content h2.is-link-copied .brand-heading__anchor::after {
+	opacity: 1;
+}
+
 // Section treatments registered as core/group block styles in functions.php.
 
 .is-style-gold-edge {

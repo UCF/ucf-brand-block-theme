@@ -59,6 +59,19 @@ textarea,
 	}
 }
 
+// Off-screen but announced — used for the "Link copied" live region in brand-nav.js.
+.brand-visually-hidden {
+	border: 0;
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
 .brand-skip-link {
 	background: map.get($color, "gold");
 	color: map.get($color, "black");
