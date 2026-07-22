@@ -55,10 +55,12 @@
 	background: map.get($color, "black");
 	border-right: 1px solid map.get($color, "line-dark");
 	color: map.get($color, "white");
+	display: flex;
+	flex-direction: column;
 	height: calc(100vh - #{$header-height});
 	overflow-y: auto;
 	overscroll-behavior: contain;
-	padding: map.get($space, "40") 0 map.get($space, "50");
+	padding: map.get($space, "40") 0 0;
 	position: sticky;
 	top: $header-height;
 
@@ -71,6 +73,14 @@
 		height: 0;
 		width: 0;
 	}
+}
+
+// The sidebar's content comes from a template part invoked without a `tagName`, so WP wraps
+// it in `<div class="wp-block-template-part">`. Left alone that wrapper is the sidebar's only
+// flex child, which collapses `margin-top: auto` on the footer (a grandchild). `display:
+// contents` drops the wrapper from the box tree so the part's blocks become the flex children.
+.brand-sidebar > .wp-block-template-part {
+	display: contents;
 }
 
 // A full-column band: it fills the grid track (no width cap) so full-width blocks can bleed
@@ -136,6 +146,38 @@
 	letter-spacing: 0.03em;
 	line-height: 1.7;
 	margin: map.get($space, "20") 0 0;
+}
+
+// ── Sidebar footer, pinned to the bottom of the drawer viewport ──────────────
+//
+// `margin-top: auto` seats it at the bottom when the nav is short; `sticky bottom: 0`
+// keeps it pinned there once the nav list is tall enough to scroll. The black fill lets
+// nav items scroll cleanly behind it, and the footer carries the drawer's bottom inset
+// (the scroll area's own bottom padding is dropped so this sits flush).
+
+.brand-sidebar__footer {
+	background: map.get($color, "black");
+	bottom: 0;
+	margin-top: auto;
+	padding: map.get($space, "40") 1.3rem map.get($space, "50");
+	position: sticky;
+}
+
+// Site title (core/site-title) + build version on one meta line. The title carries the
+// dynamic site name; the version rides after it, matching the old static "… - VERSION 1.0".
+.brand-sidebar__version {
+	align-items: baseline;
+	gap: 0.4rem;
+
+	p {
+		margin: 0;
+		text-transform: uppercase;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
 }
 
 // ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
