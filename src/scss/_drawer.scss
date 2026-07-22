@@ -73,14 +73,32 @@
 	}
 }
 
+// A full-column band: it fills the grid track (no width cap) so full-width blocks can bleed
+// to the column edges. The horizontal gutter is a token, applied here so the title and all
+// normal content share one inset; the constrained `post-content` inside supplies the
+// reading measure (720/1160). See templates/page.html.
 .brand-content {
-	max-width: $wrap;
+	--brand-gutter: clamp(1.5rem, 4vw, 3.4rem);
+
 	min-width: 0;
 	padding-block: map.get($space, "50") map.get($space, "60");
-	padding-inline: clamp(1.5rem, 4vw, 3.4rem);
+	padding-inline: var(--brand-gutter);
+}
 
-	// Children are left-aligned rather than centered — see the constrained-layout note
-	// in _base.scss.
+// The post title is no longer capped by a constrained parent — hold it to the measure.
+// Children are otherwise left-aligned rather than centered — see the note in _base.scss.
+.brand-content > .wp-block-post-title {
+	max-width: var(--wp--style--global--content-size);
+}
+
+// Full-bleed: cancel the band gutter so image/color backgrounds reach the content-column
+// edges, then restore it as padding so the callout's own inner content keeps the reading
+// inset and lines up with the rest of the page. An editor's own horizontal padding, set
+// inline via the block's dimension controls, still wins over this default.
+.brand-content .wp-block-post-content > .alignfull {
+	margin-inline: calc(-1 * var(--brand-gutter)) !important;
+	max-width: none;
+	padding-inline: var(--brand-gutter);
 }
 
 // ── Sidebar masthead ─────────────────────────────────────────────────────────
@@ -285,6 +303,6 @@
 	}
 
 	.brand-content {
-		padding-inline: 1.2rem;
+		--brand-gutter: 1.2rem;
 	}
 }
