@@ -15,10 +15,13 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { registerBlockType } from '@wordpress/blocks';
+import { InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
-import { TextControl } from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { addFilter } from '@wordpress/hooks';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 const META_KEY = 'ucf_brand_number';
@@ -65,6 +68,84 @@ function BrandOrderPanel() {
 }
 
 registerPlugin( 'ucf-brand-order', { render: BrandOrderPanel } );
+
+/**
+ * Stretch link: an orthogonal `stretchLink` toggle on core/button. Unlike a block
+ * style (single-select — you couldn't have Outline *and* stretch), this is a boolean
+ * that composes with any look. When on, it emits `.has-stretch-link` on the button
+ * wrapper; the covering overlay lives in src/scss/_stretch-link.scss.
+ */
+const STRETCH_ATTR = 'stretchLink';
+
+addFilter(
+	'blocks.registerBlockType',
+	'ucf-brand/stretch-link-attribute',
+	( settings, name ) => {
+		if ( name !== 'core/button' ) {
+			return settings;
+		}
+		settings.attributes = {
+			...settings.attributes,
+			[ STRETCH_ATTR ]: { type: 'boolean', default: false },
+		};
+		return settings;
+	}
+);
+
+const withStretchToggle = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		if ( props.name !== 'core/button' ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		const stretch = !! props.attributes[ STRETCH_ATTR ];
+
+		return (
+			<>
+				<BlockEdit { ...props } />
+				<InspectorControls>
+					<PanelBody
+						title={ __( 'Link behavior', 'ucf-brand-block-theme' ) }
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __(
+								'Stretch to container',
+								'ucf-brand-block-theme'
+							) }
+							help={ __(
+								'Makes the enclosing Group clickable. Previews on the front end, not in the editor.',
+								'ucf-brand-block-theme'
+							) }
+							checked={ stretch }
+							onChange={ ( next ) =>
+								props.setAttributes( {
+									[ STRETCH_ATTR ]: next,
+								} )
+							}
+						/>
+					</PanelBody>
+				</InspectorControls>
+			</>
+		);
+	},
+	'withStretchToggle'
+);
+addFilter( 'editor.BlockEdit', 'ucf-brand/stretch-link-toggle', withStretchToggle );
+
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'ucf-brand/stretch-link-class',
+	( props, block, attributes ) => {
+		if ( block.name !== 'core/button' || ! attributes[ STRETCH_ATTR ] ) {
+			return props;
+		}
+		props.className = [ props.className, 'has-stretch-link' ]
+			.filter( Boolean )
+			.join( ' ' );
+		return props;
+	}
+);
 
 registerBlockType( 'ucf-brand/section-nav', {
 	apiVersion: 3,
