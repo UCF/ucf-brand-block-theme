@@ -143,9 +143,15 @@
 			if ( ! label._ucfBound ) {
 				label._ucfBound = true;
 				label.addEventListener( 'click', function () {
+					if ( ! mql.matches ) {
+						return;
+					}
 					activate( inst, i, false );
 				} );
 				label.addEventListener( 'keydown', function ( event ) {
+					if ( ! mql.matches ) {
+						return;
+					}
 					if ( event.key === 'Enter' || event.key === ' ' ) {
 						event.preventDefault();
 						activate( inst, i, false );
