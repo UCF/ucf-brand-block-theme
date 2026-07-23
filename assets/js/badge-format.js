@@ -19,6 +19,7 @@
  * `wp.*` packages enqueued as script dependencies in functions.php.
  */
 ( function ( wp ) {
+	'use strict';
 	var registerFormatType = wp.richText.registerFormatType;
 	var toggleFormat = wp.richText.toggleFormat;
 	var removeFormat = wp.richText.removeFormat;
