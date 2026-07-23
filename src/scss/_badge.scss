@@ -1,0 +1,60 @@
+// -----------------------------------------------------------------------------
+// Badge
+//
+// Small, bold, uppercase inline chip applied to a run of text via the "Badge"
+// rich-text format (see assets/js/badge-format.js). Ported from
+// ucf-wordpress-block-theme's Athena-derived badge — same metrics (padding,
+// font-size, letter-spacing, uppercase, squared corners) — with the tones
+// remapped onto this theme's palette so a theme.json change flows through.
+//
+// Base .badge is the neutral default; .badge-{tone} for each contextual fill.
+// Each tone is a standalone class (one independent inline format), so the shared
+// look lives in %badge-base and only the fill/text color differs per tone.
+// -----------------------------------------------------------------------------
+
+@use "sass:list";
+
+%badge-base {
+	border-radius: 0;
+	display: inline-block;
+	font-family: var(--wp--preset--font-family--body);
+	font-size: var(--wp--preset--font-size--meta);
+	font-weight: bold;
+	letter-spacing: 0.1em;
+	line-height: 1;
+	padding: 0.35em 0.8em;
+	text-align: left;
+	text-transform: uppercase;
+	vertical-align: baseline;
+	white-space: normal;
+
+	&:empty {
+		display: none;
+	}
+}
+
+// Default (neutral): hairline fill, body text.
+.badge {
+	@extend %badge-base;
+	background-color: var(--wp--preset--color--line);
+	color: var(--wp--preset--color--text-body);
+}
+
+// Contextual tones: (background slug, text slug). One entry per format in
+// badge-format.js, using theme.json palette slugs.
+$badge-tones: (
+	"gold":    ("gold", "black"),
+	"blue":    ("link-blue", "white"),
+	"success": ("success", "white"),
+	"danger":  ("danger", "white"),
+	"dark":    ("ink", "white"),
+	"inverse": ("white", "black"),
+);
+
+@each $name, $pair in $badge-tones {
+	.badge-#{$name} {
+		@extend %badge-base;
+		background-color: var(--wp--preset--color--#{list.nth($pair, 1)});
+		color: var(--wp--preset--color--#{list.nth($pair, 2)});
+	}
+}
