@@ -216,7 +216,11 @@
 		}
 
 		sync();
-		mql.addEventListener( 'change', sync );
+		if ( mql.addEventListener ) {
+			mql.addEventListener( 'change', sync );
+		} else if ( mql.addListener ) {
+			mql.addListener( sync );
+		}
 	}
 
 	if ( document.readyState === 'loading' ) {
