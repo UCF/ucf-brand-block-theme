@@ -86,14 +86,7 @@ add_action( 'wp_enqueue_scripts', 'ucf_brand_enqueue_assets' );
  * @return void
  */
 function ucf_brand_register_blocks() {
-	$blocks = array(
-		'color-swatches',
-		'color-swatch',
-		'tabs',
-		'tab',
-		'tab-label',
-		'tab-panel',
-	);
+	$blocks = array( 'color-swatches', 'color-swatch' );
 
 	foreach ( $blocks as $block ) {
 		$path = get_theme_file_path( "build/$block" );
