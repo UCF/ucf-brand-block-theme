@@ -120,17 +120,22 @@
 
 			// ColorPalette entries: one swatch per tone, colored by its fill.
 			var swatches = tones.map( function ( tone ) {
-				return { name: tone.title, color: paletteHex( tone.bg ), slug: tone.name };
+				return {
+					name: tone.title,
+					color: paletteHex( tone.bg ),
+					slug: tone.bg,
+					toneName: tone.name,
+				};
 			} );
 
 			// ColorPalette speaks in hex; map the chosen color back to its tone
-			// (or clear when the swatch is toggled off).
+			// (or clear when the swatch is cleared).
 			function onSelectColor( color ) {
 				var picked = null;
 				if ( color ) {
 					for ( var i = 0; i < swatches.length; i++ ) {
 						if ( swatches[ i ].color === color ) {
-							picked = swatches[ i ].slug;
+							picked = swatches[ i ].toneName;
 							break;
 						}
 					}
