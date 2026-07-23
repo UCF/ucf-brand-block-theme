@@ -127,13 +127,30 @@
 	/**
 	 * Switch an instance into tabs mode: tablist roles, keyboard, one panel shown.
 	 *
+	 * The tablist may only own tabs, so the root — which also holds the panels — cannot
+	 * be it. We hoist the labels into a generated `.ucf-tabs__tablist` wrapper instead,
+	 * and reset() puts them back. The saved markup stays role-free and interleaved,
+	 * which is what makes the stacked layout work with no JS.
+	 *
 	 * @param {Object} inst Instance descriptor.
 	 */
 	function enhance( inst ) {
 		inst.root.classList.add( 'is-enhanced' );
-		inst.root.setAttribute( 'role', 'tablist' );
+
+		if ( ! inst.tablist ) {
+			inst.tablist = document.createElement( 'div' );
+			inst.tablist.className = 'ucf-tabs__tablist';
+			inst.tablist.setAttribute( 'role', 'tablist' );
+		}
+		if ( inst.tablist.parentNode !== inst.root ) {
+			inst.root.insertBefore( inst.tablist, inst.root.firstChild );
+		}
 
 		inst.labels.forEach( function ( label, i ) {
+			// Appended in order, so the strip follows source order.
+			if ( label.parentNode !== inst.tablist ) {
+				inst.tablist.appendChild( label );
+			}
 			label.setAttribute( 'role', 'tab' );
 			label.setAttribute( 'aria-controls', inst.panels[ i ].id );
 			inst.panels[ i ].setAttribute( 'role', 'tabpanel' );
@@ -174,9 +191,13 @@
 	 */
 	function reset( inst ) {
 		inst.root.classList.remove( 'is-enhanced' );
-		inst.root.removeAttribute( 'role' );
 
 		inst.labels.forEach( function ( label, i ) {
+			// Back into its own `.ucf-tabs__set`, ahead of its panel — the saved order.
+			var set = inst.panels[ i ].parentNode;
+			if ( label.parentNode !== set ) {
+				set.insertBefore( label, inst.panels[ i ] );
+			}
 			label.removeAttribute( 'role' );
 			label.removeAttribute( 'aria-selected' );
 			label.removeAttribute( 'aria-controls' );
@@ -186,6 +207,11 @@
 			inst.panels[ i ].removeAttribute( 'tabindex' );
 			inst.panels[ i ].hidden = false;
 		} );
+
+		// An empty tablist would still show up in the a11y tree, so drop it entirely.
+		if ( inst.tablist && inst.tablist.parentNode ) {
+			inst.tablist.parentNode.removeChild( inst.tablist );
+		}
 	}
 
 	/**

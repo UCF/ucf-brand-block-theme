@@ -12,10 +12,11 @@
 //   1. Base (mobile, and no-JS at any width): the pairs read as stacked sections — a
 //      gold badge over a condensed heading, with the panel beneath. This is the
 //      interleaved source order, so it needs no reflow.
-//   2. `.is-enhanced` at tablet and up: a tab strip. The `.ucf-tabs__set` wrapper is
-//      `display: contents`, so labels and panels are direct grid items — every label in
-//      row 1, every panel sharing one full-width cell in row 2. An idle tab is black
-//      with a gold heading; the selected tab is white with a black heading.
+//   2. `.is-enhanced` at tablet and up: a tab strip. view.js hoists the labels into a
+//      generated `.ucf-tabs__tablist` (the ARIA tablist may not own the panels), which
+//      is its own one-row grid in row 1; the `.ucf-tabs__set` wrapper is
+//      `display: contents`, so every panel shares one full-width cell in row 2. An idle
+//      tab is black with a gold heading; the selected tab is white with a black heading.
 //
 // The editor never runs view.js, so authors always see the stacked (base) layout.
 
@@ -75,10 +76,22 @@
 		grid-template-columns: repeat(var(--tab-count, 1), minmax(0, 1fr));
 	}
 
+	// The tab strip itself. It spans the whole container and lays its own tabs out on
+	// `--tab-count` equal columns, so the labels never share a grid with the panels.
+	.is-enhanced .ucf-tabs__tablist {
+		display: grid;
+		gap: 2px;
+		grid-column: 1 / -1;
+		grid-row: 1;
+		// One column: the strip and the panel cell each span it. `--tab-count` is set on
+		// this element by view.js and inherits down to the tablist, which does the
+		// per-tab division.
+		grid-template-columns: minmax(0, 1fr);
+	}
+
 	.is-enhanced .ucf-tabs__label {
 		background: map.get($color, "black");
 		cursor: pointer;
-		grid-row: 1;
 		margin: 0;
 		min-height: 4rem;
 		padding: map.get($space, "40") map.get($space, "40")
