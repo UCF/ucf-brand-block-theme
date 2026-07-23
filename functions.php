@@ -143,13 +143,15 @@ function ucf_brand_register_block_styles() {
 		}
 	}
 
-	// Stretch link: the button's anchor covers its nearest Group container, making
-	// the whole card clickable. Styling lives in `src/scss/_stretch-link.scss`.
+	// Glyph: a transparent, borderless button for a clickable icon/glyph. This is a
+	// look, so it stays a block style. The orthogonal "stretch to container" behavior
+	// is a toggle attribute added to core/button in blocks/index.js so it composes
+	// with any look. Styling for both lives in `src/scss/_stretch-link.scss`.
 	register_block_style(
 		'core/button',
 		array(
-			'name'  => 'stretch',
-			'label' => __( 'Stretch to container', 'ucf-brand-block-theme' ),
+			'name'  => 'glyph',
+			'label' => __( 'Glyph', 'ucf-brand-block-theme' ),
 		)
 	);
 }

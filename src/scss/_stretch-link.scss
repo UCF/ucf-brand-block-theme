@@ -1,19 +1,25 @@
-// Stretch link
+// Stretch link + glyph button
 //
-// A Button with the `is-style-stretch` block style turns its nearest Group
-// container into the click target: the anchor's `::after` overlay fills the
-// container, so the whole card is clickable. The entire control lives on the
-// button — `:has()` promotes the Group to the positioning context, so authors
-// never touch the parent. Scoped to `core/group` for now (Row/Stack share the
-// `.wp-block-group` class); extend to other containers as needed.
+// Stretch is a behavior, not a look: a `stretchLink` toggle on core/button (added
+// in blocks/index.js) emits `.has-stretch-link` on the button wrapper. When set, the
+// button's anchor covers its nearest Group container so the whole card is clickable.
+// Because it's a class and not an `is-style-*` variant, it composes with any button
+// look — default, Outline, or the Glyph style below.
+//
+// The overlay is keyed to the front-end anchor (`> a`), which the editor never renders
+// (it edits the link as a div), so the overlay stays off in the editor — otherwise it
+// would sit over sibling blocks in the card and block selection while editing.
+//
+// Scoped to `core/group` for now (Row/Stack share `.wp-block-group`); extend to other
+// containers as needed.
 
 // `inset: 0` resolves to the nearest positioned ancestor, so the container that
 // `:has()` a stretch button becomes that ancestor.
-.wp-block-group:has(.wp-block-button.is-style-stretch > a) {
+.wp-block-group:has(.wp-block-button.has-stretch-link > a) {
 	position: relative;
 }
 
-.wp-block-button.is-style-stretch > a::after {
+.wp-block-button.has-stretch-link > a::after {
 	content: "";
 	inset: 0;
 	position: absolute;
@@ -21,9 +27,18 @@
 }
 
 // Genuine links and controls inside the card must sit above the overlay so they
-// stay independently clickable — not just anchors/buttons but native form
-// controls too, or the overlay would swallow them.
-.wp-block-group:has(.wp-block-button.is-style-stretch) :where(a, button, input, select, textarea, label, summary):not(.wp-block-button.is-style-stretch > a) {
+// stay independently clickable — not just anchors/buttons but native form controls
+// too, or the overlay would swallow them.
+.wp-block-group:has(.wp-block-button.has-stretch-link) :where(a, button, input, select, textarea, label, summary):not(.wp-block-button.has-stretch-link > a) {
 	position: relative;
 	z-index: 2;
+}
+
+// Glyph: a transparent, borderless button for a clickable icon/glyph. Keyed to
+// `.wp-block-button__link` so it previews in the editor as well as the front end.
+.wp-block-button.is-style-glyph .wp-block-button__link {
+	background: transparent;
+	border: 0;
+	color: currentColor;
+	padding: 0;
 }
