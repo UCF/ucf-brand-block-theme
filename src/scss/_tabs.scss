@@ -19,13 +19,6 @@
 //
 // The editor never runs view.js, so authors always see the stacked (base) layout.
 
-// The authoring wrapper carries no box of its own — its label and panel participate in
-// the parent's layout directly. Load-bearing: without this the grid below can't reach them.
-
-.ucf-tabs__set {
-	display: contents;
-}
-
 .ucf-tabs__label {
 	display: flex;
 	flex-direction: column;
@@ -66,6 +59,14 @@
 
 // ── Tab strip (enhanced, tablet and up) ──────────────────────────────────────
 @media (min-width: $breakpoint-tabs) {
+	// Only the desktop grid needs the tab wrapper to dissolve so its label and panel
+	// become direct grid items. Scoping `display: contents` to the enhanced state (rather
+	// than always) keeps each tab a real, selectable box in the editor and the mobile
+	// view — which is what makes an accidental tab easy to click and remove.
+	.is-enhanced .ucf-tabs__set {
+		display: contents;
+	}
+
 	.ucf-tabs.is-enhanced {
 		border: 1px solid map.get($color, "black");
 		border-top: 3px solid map.get($color, "gold");

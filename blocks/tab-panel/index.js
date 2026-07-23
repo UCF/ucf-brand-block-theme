@@ -26,6 +26,10 @@ registerBlockType( metadata.name, {
 		const blockProps = useBlockProps( { className: 'ucf-tabs__panel' } );
 		const innerProps = useInnerBlocksProps( blockProps, {
 			template: TEMPLATE,
+			// The parent Tab locks its label/panel pair with templateLock: 'all',
+			// which descendants inherit. Opt this region back out so a panel accepts
+			// any blocks — headings, images, columns, buttons, etc.
+			templateLock: false,
 		} );
 
 		return <div { ...innerProps } />;
