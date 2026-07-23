@@ -1,0 +1,59 @@
+@use "sass:map";
+@use "variables" as *;
+
+// ── Brand accordion ──────────────────────────────────────────────────────────
+//
+// A branded treatment for core's native Accordion block (core/accordion), applied
+// through the "Brand" block style. Core owns the disclosure behavior — the toggle
+// runs on the Interactivity API and the .wp-block-accordion-* markup is core's — so
+// this partial only restyles it; there is no theme JS and no custom block.
+//
+// Keep the accordion headings at H3. An H2 here would feed the drawer sub-nav and
+// pick up the gold subsection badge, and its copy-link click would fight the toggle
+// (see _sections.scss / brand-nav.js). H3 keeps the accordion self-contained.
+
+.wp-block-accordion.is-style-brand {
+	// Items read as a stack of hairline-ruled rows; the last item closes the stack.
+	.wp-block-accordion-item {
+		border-top: 1px solid map.get($color, "line");
+	}
+
+	.wp-block-accordion-item:last-child {
+		border-bottom: 1px solid map.get($color, "line");
+	}
+
+	.wp-block-accordion-heading {
+		margin: 0;
+	}
+
+	// The clickable header, in the theme's mono/uppercase/letterspaced label idiom.
+	.wp-block-accordion-heading__toggle {
+		color: map.get($color, "ink");
+		font-family: map.get($font, "mono");
+		font-size: map.get($size, "ui");
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		padding: map.get($space, "30") 0;
+		text-transform: uppercase;
+	}
+
+	// Core underlines the title on hover; swap that for a brand gold shift.
+	.wp-block-accordion-heading__toggle:hover .wp-block-accordion-heading__toggle-title {
+		color: map.get($color, "gold-deep");
+		text-decoration: none;
+	}
+
+	.wp-block-accordion-heading__toggle-icon {
+		color: map.get($color, "gold-deep");
+	}
+
+	// Tint the open row's label so the active section reads at a glance.
+	.wp-block-accordion-item.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-title {
+		color: map.get($color, "gold-deep");
+	}
+
+	// Give the revealed panel room before the next rule.
+	.wp-block-accordion-panel {
+		padding-bottom: map.get($space, "30");
+	}
+}

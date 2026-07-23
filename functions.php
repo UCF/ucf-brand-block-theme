@@ -154,6 +154,18 @@ function ucf_brand_register_block_styles() {
 			'label' => __( 'Glyph', 'ucf-brand-block-theme' ),
 		)
 	);
+
+	// Brand treatment for core's native Accordion block. The disclosure behavior is
+	// core's (Interactivity API); this style only supplies the UCF look. Styling lives
+	// in src/scss/_accordion.scss. Keep accordion headings at H3 so they stay out of
+	// the H2-driven drawer sub-nav and subsection badge — see CLAUDE.md.
+	register_block_style(
+		'core/accordion',
+		array(
+			'name'  => 'brand',
+			'label' => __( 'Brand', 'ucf-brand-block-theme' ),
+		)
+	);
 }
 add_action( 'init', 'ucf_brand_register_block_styles' );
 
