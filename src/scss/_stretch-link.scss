@@ -1,0 +1,29 @@
+// Stretch link
+//
+// A Button with the `is-style-stretch` block style turns its nearest Group
+// container into the click target: the anchor's `::after` overlay fills the
+// container, so the whole card is clickable. The entire control lives on the
+// button — `:has()` promotes the Group to the positioning context, so authors
+// never touch the parent. Scoped to `core/group` for now (Row/Stack share the
+// `.wp-block-group` class); extend to other containers as needed.
+
+// `inset: 0` resolves to the nearest positioned ancestor, so the container that
+// `:has()` a stretch button becomes that ancestor.
+.wp-block-group:has(.wp-block-button.is-style-stretch > a) {
+	position: relative;
+}
+
+.wp-block-button.is-style-stretch > a::after {
+	content: "";
+	inset: 0;
+	position: absolute;
+	z-index: 1;
+}
+
+// Genuine links and controls inside the card must sit above the overlay so they
+// stay independently clickable — not just anchors/buttons but native form
+// controls too, or the overlay would swallow them.
+.wp-block-group:has(.wp-block-button.is-style-stretch) :where(a, button, input, select, textarea, label, summary):not(.wp-block-button.is-style-stretch > a) {
+	position: relative;
+	z-index: 2;
+}

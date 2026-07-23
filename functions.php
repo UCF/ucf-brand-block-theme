@@ -142,6 +142,16 @@ function ucf_brand_register_block_styles() {
 			);
 		}
 	}
+
+	// Stretch link: the button's anchor covers its nearest Group container, making
+	// the whole card clickable. Styling lives in `src/scss/_stretch-link.scss`.
+	register_block_style(
+		'core/button',
+		array(
+			'name'  => 'stretch',
+			'label' => __( 'Stretch to container', 'ucf-brand-block-theme' ),
+		)
+	);
 }
 add_action( 'init', 'ucf_brand_register_block_styles' );
 
