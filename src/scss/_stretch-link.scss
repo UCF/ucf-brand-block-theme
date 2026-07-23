@@ -21,8 +21,9 @@
 }
 
 // Genuine links and controls inside the card must sit above the overlay so they
-// stay independently clickable.
-.wp-block-group:has(.wp-block-button.is-style-stretch) :where(a, button):not(.wp-block-button.is-style-stretch > a) {
+// stay independently clickable — not just anchors/buttons but native form
+// controls too, or the overlay would swallow them.
+.wp-block-group:has(.wp-block-button.is-style-stretch) :where(a, button, input, select, textarea, label, summary):not(.wp-block-button.is-style-stretch > a) {
 	position: relative;
 	z-index: 2;
 }
