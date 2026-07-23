@@ -395,3 +395,30 @@ function ucf_brand_enqueue_editor_assets() {
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'ucf_brand_enqueue_editor_assets' );
+
+/**
+ * Register the "Badge" rich-text inline formats in the block editor.
+ *
+ * A no-build script (uses the global wp.* packages declared as dependencies)
+ * that adds a single Badge button to the RichText formatting toolbar; it opens
+ * a swatch popover (built from the same ColorPalette as core's Highlight dialog)
+ * to pick a tone, wrapping the selected text in <span class="badge…">. The look
+ * comes from the compiled stylesheet (src/scss/_badge.scss), so it matches the
+ * front end.
+ *
+ * @return void
+ */
+function ucf_brand_enqueue_badge_format() {
+	$relative_path = 'assets/js/badge-format.js';
+	$file_path     = get_theme_file_path( $relative_path );
+	$version       = file_exists( $file_path ) ? filemtime( $file_path ) : false;
+
+	wp_enqueue_script(
+		'ucf-brand-badge-format',
+		get_theme_file_uri( $relative_path ),
+		array( 'wp-rich-text', 'wp-block-editor', 'wp-components', 'wp-data', 'wp-element', 'wp-i18n' ),
+		$version,
+		true
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'ucf_brand_enqueue_badge_format' );
