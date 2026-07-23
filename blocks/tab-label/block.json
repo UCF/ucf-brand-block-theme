@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "ucf-brand/tab-label",
+	"title": "Tab Label",
+	"category": "design",
+	"icon": "index-card",
+	"parent": [ "ucf-brand/tab" ],
+	"description": "The clickable label for a tab: a gold badge over a condensed H3 heading.",
+	"textdomain": "ucf-brand-block-theme",
+	"keywords": [ "tab", "label", "badge", "heading" ],
+	"attributes": {
+		"badge": {
+			"type": "string",
+			"source": "html",
+			"selector": ".ucf-tabs__badge",
+			"default": ""
+		},
+		"heading": {
+			"type": "string",
+			"source": "html",
+			"selector": ".ucf-tabs__heading",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"inserter": false
+	},
+	"editorScript": "file:./index.js"
+}
