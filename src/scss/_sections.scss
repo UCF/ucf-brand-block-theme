@@ -19,6 +19,7 @@
 
 .wp-block-post-content h2::before {
 	background: map.get($color, "black");
+	border-left: 3px solid map.get($color, "gold");
 	color: map.get($color, "gold");
 	content: var(--brand-section) counter(brand-subsection, decimal-leading-zero);
 	display: inline-block;
@@ -28,7 +29,7 @@
 	letter-spacing: 0.05em;
 	line-height: 1;
 	margin-right: 0.7rem;
-	padding: 0.3em 0.5em;
+	padding: 0.75em 0.8em;
 	vertical-align: middle;
 }
 

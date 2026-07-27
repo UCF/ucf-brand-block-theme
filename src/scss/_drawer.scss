@@ -1,4 +1,5 @@
 @use "sass:map";
+@use "chevron" as *;
 @use "variables" as *;
 
 // ── The shell ────────────────────────────────────────────────────────────────
@@ -195,6 +196,7 @@
 
 .brand-nav__item {
 	margin: 0;
+	border-bottom: 1px solid map.get($color, "line-dark");
 }
 
 .brand-nav__link {
@@ -224,6 +226,21 @@
 	min-width: 1.6em;
 }
 
+// The same chevron primitive the accordion uses, closing the row at its far edge.
+// Nav uses the disclosure convention: it points right when collapsed and spins down
+// on the current (expanded) item. Quiet by default; `margin-left: auto` pins it
+// right, and `align-self: center` overrides the link's baseline alignment so it sits
+// on the text's optical center.
+.brand-nav__icon {
+	@include chevron(0.42em, $rotation: -45deg);
+	align-self: center;
+	color: map.get($color, "text-meta-dark");
+	flex: none;
+	height: 1em;
+	margin-left: auto;
+	width: 1em;
+}
+
 // Set server-side on the item matching the request (aria-current="page").
 .brand-nav__item.is-current > .brand-nav__link {
 	background: map.get($color, "card-dark");
@@ -231,6 +248,13 @@
 	color: map.get($color, "gold");
 
 	.brand-nav__num {
+		color: map.get($color, "gold");
+	}
+
+	// The current section is the expanded one (its sub-nav is shown), so its chevron
+	// spins from right down to ∨ and goes gold.
+	.brand-nav__icon {
+		@include chevron-rotate(45deg);
 		color: map.get($color, "gold");
 	}
 }
@@ -245,6 +269,7 @@
 
 .brand-subnav__item {
 	margin: 0;
+	margin-top: 2px;
 }
 
 .brand-subnav__link {
