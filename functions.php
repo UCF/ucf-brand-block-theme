@@ -368,7 +368,7 @@ function ucf_brand_render_section_nav() {
 
 	foreach ( $sections as $section ) {
 		$items .= sprintf(
-			'<li class="brand-nav__item%1$s"><a class="brand-nav__link" href="%2$s"%3$s><span class="brand-nav__num">%4$s</span><span class="brand-nav__text">%5$s</span></a></li>',
+			'<li class="brand-nav__item%1$s"><a class="brand-nav__link" href="%2$s"%3$s><span class="brand-nav__num">%4$s</span><span class="brand-nav__text">%5$s</span><span class="brand-nav__icon" aria-hidden="true"></span></a></li>',
 			$section['is_current'] ? ' is-current' : '',
 			esc_url( $section['url'] ),
 			$section['is_current'] ? ' aria-current="page"' : '',
