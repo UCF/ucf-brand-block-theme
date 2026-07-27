@@ -83,10 +83,10 @@
 		gap: 2px;
 		grid-column: 1 / -1;
 		grid-row: 1;
-		// One column: the strip and the panel cell each span it. `--tab-count` is set on
-		// this element by view.js and inherits down to the tablist, which does the
-		// per-tab division.
-		grid-template-columns: minmax(0, 1fr);
+		// The strip spans the whole container (grid-column 1 / -1) and divides itself into
+		// `--tab-count` equal columns, one per label. `--tab-count` is set on the root
+		// `.ucf-tabs` by view.js and inherits down to this element.
+		grid-template-columns: repeat(var(--tab-count, 1), minmax(0, 1fr));
 	}
 
 	.is-enhanced .ucf-tabs__label {
