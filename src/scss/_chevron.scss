@@ -1,0 +1,41 @@
+// ── Chevron primitive ────────────────────────────────────────────────────────
+//
+// A chevron drawn as a single rotated corner on the host's ::after, which spins
+// between states. Colour comes from the host via `currentColor`; the host owns its
+// size box and must allow positioning (the mixin sets `position: relative`).
+//
+// Direction is just the corner's rotation, so callers pick it per context:
+//   45deg → ∨ (down)   −45deg → › (right)   225deg → ∧ (up)   135deg → ‹ (left)
+// The accordion points down→up; the drawer nav points right→down. `chevron-rotate`
+// re-aims the same corner for the open/active state, and it animates the spin.
+
+// Draw the resting chevron. $rotation sets its direction (default ∨, down).
+@mixin chevron($size: 0.45em, $thickness: 2px, $rotation: 45deg) {
+	position: relative;
+
+	&::after {
+		border-bottom: $thickness solid currentColor;
+		border-right: $thickness solid currentColor;
+		content: "";
+		height: $size;
+		left: 50%;
+		position: absolute;
+		top: 40%;
+		transform: translate(-50%, -50%) rotate($rotation);
+		visibility: visible;
+		width: $size;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		&::after {
+			transition: transform 0.2s ease-in-out;
+		}
+	}
+}
+
+// Re-aim the chevron (used for the open/active state). Spins from the resting angle.
+@mixin chevron-rotate($rotation) {
+	&::after {
+		transform: translate(-50%, -50%) rotate($rotation);
+	}
+}

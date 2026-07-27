@@ -161,6 +161,18 @@ function ucf_brand_register_block_styles() {
 			'label' => __( 'Glyph', 'ucf-brand-block-theme' ),
 		)
 	);
+
+	// Brand treatment for core's native Accordion block. The disclosure behavior is
+	// core's (Interactivity API); this style only supplies the UCF look. Styling lives
+	// in src/scss/_accordion.scss. Keep accordion headings at H3 so they stay out of
+	// the H2-driven drawer sub-nav and subsection badge — see CLAUDE.md.
+	register_block_style(
+		'core/accordion',
+		array(
+			'name'  => 'brand',
+			'label' => __( 'Brand', 'ucf-brand-block-theme' ),
+		)
+	);
 }
 add_action( 'init', 'ucf_brand_register_block_styles' );
 
@@ -356,7 +368,7 @@ function ucf_brand_render_section_nav() {
 
 	foreach ( $sections as $section ) {
 		$items .= sprintf(
-			'<li class="brand-nav__item%1$s"><a class="brand-nav__link" href="%2$s"%3$s><span class="brand-nav__num">%4$s</span><span class="brand-nav__text">%5$s</span></a></li>',
+			'<li class="brand-nav__item%1$s"><a class="brand-nav__link" href="%2$s"%3$s><span class="brand-nav__num">%4$s</span><span class="brand-nav__text">%5$s</span><span class="brand-nav__icon" aria-hidden="true"></span></a></li>',
 			$section['is_current'] ? ' is-current' : '',
 			esc_url( $section['url'] ),
 			$section['is_current'] ? ' aria-current="page"' : '',
