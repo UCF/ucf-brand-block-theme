@@ -36,6 +36,16 @@ body {
 	margin-inline: 0 !important;
 }
 
+// Reading Width: content fills the 850px area by default (the `contentSize` token); this
+// opt-in block style (registered in functions.php) caps a block to the 756px reading measure
+// for long-form copy. A `max-width` — not a right margin — so it is responsive-safe and does
+// not fight the left-anchor `margin-inline` rule above. The doubled class lifts specificity to
+// (0,2,0) so the cap beats core's constrained-layout rule (`… > :where(…)` at (0,1,0)). It
+// stays left-anchored via that rule, so the tighter measure sits flush left.
+.is-style-reading-width.is-style-reading-width {
+	max-width: var(--wp--custom--reading-width);
+}
+
 // Brand rule: square corners everywhere. Buttons opt back in via theme.json only if
 // a future component needs it.
 button,

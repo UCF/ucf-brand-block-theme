@@ -110,11 +110,11 @@
 			"textOnDark": "#EAEAEA",
 			"sidebarWidth": "288px",
 			"headerHeight": "50px",
-			"wrap": "1160px"
+			"wrap": "1160px",
+			"readingWidth": "756px"
 		},
 		"layout": {
-			"contentSize": "720px",
-			"wideSize": "1160px"
+			"contentSize": "850px"
 		},
 		"spacing": {
 			"defaultSpacingSizes": false,

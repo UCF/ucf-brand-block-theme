@@ -84,13 +84,20 @@
 	display: contents;
 }
 
-// A full-column band: it fills the grid track (no width cap) so full-width blocks can bleed
-// to the column edges. The horizontal gutter is a token, applied here so the title and all
-// normal content share one inset; the constrained `post-content` inside supplies the
-// reading measure (720/1160). See templates/page.html.
+// The content column: an 850px content area (the `contentSize` token) centered in the grid
+// track beside the sidebar, so content sits centered in the space the sidebar leaves rather
+// than hugging it. A plain block fills the full 850; the "Reading Width" block style pulls a
+// block in to the 756px measure for long-form copy. `max-width` is that measure plus its two
+// gutters so the inner content reaches a true 850; `margin-inline: auto` centers the column
+// within the `minmax(0, 1fr)` track (grid items justify to `stretch` by default, and auto
+// margins beat that). The gutter is a token, applied here so the title and all content share
+// one inset. See templates/page.html.
 .brand-content {
 	--brand-gutter: clamp(1.5rem, 4vw, 3.4rem);
 
+	box-sizing: border-box;
+	margin-inline: auto;
+	max-width: calc(var(--wp--style--global--content-size) + 2 * var(--brand-gutter));
 	min-width: 0;
 	padding-block: map.get($space, "50") map.get($space, "60");
 	padding-inline: var(--brand-gutter);
