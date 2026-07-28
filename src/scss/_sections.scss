@@ -231,3 +231,24 @@
 		background: map.get($color, "danger");
 	}
 }
+
+// ── Section band ─────────────────────────────────────────────────────────────
+//
+// A full-width content section: `.brand-section` is a core Group (tagName `section`, aligned
+// full) carrying the section's vertical rhythm. It has no background of its own — set one from
+// the block's color control (any palette slug) if the section should read as a band. It bleeds
+// to the content-column edges via the alignfull rule in _drawer.scss; `padding-inline` (the
+// inherited `--brand-gutter`) restores the reading inset so its content lines up with the rest
+// of the page, and the baked-in H2 keeps its automatic subsection badge. Built from
+// patterns/sections/section.php.
+.brand-section {
+	padding-block: map.get($space, "60");
+	padding-inline: var(--brand-gutter);
+}
+
+// Bands stack flush: their own `padding-block` supplies the vertical rhythm, so cancel the
+// flow block-gap (`:root :where(.is-layout-constrained) > *`, at (0,1,0)) that would otherwise
+// leave a strip of page background above each band. The doubled class outranks that rule.
+.brand-section.brand-section {
+	margin-block: 0;
+}

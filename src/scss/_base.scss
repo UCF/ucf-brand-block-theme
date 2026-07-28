@@ -14,36 +14,31 @@ body {
 	text-rendering: optimizeLegibility;
 }
 
-// Core's constrained layout emits
-// `.wp-container-* > :where(…) { margin-left: auto !important; margin-right: auto }`,
-// which centers every child. Anything that sets a max-width narrower than the container
-// therefore drifts to the middle — never what this layout wants, since the brand guide
-// is left-aligned throughout (and, in the drawer layout, anchored beside the sidebar).
-//
-// `!important` is the only thing that can beat `!important`. Kept in one place, scoped
-// to the specific elements that need it, rather than sprinkled through the components.
-//
-// The drawer's reading measure lives on the constrained `.wp-block-post-content` and on any
-// constrained group nested inside it (e.g. a full-width callout), so core centers their
-// children — normal blocks and `alignwide` alike. Left-anchor every one of them. `alignfull`
-// is excluded: it needs the negative margin from _drawer.scss, not 0. `:where()` keeps the
-// selector at (0,2,0) so it beats core's centering `!important` but loses to the more
-// specific `.alignfull` breakout rule.
-.brand-content > *,
-.brand-content .is-layout-constrained > :where(:not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter)),
-.lead,
-.is-style-lead {
-	margin-inline: 0 !important;
-}
+// Content centers on the reading measure. Core's constrained layout already centers the
+// children of `.wp-block-post-content` (and any nested constrained group) with `margin-inline:
+// auto`, which is exactly what this layout wants now: the reading column sits centered in the
+// track that `.brand-content` fills, and full-width sections bleed to the track edges (see the
+// `.alignfull` rule in _drawer.scss). So there is nothing to override here — core does it.
 
 // Reading Width: content fills the 850px area by default (the `contentSize` token); this
-// opt-in block style (registered in functions.php) caps a block to the 756px reading measure
-// for long-form copy. A `max-width` — not a right margin — so it is responsive-safe and does
-// not fight the left-anchor `margin-inline` rule above. The doubled class lifts specificity to
-// (0,2,0) so the cap beats core's constrained-layout rule (`… > :where(…)` at (0,1,0)). It
-// stays left-anchored via that rule, so the tighter measure sits flush left.
+// opt-in block style (registered in functions.php) narrows a block to the 756px reading
+// measure for long-form copy. It narrows from the *right* so the block keeps its normal
+// centered 850 box and the text stays flush-left with the rest of the content instead of
+// floating centered at 756. `box-sizing: border-box` + `max-width: 850` pin the box to 850,
+// then `padding-right` of the (content − reading) difference eats *into* that box — content
+// 756, box 850. (Plain `padding-right` alone would sit outside the content-box and grow the
+// block to 944, pushing it left.) The doubled class lifts specificity to (0,2,0). Below the
+// drawer breakpoint the column is already narrow, so the inset is dropped.
 .is-style-reading-width.is-style-reading-width {
-	max-width: var(--wp--custom--reading-width);
+	box-sizing: border-box;
+	max-width: var(--wp--style--global--content-size);
+	padding-right: calc(var(--wp--style--global--content-size) - var(--wp--custom--reading-width));
+}
+
+@media (max-width: $breakpoint-drawer) {
+	.is-style-reading-width.is-style-reading-width {
+		padding-right: 0;
+	}
 }
 
 // Brand rule: square corners everywhere. Buttons opt back in via theme.json only if

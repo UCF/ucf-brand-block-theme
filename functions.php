@@ -163,6 +163,26 @@ function ucf_brand_register_block_styles() {
 		);
 	}
 
+	// Detail card tones: the "Detail Card" unit pattern (patterns/detail-card.php) is a Group
+	// carrying `.brand-detail-card`; these mutually exclusive block styles recolor its header
+	// bar. Styling in src/scss/_detail-card.scss.
+	$detail_card_tones = array(
+		'detail-card-gold' => __( 'Detail Card — Gold', 'ucf-brand-block-theme' ),
+		'detail-card-grey' => __( 'Detail Card — Grey', 'ucf-brand-block-theme' ),
+		'detail-card-red'  => __( 'Detail Card — Red', 'ucf-brand-block-theme' ),
+	);
+
+	foreach ( $detail_card_tones as $name => $label ) {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => $name,
+				'label' => $label,
+			)
+		);
+	}
+
+
 	// Glyph: a transparent, borderless button for a clickable icon/glyph. This is a
 	// look, so it stays a block style. The orthogonal "stretch to container" behavior
 	// is a toggle attribute added to core/button in blocks/index.js so it composes

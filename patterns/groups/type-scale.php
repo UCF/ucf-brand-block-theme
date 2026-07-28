@@ -2,7 +2,7 @@
 /**
  * Title: Type Scale
  * Slug: ucf-brand/type-scale
- * Categories: ucf-brand-blocks
+ * Categories: ucf-brand-groups
  * Description: Every size in the theme's type scale, each rendered at its own preset so the demo can never drift from the tokens.
  * Keywords: type, typography, scale, size, fluid
  *
@@ -38,7 +38,10 @@ $ucf_brand_samples = array(
 	'eyebrow'   => __( 'Section label', 'ucf-brand-block-theme' ),
 	'meta'      => __( 'Captions, credits and fine print.', 'ucf-brand-block-theme' ),
 );
-
+?>
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group">
+<?php
 foreach ( $ucf_brand_scale as $ucf_brand_row ) {
 	list( $ucf_brand_slug, $ucf_brand_label, $ucf_brand_value, $ucf_brand_family, $ucf_brand_caps ) = $ucf_brand_row;
 
@@ -67,3 +70,6 @@ foreach ( $ucf_brand_scale as $ucf_brand_row ) {
 <!-- /wp:group -->
 	<?php
 }
+?>
+</div>
+<!-- /wp:group -->

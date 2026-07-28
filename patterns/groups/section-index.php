@@ -2,7 +2,7 @@
 /**
  * Title: Index
  * Slug: ucf-brand/index
- * Categories: ucf-brand-sections
+ * Categories: ucf-brand-groups
  * Description: A numbered index of a section's contents — a lead-in heading beside a divided list of entries, each with a mono section number, title and short description.
  * Keywords: index, contents, toc, list, numbered, overview
  *
@@ -38,6 +38,8 @@ $ucf_index_entries = array(
 	),
 );
 ?>
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group">
 <!-- wp:columns {"verticalAlignment":"top"} -->
 <div class="wp-block-columns are-vertically-aligned-top">
 	<!-- wp:column {"verticalAlignment":"top","width":"28%"} -->
@@ -90,3 +92,5 @@ $ucf_index_entries = array(
 	<!-- /wp:column -->
 </div>
 <!-- /wp:columns -->
+</div>
+<!-- /wp:group -->

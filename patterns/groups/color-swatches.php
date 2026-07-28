@@ -2,7 +2,7 @@
 /**
  * Title: Color Swatches — Core Palette
  * Slug: ucf-brand/color-swatches
- * Categories: ucf-brand-blocks
+ * Categories: ucf-brand-groups
  * Description: The six core brand colors as swatches, with published values and measured contrast.
  * Keywords: color, swatch, palette, hex, contrast
  * Block Types: ucf-brand/color-swatches
@@ -11,6 +11,8 @@
  */
 
 ?>
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group">
 <!-- wp:ucf-brand/color-swatches -->
 <div class="wp-block-ucf-brand-color-swatches brand-swatches">
 	<!-- wp:ucf-brand/color-swatch {"colorSlug":"gold","name":"<?php esc_attr_e( 'Bold Gold', 'ucf-brand-block-theme' ); ?>","hex":"#EDB80D","rgb":"237 · 184 · 13","cmyk":"0 · 23 · 100 · 7","pantone":"124","ratio":"11.46:1 on black"} -->
@@ -38,3 +40,5 @@
 	<!-- /wp:ucf-brand/color-swatch -->
 </div>
 <!-- /wp:ucf-brand/color-swatches -->
+</div>
+<!-- /wp:group -->

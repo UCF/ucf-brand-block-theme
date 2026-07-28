@@ -2,7 +2,7 @@
 /**
  * Title: Type Specimens
  * Slug: ucf-brand/type-specimens
- * Categories: ucf-brand-blocks
+ * Categories: ucf-brand-groups
  * Description: One row per typeface, showing the face at display size with its role and weight range.
  * Keywords: type, typography, specimen, typeface, font
  *
@@ -10,6 +10,8 @@
  */
 
 ?>
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group">
 <!-- wp:group {"className":"is-style-specimen","layout":{"type":"constrained"}} -->
 <div class="wp-block-group is-style-specimen">
 	<!-- wp:paragraph {"className":"is-style-eyebrow"} -->
@@ -43,5 +45,7 @@
 	<!-- wp:paragraph {"fontFamily":"mono","fontSize":"heading-4","style":{"typography":{"letterSpacing":"0.06em","textTransform":"uppercase"}}} -->
 	<p class="has-mono-font-family has-heading-4-font-size" style="letter-spacing:0.06em;text-transform:uppercase">Pantone 124 · #EDB80D · 11.46:1</p>
 	<!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
 </div>
 <!-- /wp:group -->
