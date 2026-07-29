@@ -84,21 +84,28 @@
 	display: contents;
 }
 
-// A full-column band: it fills the grid track (no width cap) so full-width blocks can bleed
-// to the column edges. The horizontal gutter is a token, applied here so the title and all
-// normal content share one inset; the constrained `post-content` inside supplies the
-// reading measure (720/1160). See templates/page.html.
+// The content column: an 850px content area (the `contentSize` token) centered in the grid
+// beside the sidebar. It fills the whole grid track (a grid item justifies to `stretch` by
+// default, so no width cap or centering here). The reading content is held to 850 and centered
+// *inside* it by core's constrained layout on `.wp-block-post-content`, while full-width
+// sections bleed to the track edges — so a colored section band spans the full column. The
+// gutter is a token, applied here so the title and all content share one inset. See
+// templates/page.html.
 .brand-content {
 	--brand-gutter: clamp(1.5rem, 4vw, 3.4rem);
 
+	box-sizing: border-box;
 	min-width: 0;
 	padding-block: map.get($space, "50") map.get($space, "60");
 	padding-inline: var(--brand-gutter);
 }
 
-// The post title is no longer capped by a constrained parent — hold it to the measure.
-// Children are otherwise left-aligned rather than centered — see the note in _base.scss.
+// The eyebrow and post title are direct (flow) children of `.brand-content`, so core does not
+// constrain them — hold them to the reading measure and center them, so the page header lines
+// up with the centered content below.
+.brand-content > .brand-page-number,
 .brand-content > .wp-block-post-title {
+	margin-inline: auto;
 	max-width: var(--wp--style--global--content-size);
 }
 

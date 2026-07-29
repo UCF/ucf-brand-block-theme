@@ -150,6 +150,21 @@ function ucf_brand_register_block_styles() {
 		}
 	}
 
+	// Reading Width: content is wide-by-default (850, the `contentSize` token). This opt-in
+	// style pulls a block in to the 756px reading measure (`--wp--custom--reading-width`) for
+	// long-form copy. Styling in src/scss/_base.scss; left-anchored like the rest of the guide.
+	foreach ( array( 'core/group', 'core/columns', 'core/paragraph', 'core/heading', 'core/list' ) as $block ) {
+		register_block_style(
+			$block,
+			array(
+				'name'  => 'reading-width',
+				'label' => __( 'Reading Width', 'ucf-brand-block-theme' ),
+			)
+		);
+	}
+
+
+
 	// Glyph: a transparent, borderless button for a clickable icon/glyph. This is a
 	// look, so it stays a block style. The orthogonal "stretch to container" behavior
 	// is a toggle attribute added to core/button in blocks/index.js so it composes

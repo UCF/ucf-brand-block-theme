@@ -84,8 +84,11 @@ A page render is not a sufficient check — invalid blocks still render on the f
 -   Webfonts come from `theme.json` `fontFace`, never from SCSS or `wp_enqueue_style`.
 -   `add_editor_style()` loads the same `main.css` in the editor, so front-end and editor
     stay in parity. Keep it that way.
--   Pattern categories are `ucf-brand-sections` / `ucf-brand-blocks`. **Avoid the bare
-    `ucf-sections` slug** — it is reserved by the UCF Section plugin.
+-   Pattern categories form a compositional ladder, small to large: `ucf-brand-units`
+    (single primitives) → `ucf-brand-groups` (clusters of units) → `ucf-brand-sections`
+    (full-width content bands) → `ucf-brand-pages` (whole-page layouts). Registered in
+    `includes/patterns.php`. **Avoid the bare `ucf-sections` slug** — it is reserved by the
+    UCF Section plugin.
 -   `tools/seed/` is dev-only local content, not part of the distributed theme.
 
 ## H2s are structural
