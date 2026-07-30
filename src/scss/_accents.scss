@@ -38,11 +38,13 @@ $on-background: (
 		"body": "text-body",
 		"link": "link-blue",
 	),
+	// Body copy is white rather than `text-secondary-dark`: the grey read as washed out
+	// against the black field. `.meta` keeps its grey so the hierarchy survives.
 	"dark": (
 		"eyebrow": "gold",
 		"lead": "white",
 		"meta": "text-meta-dark",
-		"body": "text-secondary-dark",
+		"body": "white",
 		"link": "blue-tint",
 	),
 	// Nothing lighter than `text-body` clears 4.5:1 on the gold field — `text-secondary`
@@ -68,7 +70,8 @@ $on-background: (
 }
 
 // `rule` overrides the default gold edge — Bold Gold needs the deeper gold so the edge
-// still reads against the gold field. `on` selects the text treatment above.
+// still reads against the gold field, and Dark uses it for a warmer, less shouty rule on
+// black. `on` selects the text treatment above.
 $accents: (
 	"bold-gold": (
 		"bg": "gold",
@@ -89,6 +92,7 @@ $accents: (
 	"dark": (
 		"bg": "black",
 		"text": "white",
+		"rule": "gold-deep",
 		"on": "dark",
 	),
 );
