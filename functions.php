@@ -108,18 +108,17 @@ add_action( 'init', 'ucf_brand_register_blocks' );
 /**
  * Register block styles for the section treatments the brand guide uses.
  *
- * These are the prototype's `.on-dark` / `.gold-edge` / `.ht` section modifiers,
- * expressed so an editor can apply them from the block sidebar instead of hand-writing
- * a class. Definitions live in src/scss/_sections.scss and _typography.scss.
+ * These are the prototype's `.on-dark` / `.ht` section modifiers, expressed so an editor
+ * can apply them from the block sidebar instead of hand-writing a class. Definitions live
+ * in src/scss/_sections.scss and _typography.scss.
  *
  * @return void
  */
 function ucf_brand_register_block_styles() {
 	$group_styles = array(
-		'on-dark'   => __( 'On Dark', 'ucf-brand-block-theme' ),
-		'gold-edge' => __( 'Gold Edge', 'ucf-brand-block-theme' ),
-		'halftone'  => __( 'Halftone', 'ucf-brand-block-theme' ),
-		'specimen'  => __( 'Type Specimen', 'ucf-brand-block-theme' ),
+		'on-dark'  => __( 'On Dark', 'ucf-brand-block-theme' ),
+		'halftone' => __( 'Halftone', 'ucf-brand-block-theme' ),
+		'specimen' => __( 'Type Specimen', 'ucf-brand-block-theme' ),
 	);
 
 	foreach ( $group_styles as $name => $label ) {
@@ -131,6 +130,8 @@ function ucf_brand_register_block_styles() {
 			)
 		);
 	}
+
+	ucf_brand_register_callout_styles();
 
 	$text_styles = array(
 		'lead'    => __( 'Lead', 'ucf-brand-block-theme' ),
@@ -190,6 +191,52 @@ function ucf_brand_register_block_styles() {
 	);
 }
 add_action( 'init', 'ucf_brand_register_block_styles' );
+
+/**
+ * Register the callout color pairs as core/group block styles.
+ *
+ * One primitive, four color pairs, two flavors each — a plain background/text pair and
+ * the same pair with a 3px gold rule on the leading edge:
+ *
+ *     is-style-paper           background + text only
+ *     is-style-paper-accent    the same pair plus the edge rule
+ *
+ * Definitions live in src/scss/_callouts.scss, and the dark and gold pairs also appear in
+ * the on-background inversions in _typography.scss so `.eyebrow` and `.meta` stay legible
+ * on them. Adding a pair means a row here plus a row in the `$callouts` map in
+ * _callouts.scss.
+ *
+ * Replaces the old single-purpose `gold-edge` style.
+ *
+ * @return void
+ */
+function ucf_brand_register_callout_styles() {
+	$callouts = array(
+		'bold-gold' => __( 'Bold Gold', 'ucf-brand-block-theme' ),
+		'paper'     => __( 'Paper', 'ucf-brand-block-theme' ),
+		'light'     => __( 'Light', 'ucf-brand-block-theme' ),
+		'dark'      => __( 'Dark', 'ucf-brand-block-theme' ),
+	);
+
+	foreach ( $callouts as $name => $label ) {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => $name,
+				'label' => $label,
+			)
+		);
+
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => $name . '-accent',
+				/* translators: %s: callout color pair name, e.g. "Paper". */
+				'label' => sprintf( __( '%s + Accent', 'ucf-brand-block-theme' ), $label ),
+			)
+		);
+	}
+}
 
 /**
  * ── Section numbering ─────────────────────────────────────────────────────────

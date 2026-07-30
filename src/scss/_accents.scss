@@ -1,0 +1,129 @@
+// Background treatments — the accent color pairs registered as core/group block styles in
+// functions.php, plus the older background contexts that predate them.
+//
+// One primitive, four color pairs, two flavors each:
+//
+//   .is-style-paper          background + text only
+//   .is-style-paper-accent   the same pair plus a 3px gold rule on the leading edge
+//
+// Padding, spacing and layout stay with the block's own controls; these styles own color
+// and the edge rule, nothing else. The accent flavors replace the old single-purpose
+// `gold-edge` style, which was the same idea with a top rule and no color pair.
+//
+// Anything that sets a background also declares how text sits on it, via the `--brand-*`
+// custom properties in $on-background. The helper classes (`.lead`, `.eyebrow`, `.meta`),
+// body copy and links read those properties in _typography.scss, each falling back to the
+// "light" values.
+//
+// Custom properties, not descendant selectors, on purpose. A descendant rule such as
+// `.is-style-on-dark p` keeps applying to a nested card that has its own background,
+// because inheritance never beats a matching rule — a Light card inside a Dark section got
+// #B3B3B3 paragraphs on white. Custom properties resolve from the nearest ancestor that
+// sets them, so nesting works in either direction and does not depend on source order or
+// specificity.
+//
+// Adding a pair means a row in $accents here plus a row in the same-named array in
+// functions.php.
+
+@use "sass:map";
+@use "variables" as *;
+
+$on-background: (
+	// The default. These values are also baked into the helper classes in
+	// _typography.scss as their `var()` fallbacks, so the two have to stay in sync.
+	"light": (
+		"eyebrow": "link-blue",
+		"lead": "text-body",
+		"meta": "text-secondary",
+		"body": "text-body",
+		"link": "link-blue",
+	),
+	"dark": (
+		"eyebrow": "gold",
+		"lead": "white",
+		"meta": "text-meta-dark",
+		"body": "text-secondary-dark",
+		"link": "blue-tint",
+	),
+	// Nothing lighter than `text-body` clears 4.5:1 on the gold field — `text-secondary`
+	// lands at 4.01:1 and `link-blue` at 3.20:1 — so `.meta` gives up its grey
+	// de-emphasis here and leans on the mono family and size instead.
+	"gold": (
+		"eyebrow": "black",
+		"lead": "text-body",
+		"meta": "text-body",
+		"body": "black",
+		"link": "black",
+	),
+);
+
+@mixin on-background($context) {
+	$spec: map.get($on-background, $context);
+
+	--brand-eyebrow: #{map.get($color, map.get($spec, "eyebrow"))};
+	--brand-lead: #{map.get($color, map.get($spec, "lead"))};
+	--brand-meta: #{map.get($color, map.get($spec, "meta"))};
+	--brand-body: #{map.get($color, map.get($spec, "body"))};
+	--brand-link: #{map.get($color, map.get($spec, "link"))};
+}
+
+// `rule` overrides the default gold edge — Bold Gold needs the deeper gold so the edge
+// still reads against the gold field. `on` selects the text treatment above.
+$accents: (
+	"bold-gold": (
+		"bg": "gold",
+		"text": "black",
+		"rule": "gold-deep",
+		"on": "gold",
+	),
+	"paper": (
+		"bg": "paper-alt",
+		"text": "text-body",
+		"on": "light",
+	),
+	"light": (
+		"bg": "white",
+		"text": "text-body",
+		"on": "light",
+	),
+	"dark": (
+		"bg": "black",
+		"text": "white",
+		"on": "dark",
+	),
+);
+
+@each $name, $spec in $accents {
+	.is-style-#{$name},
+	.is-style-#{$name}-accent {
+		@include on-background(map.get($spec, "on"));
+
+		background-color: map.get($color, map.get($spec, "bg"));
+		color: map.get($color, map.get($spec, "text"));
+	}
+
+	.is-style-#{$name}-accent {
+		border-left: 3px solid
+			map.get($color, map.get($spec, "rule") or "gold");
+	}
+}
+
+// Backgrounds that predate the accent pairs. `.is-style-on-dark` supplies the treatment
+// only — the editor sets the background itself through the block's color controls.
+.has-black-background-color,
+.has-ink-background-color,
+.is-style-on-dark {
+	@include on-background("dark");
+}
+
+.has-gold-background-color {
+	@include on-background("gold");
+}
+
+// Focus rings need to clear the dark field. Paired with the base outline in _base.scss.
+.is-style-dark,
+.is-style-dark-accent {
+	:focus-visible {
+		outline-color: map.get($color, "gold");
+	}
+}
