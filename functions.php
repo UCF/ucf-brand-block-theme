@@ -110,7 +110,7 @@ add_action( 'init', 'ucf_brand_register_blocks' );
  *
  * These are the prototype's `.on-dark` / `.ht` section modifiers, expressed so an editor
  * can apply them from the block sidebar instead of hand-writing a class. Definitions live
- * in src/scss/_sections.scss and _typography.scss.
+ * in src/scss/_sections.scss and _accents.scss.
  *
  * @return void
  */
