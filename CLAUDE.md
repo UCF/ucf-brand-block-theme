@@ -9,9 +9,10 @@ Same rule as `ucf-wordpress-block-theme`. Reuse tokens; add as little as possibl
 
 1. **`theme.json` tokens first.** Never hard-code a hex, a font stack, a spacing value or
    a size that a token already expresses.
-2. **Existing classes and block styles next** — `lead`, `eyebrow`, `meta`, and the
-   `is-style-on-dark` / `is-style-gold-edge` / `is-style-halftone` group styles. Reuse
-   these rather than writing pattern-local CSS.
+2. **Existing classes and block styles next** — `lead`, `eyebrow`, `meta`, the accent
+   color pairs (`is-style-paper`, `is-style-dark`, … and their `-accent` variants), and
+   the `is-style-on-dark` / `is-style-halftone` group styles. Reuse these rather than
+   writing pattern-local CSS.
 3. **Core block controls next.** Express color through the block's color controls
    (`backgroundColor` / `textColor` / `style.color`) and layout through block attributes —
    not bespoke classes.
@@ -27,6 +28,14 @@ Corollary: don't ship near-duplicate patterns for color variants.
     (`heading-1`, `display-1`, `ui`, `meta`) so the slug and the generated name match.
 -   **Don't reuse core's default preset slugs** (`small`, `medium`, `large`, `x-large`).
     `defaultFontSizes` is `false`, but same-slug collisions are still confusing.
+-   **Anything that sets a background must declare a text treatment with it.** Body copy,
+    links and the `lead` / `eyebrow` / `meta` helpers read `--brand-*` custom properties;
+    a background that sets none of them inherits the enclosing one, so a light card
+    nested in a dark section would keep the dark section's grey copy. Add a row to
+    `$on-background` in `_accents.scss` and `@include on-background(...)`. Never recolor
+    these with a descendant selector like `.is-style-on-dark p` — inheritance never beats
+    a matching rule, so that version leaks into every nested card that has its own
+    background. That bug shipped once already.
 -   **`ch` is font-relative.** Never use `ch` for `layout.contentSize` — the measure would
     scale with each element's own font size, so an H1 would get a wildly wider column than
     a paragraph. Content sizes are in px.

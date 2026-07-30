@@ -97,10 +97,6 @@
 
 // Section treatments registered as core/group block styles in functions.php.
 
-.is-style-gold-edge {
-	border-top: 5px solid map.get($color, "gold");
-}
-
 // Halftone dot field, used over black sections in the prototype.
 .is-style-halftone {
 	position: relative;

@@ -6,7 +6,7 @@
 
 .lead,
 .is-style-lead {
-	color: map.get($color, "text-body");
+	color: var(--brand-lead, #{map.get($color, "text-body")});
 	font-family: map.get($font, "body");
 	font-size: map.get($size, "lead");
 	font-weight: 600;
@@ -19,7 +19,7 @@
 .eyebrow,
 .is-style-eyebrow {
 	align-items: center;
-	color: map.get($color, "link-blue");
+	color: var(--brand-eyebrow, #{map.get($color, "link-blue")});
 	display: flex;
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "eyebrow");
@@ -40,7 +40,7 @@
 
 .meta,
 .is-style-meta {
-	color: map.get($color, "text-secondary");
+	color: var(--brand-meta, #{map.get($color, "text-secondary")});
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "meta");
 	letter-spacing: 0.03em;
@@ -54,31 +54,23 @@
 	display: none;
 }
 
-// On-dark inversions.
-.has-black-background-color,
-.has-ink-background-color,
-.is-style-on-dark {
-	.eyebrow,
-	.is-style-eyebrow {
-		color: map.get($color, "gold");
-	}
+// Body copy and links read the same `--brand-*` properties the helper classes do. Which
+// background declares them, and why they are properties rather than descendant selectors,
+// is documented in _accents.scss.
+//
+// `--brand-body` falls back to `inherit` so that outside a declared background nothing
+// changes — copy keeps inheriting whatever the page sets. `:hover` is listed alongside the
+// base link so the pair outranks theme.json's own `:root :where(a:hover)` color, which is
+// otherwise the more specific of the two.
+p,
+li {
+	color: var(--brand-body, inherit);
+}
 
-	.lead,
-	.is-style-lead {
-		color: map.get($color, "white");
-	}
-
-	.meta,
-	.is-style-meta {
-		color: map.get($color, "text-meta-dark");
-	}
-
-	p,
-	li {
-		color: map.get($color, "text-secondary-dark");
-	}
-
-	a:where(:not(.wp-block-button__link)) {
-		color: map.get($color, "blue-tint");
-	}
+// `brand-` components are excluded: the drawer links, the skip link and the heading anchor
+// carry their own color at (0,1,0), which the `:hover` half of this rule would otherwise
+// outrank. Both halves keep the exclusion so the two states cannot drift apart.
+a:where(:not(.wp-block-button__link, [class*="brand-"])),
+a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
+	color: var(--brand-link, #{map.get($color, "link-blue")});
 }
