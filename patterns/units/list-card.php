@@ -3,7 +3,7 @@
  * Title: List Card
  * Slug: ucf-brand/list-card
  * Categories: ucf-brand-units
- * Description: A bordered card holding a numbered list — each row a mono number beside a short title and a one-line description, rows divided by a bottom rule. Everything is set through core block controls, so the card recolors from the block sidebar.
+ * Description: A bordered card holding a numbered list — each row a number beside a short title and a description, rows divided by a bottom rule. Everything is set through core block controls, so the card recolors from the block sidebar.
  * Keywords: list card, list, numbered, steps, checklist, card, index
  *
  * @package ucf-brand-block-theme
@@ -23,7 +23,10 @@
  * the rule off, so adding or removing a row means duplicating a group and toggling one
  * border — no separators to keep in sync.
  *
- * Titles are H4 so they stay off the H2-driven drawer sub-nav — see CLAUDE.md. The three
+ * Titles are H3: the card normally follows an H2 section heading directly, so H3 is the next
+ * level down and keeps the outline from skipping one. H3 also stays off the H2-driven drawer
+ * sub-nav — see CLAUDE.md. Under a lead-in H3 (the Index layout), drop the rows to H4 on that
+ * instance. The three
  * rows below are starter content an editor edits in place.
  */
 ?>
@@ -43,8 +46,8 @@
 
 			<!-- wp:column {"verticalAlignment":"top","width":"90%"} -->
 			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:90%">
-				<!-- wp:heading {"level":4,"fontFamily":"body","fontSize":"ui","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"var:preset|spacing|10"}}}} -->
-				<h4 class="wp-block-heading has-body-font-family has-ui-font-size" style="margin-top:0;margin-bottom:var(--wp--preset--spacing--10);font-weight:700;line-height:1.2"><?php esc_html_e( 'Pacing', 'ucf-brand-block-theme' ); ?></h4>
+				<!-- wp:heading {"level":3,"fontFamily":"body","fontSize":"ui","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"var:preset|spacing|10"}}}} -->
+				<h3 class="wp-block-heading has-body-font-family has-ui-font-size" style="margin-top:0;margin-bottom:var(--wp--preset--spacing--10);font-weight:700;line-height:1.2"><?php esc_html_e( 'Pacing', 'ucf-brand-block-theme' ); ?></h3>
 				<!-- /wp:heading -->
 
 				<!-- wp:paragraph {"fontSize":"ui","style":{"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
@@ -71,8 +74,8 @@
 
 			<!-- wp:column {"verticalAlignment":"top","width":"90%"} -->
 			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:90%">
-				<!-- wp:heading {"level":4,"fontFamily":"body","fontSize":"ui","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"var:preset|spacing|10"}}}} -->
-				<h4 class="wp-block-heading has-body-font-family has-ui-font-size" style="margin-top:0;margin-bottom:var(--wp--preset--spacing--10);font-weight:700;line-height:1.2"><?php esc_html_e( 'Sound', 'ucf-brand-block-theme' ); ?></h4>
+				<!-- wp:heading {"level":3,"fontFamily":"body","fontSize":"ui","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"var:preset|spacing|10"}}}} -->
+				<h3 class="wp-block-heading has-body-font-family has-ui-font-size" style="margin-top:0;margin-bottom:var(--wp--preset--spacing--10);font-weight:700;line-height:1.2"><?php esc_html_e( 'Sound', 'ucf-brand-block-theme' ); ?></h3>
 				<!-- /wp:heading -->
 
 				<!-- wp:paragraph {"fontSize":"ui","style":{"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
@@ -99,8 +102,8 @@
 
 			<!-- wp:column {"verticalAlignment":"top","width":"90%"} -->
 			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:90%">
-				<!-- wp:heading {"level":4,"fontFamily":"body","fontSize":"ui","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"var:preset|spacing|10"}}}} -->
-				<h4 class="wp-block-heading has-body-font-family has-ui-font-size" style="margin-top:0;margin-bottom:var(--wp--preset--spacing--10);font-weight:700;line-height:1.2"><?php esc_html_e( 'Editing', 'ucf-brand-block-theme' ); ?></h4>
+				<!-- wp:heading {"level":3,"fontFamily":"body","fontSize":"ui","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"var:preset|spacing|10"}}}} -->
+				<h3 class="wp-block-heading has-body-font-family has-ui-font-size" style="margin-top:0;margin-bottom:var(--wp--preset--spacing--10);font-weight:700;line-height:1.2"><?php esc_html_e( 'Editing', 'ucf-brand-block-theme' ); ?></h3>
 				<!-- /wp:heading -->
 
 				<!-- wp:paragraph {"fontSize":"ui","style":{"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
