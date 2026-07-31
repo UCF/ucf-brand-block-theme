@@ -18,8 +18,8 @@
  * legible on a light or dark field without a variant per color.
  *
  * Each row is a Group carrying its own padding and its own bottom rule (the block's border
- * controls, `line` side border). Padding lives on the rows rather than the card, and the
- * card's block gap is 0, so each rule runs the full width of the card. The last row leaves
+ * controls, `line` color on the bottom border only). Padding lives on the rows rather than
+ * the card, and the card's block gap is 0, so each rule runs the full width of the card.
  * the rule off, so adding or removing a row means duplicating a group and toggling one
  * border — no separators to keep in sync.
  *
