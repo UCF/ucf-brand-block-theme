@@ -57,6 +57,16 @@ accent bar is part of what a pattern is rather than a look an editor picks, and 
 styles are single-select, so registering them would consume the slot an editor needs for
 a composition.
 
+**A pattern is core blocks and nothing else.** Structure, spacing, borders and type come
+from each block's own controls. The only classes a pattern may carry are the composition
+on its container and the role utilities that bind its accent (`accent-fill`, `accent-text`,
+`hairline`) — the parts that make it _that_ pattern rather than a look an editor picks.
+A registered block style prefilled as a sensible default is fine; a bespoke class carrying
+padding or a border is not. That is a sign the primitive is missing — add it to
+`_base.scss` or express it through the block's controls, not through a class only the
+pattern knows about. `brand-section` and `is-style-specimen` predate this rule and are the
+two standing exceptions, not precedent.
+
 ## Gotchas that have already bitten
 
 -   **Preset slugs get kebab-cased.** A slug of `h1` produces
