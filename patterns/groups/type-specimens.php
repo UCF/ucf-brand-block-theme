@@ -39,7 +39,7 @@
 <!-- wp:group {"className":"is-style-specimen","layout":{"type":"constrained"}} -->
 <div class="wp-block-group is-style-specimen">
 	<!-- wp:paragraph {"className":"is-style-eyebrow"} -->
-	<p class="is-style-eyebrow"><?php esc_html_e( 'Technical · JetBrains Mono · 100–800', 'ucf-brand-block-theme' ); ?></p>
+	<p class="is-style-eyebrow"><?php esc_html_e( 'Technical · Roboto Mono · 100–700', 'ucf-brand-block-theme' ); ?></p>
 	<!-- /wp:paragraph -->
 
 	<!-- wp:paragraph {"fontFamily":"mono","fontSize":"heading-4","style":{"typography":{"letterSpacing":"0.06em","textTransform":"uppercase"}}} -->

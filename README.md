@@ -56,7 +56,7 @@ mapped in `src/scss/_variables.scss`.
 
 ### Swapping the typefaces
 
-The prototype's Oswald / Montserrat / JetBrains Mono are **web stand-ins** for the licensed
+The prototype's Oswald / Montserrat / Roboto Mono are **web stand-ins** for the licensed
 brand faces (Gotham and URW DIN Condensed). Because the font family slugs are abstract —
 `display`, `body`, `mono` rather than font names — swapping them is a `theme.json`-only
 change: drop the new `woff2` files into `assets/fonts/`, repoint the three `fontFamily`
