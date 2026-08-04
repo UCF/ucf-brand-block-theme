@@ -76,6 +76,54 @@
 	}
 }
 
+.brand-sidebar__search {
+	margin: 0;
+	padding: 0 1.3rem 1rem;
+
+	.wp-block-search__inside-wrapper {
+		background: map.get($color, "card-dark");
+		border: 1px solid map.get($color, "line-dark");
+		gap: 0;
+	}
+
+	.wp-block-search__input {
+		background: transparent;
+		border: 0;
+		color: map.get($color, "white");
+		font-family: map.get($font, "body");
+		font-size: map.get($size, "ui");
+		font-weight: 600;
+		padding: 0.62rem 0.75rem;
+
+		&::placeholder {
+			color: map.get($color, "text-secondary-dark");
+			opacity: 1;
+		}
+
+		&:focus {
+			outline: 0;
+		}
+	}
+
+	.wp-block-search__button {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		border-left: 1px solid map.get($color, "line-dark");
+		color: map.get($color, "gold");
+		display: inline-flex;
+		justify-content: center;
+		margin: 0;
+		padding: 0.62rem 0.72rem;
+
+		&:hover,
+		&:focus {
+			background: map.get($color, "black");
+			color: map.get($color, "white");
+		}
+	}
+}
+
 // The sidebar's content comes from a template part invoked without a `tagName`, so WP wraps
 // it in `<div class="wp-block-template-part">`. Left alone that wrapper is the sidebar's only
 // flex child, which collapses `margin-top: auto` on the footer (a grandchild). `display:
