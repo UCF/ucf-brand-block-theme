@@ -10,18 +10,17 @@
  */
 
 /*
- * Same row idiom as the Index pattern (ucf-brand/index), boxed. Vanilla Gutenberg only:
- * the border color comes from the palette through the block's own border controls and the
- * number's display family and size from the typography controls — no theme classes, so an
- * editor can change any of it from the sidebar. The card sets neither a background nor a
- * text color: it inherits both from the section or group style it sits in, so it stays
- * legible on a light or dark field without a variant per color.
+ * Same row idiom as the Index pattern (ucf-brand/index), boxed. The card names no colors
+ * at all — border widths come from the block's own border controls and the `hairline`
+ * class points them at the `--brand-line` role, so the outline follows whatever
+ * composition the card sits in. Background and text color are likewise inherited, so it
+ * stays legible on a light or dark field without a variant per color.
  *
- * Each row is a Group carrying its own padding and its own bottom rule (the block's border
- * controls, `line` color on the bottom border only). Padding lives on the rows rather than
- * the card, and the card's block gap is 0, so each rule runs the full width of the card.
- * the rule off, so adding or removing a row means duplicating a group and toggling one
- * border — no separators to keep in sync.
+ * Each row is a Group carrying its own padding and its own bottom rule (a border width on
+ * the bottom side only, colored by the same `hairline` class). Padding lives on the rows
+ * rather than the card, and the card's block gap is 0, so each rule runs the full width of
+ * the card. The last row omits the rule, so adding or removing a row means duplicating a
+ * group and toggling one border — no separators to keep in sync.
  *
  * Titles are H3: the card normally follows an H2 section heading directly, so H3 is the next
  * level down and keeps the outline from skipping one. H3 also stays off the H2-driven drawer
@@ -30,10 +29,10 @@
  * rows below are starter content an editor edits in place.
  */
 ?>
-<!-- wp:group {"metadata":{"name":"List Card"},"style":{"border":{"width":"1px"},"spacing":{"blockGap":"0"}},"borderColor":"line","layout":{"type":"default"}} -->
-<div class="wp-block-group has-border-color has-line-border-color" style="border-width:1px">
-	<!-- wp:group {"metadata":{"name":"Row"},"style":{"border":{"bottom":{"color":"var:preset|color|line","width":"1px"}},"spacing":{"padding":{"top":"var:preset|spacing|30","right":"var:preset|spacing|40","bottom":"var:preset|spacing|30","left":"var:preset|spacing|40"}}},"layout":{"type":"default"}} -->
-	<div class="wp-block-group" style="border-bottom-color:var(--wp--preset--color--line);border-bottom-width:1px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--40)">
+<!-- wp:group {"metadata":{"name":"List Card"},"className":"hairline","style":{"border":{"width":"1px"},"spacing":{"blockGap":"0"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group hairline" style="border-width:1px">
+	<!-- wp:group {"metadata":{"name":"Row"},"className":"hairline","style":{"border":{"bottom":{"width":"1px"}},"spacing":{"padding":{"top":"var:preset|spacing|30","right":"var:preset|spacing|40","bottom":"var:preset|spacing|30","left":"var:preset|spacing|40"}}},"layout":{"type":"default"}} -->
+	<div class="wp-block-group hairline" style="border-bottom-width:1px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--40)">
 		<!-- wp:columns {"verticalAlignment":"top"} -->
 		<div class="wp-block-columns are-vertically-aligned-top">
 			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
@@ -60,8 +59,8 @@
 	</div>
 	<!-- /wp:group -->
 
-	<!-- wp:group {"metadata":{"name":"Row"},"style":{"border":{"bottom":{"color":"var:preset|color|line","width":"1px"}},"spacing":{"padding":{"top":"var:preset|spacing|30","right":"var:preset|spacing|40","bottom":"var:preset|spacing|30","left":"var:preset|spacing|40"}}},"layout":{"type":"default"}} -->
-	<div class="wp-block-group" style="border-bottom-color:var(--wp--preset--color--line);border-bottom-width:1px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--40)">
+	<!-- wp:group {"metadata":{"name":"Row"},"className":"hairline","style":{"border":{"bottom":{"width":"1px"}},"spacing":{"padding":{"top":"var:preset|spacing|30","right":"var:preset|spacing|40","bottom":"var:preset|spacing|30","left":"var:preset|spacing|40"}}},"layout":{"type":"default"}} -->
+	<div class="wp-block-group hairline" style="border-bottom-width:1px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--40)">
 		<!-- wp:columns {"verticalAlignment":"top"} -->
 		<div class="wp-block-columns are-vertically-aligned-top">
 			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->

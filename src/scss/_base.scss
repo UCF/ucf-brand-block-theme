@@ -1,4 +1,5 @@
 @use "sass:map";
+@use "compositions";
 @use "variables" as *;
 
 // `clip` rather than `hidden`: an `overflow: hidden` ancestor silently disables
@@ -93,6 +94,14 @@ textarea,
 	&:focus {
 		top: map.get($space, "20");
 	}
+}
+
+// Core's separator inherits `currentColor`, which makes it as dark as the copy around it.
+// Point it at the hairline role instead, so a pattern gets the field-appropriate rule
+// without naming a color token. An editor who sets one explicitly still wins — preset
+// color classes carry `!important`.
+.wp-block-separator {
+	border-color: var(--brand-line, #{compositions.role-default("line")});
 }
 
 @media (prefers-reduced-motion: reduce) {

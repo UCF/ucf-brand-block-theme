@@ -1,0 +1,183 @@
+// Color compositions — the layer between the raw tokens in _variables.scss and the CSS
+// that paints them.
+//
+// A composition is a background plus everything that has to be true of what sits on it:
+// body text, the `.lead` / `.eyebrow` / `.meta` helpers, links, and an accent. Nothing
+// here invents a value; every entry names a token that already exists in theme.json and
+// is aliased in _variables.scss. This module owns the *relationships* only.
+//
+// Two tables, deliberately not flattened into one. `$treatments` describes what happens
+// to marks on a kind of field; `$compositions` names the fields and points at a treatment.
+// `paper` and `light` are different backgrounds that share the same treatment, so merging
+// the tables would duplicate the treatment per composition and let the copies drift.
+//
+// One primitive, four compositions, two flavors each:
+//
+//   .is-style-paper          background + text only
+//   .is-style-paper-accent   the same, plus a 3px rule on the leading edge
+//
+// Padding, spacing and layout stay with the block's own controls; these styles own color
+// and the edge rule, nothing else.
+//
+// Custom properties, not descendant selectors, on purpose. A descendant rule such as
+// `.is-style-on-dark p` keeps applying to a nested card that has its own background,
+// because inheritance never beats a matching rule — a Light card inside a Dark section got
+// #B3B3B3 paragraphs on white. Custom properties resolve from the nearest ancestor that
+// sets them, so nesting works in either direction and does not depend on source order or
+// specificity.
+//
+// What consumes what:
+//
+//   this module            declares --brand-*        (a composition sets the properties)
+//   _typography.scss       reads --brand-lead etc.   (role assignment for the helpers)
+//   component partials     read --brand-accent       (a component binds it to something)
+//
+// The rule of thumb: anything that *sets* a --brand-* property belongs here; anything
+// that reads one for a single component belongs with that component.
+//
+// Adding a composition means a row in $compositions here plus a row in the same-named
+// array in functions.php — PHP cannot read a Sass map, so the two are synced by hand.
+
+@use "sass:map";
+@use "variables" as *;
+
+// Marks on a kind of field. `accent` is the composition's highlight color and `on-accent`
+// is the text that stays legible when a component uses that accent as a background —
+// they are always declared together, because anything that sets a background has to say
+// how text sits on it.
+$treatments: (
+	// The default. `role-default()` reads this row for the `var()` fallbacks used by the
+	// typography helpers, so the two can no longer drift.
+	"light": (
+		"accent": "gold",
+		"body": "text-body",
+		"body-muted": "text-secondary",
+		"eyebrow": "link-blue",
+		"lead": "text-body",
+		"line": "line",
+		"link": "link-blue",
+		"meta": "text-secondary",
+		"on-accent": "black",
+	),
+	// Body copy is white rather than `text-secondary-dark`: the grey read as washed out
+	// against the black field. `.meta` keeps its grey so the hierarchy survives. The
+	// accent is the deeper gold — a warmer, less shouty rule on black.
+	"dark": (
+		"accent": "gold-deep",
+		"body": "white",
+		"body-muted": "text-secondary-dark",
+		"eyebrow": "gold",
+		"lead": "white",
+		"line": "line-dark",
+		"link": "blue-tint",
+		"meta": "text-meta-dark",
+		"on-accent": "black",
+	),
+	// Nothing lighter than `text-body` clears 4.5:1 on the gold field — `text-secondary`
+	// lands at 4.01:1 and `link-blue` at 3.20:1 — so `.meta` gives up its grey
+	// de-emphasis here and leans on the mono family and size instead. The accent has to
+	// be the deeper gold or the edge disappears into the field.
+	// `body-muted` gives up its grey for the same reason `meta` does — de-emphasis on this
+	// field comes from family and size, not lightness. The hairline is the deeper gold;
+	// the light-field `line` would vanish here.
+	"gold": (
+		"accent": "gold-deep",
+		"body": "black",
+		"body-muted": "text-body",
+		"eyebrow": "black",
+		"lead": "text-body",
+		"line": "gold-deep",
+		"link": "black",
+		"meta": "text-body",
+		"on-accent": "black",
+	),
+);
+
+// The fields themselves. `treatment` is the foreign key into $treatments above.
+$compositions: (
+	"bold-gold": (
+		"bg": "gold",
+		"text": "black",
+		"treatment": "gold",
+	),
+	"paper": (
+		"bg": "paper-alt",
+		"text": "text-body",
+		"treatment": "light",
+	),
+	"light": (
+		"bg": "white",
+		"text": "text-body",
+		"treatment": "light",
+	),
+	"dark": (
+		"bg": "black",
+		"text": "white",
+		"treatment": "dark",
+	),
+);
+
+// The value a role takes when no composition has been declared. Consumers use it as the
+// `var()` fallback so the default lives in exactly one place — this table.
+@function role-default($role) {
+	@return map.get($color, map.get($treatments, "light", $role));
+}
+
+// Declare a treatment's roles as custom properties. Everything downstream reads these
+// rather than the tokens directly, which is what makes nesting work.
+@mixin treatment($name) {
+	$spec: map.get($treatments, $name);
+
+	--brand-accent: #{map.get($color, map.get($spec, "accent"))};
+	--brand-body: #{map.get($color, map.get($spec, "body"))};
+	--brand-body-muted: #{map.get($color, map.get($spec, "body-muted"))};
+	--brand-eyebrow: #{map.get($color, map.get($spec, "eyebrow"))};
+	--brand-lead: #{map.get($color, map.get($spec, "lead"))};
+	--brand-line: #{map.get($color, map.get($spec, "line"))};
+	--brand-link: #{map.get($color, map.get($spec, "link"))};
+	--brand-meta: #{map.get($color, map.get($spec, "meta"))};
+	--brand-on-accent: #{map.get($color, map.get($spec, "on-accent"))};
+}
+
+// Both flavors of every composition set the accent, so a component can bind
+// `--brand-accent` to whatever it needs whether or not the edge rule is showing. The
+// `-accent` flavor adds only the binding.
+@each $name, $spec in $compositions {
+	// `border-color` is set even though nothing here draws a border: `border-style` is
+	// `none` by default, so it paints only once the editor adds a width through the
+	// block's border control. That lets a pattern ask for a 1px outline without naming a
+	// color, and the outline follows the field. An editor who picks a border color
+	// explicitly still wins — preset classes carry `!important`.
+	.is-style-#{$name},
+	.is-style-#{$name}-accent {
+		@include treatment(map.get($spec, "treatment"));
+
+		background-color: map.get($color, map.get($spec, "bg"));
+		border-color: var(--brand-line);
+		color: map.get($color, map.get($spec, "text"));
+	}
+
+	.is-style-#{$name}-accent {
+		border-left: 3px solid var(--brand-accent, #{role-default("accent")});
+	}
+}
+
+// Backgrounds that predate the compositions. `.is-style-on-dark` supplies the treatment
+// only — the editor sets the background itself through the block's color controls.
+.has-black-background-color,
+.has-ink-background-color,
+.is-style-on-dark {
+	@include treatment("dark");
+}
+
+.has-gold-background-color {
+	@include treatment("gold");
+}
+
+// Focus rings need to clear the dark field. Paired with the base outline in _base.scss.
+.is-style-dark,
+.is-style-dark-accent {
+	:focus-visible {
+		outline-color: map.get($color, "gold");
+	}
+}
