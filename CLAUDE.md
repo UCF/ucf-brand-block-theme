@@ -21,6 +21,52 @@ Same rule as `ucf-wordpress-block-theme`. Reuse tokens; add as little as possibl
 
 Corollary: don't ship near-duplicate patterns for color variants.
 
+## Roles, not tokens
+
+`_compositions.scss` is the layer between the palette and the CSS that paints it. A
+composition (`is-style-light`, `-dark`, `-paper`, `-bold-gold`) declares a set of
+`--brand-*` roles — `accent`, `on-accent`, `line`, `body`, `body-muted`, `lead`, `eyebrow`,
+`meta`, `link` — and everything downstream reads those instead of naming a color.
+
+-   **Anything that _sets_ a `--brand-*` property belongs in `_compositions.scss`.**
+    Anything that _reads_ one for a single component belongs with that component.
+-   **The test for which to use: could an editor drop this inside a group carrying a
+    composition?** If yes it reads a role. If no — fixed chrome like the drawer, or status
+    colors like `success` / `danger` that must _not_ invert — a direct token is correct and
+    clearer. Don't convert `_tabs.scss` / `_accordion.scss` speculatively.
+-   Consumers use `compositions.role-default("<role>")` as the `var()` fallback, never a
+    restated token. That is what keeps the default in one place.
+
+## Patterns declare structure and composition, never color
+
+Color reaches a pattern two ways only: the composition class on a container, and the
+prefilled role utilities in `_utilities.scss` (`accent-fill`, `accent-text`, `hairline`).
+A `backgroundColor` / `textColor` / `borderColor` attribute, or a `var:preset|color|…` in a
+`style` object, freezes that block to one field and opts it out of the system.
+
+Because preset classes carry `!important`, opting out silently wins — `is-style-meta`
+combined with `textColor: "text-secondary"` looks fine on white and stays grey-on-black
+inside a Dark group. That exact pairing shipped in `section-index.php`. Set the width, the
+side and the size through core's controls; let the class supply the color.
+
+The one legitimate exception is a pattern whose subject _is_ a color — the swatch patterns
+name palette slugs on purpose.
+
+The role utilities are plain classes, not `register_block_style()`, for two reasons: an
+accent bar is part of what a pattern is rather than a look an editor picks, and block
+styles are single-select, so registering them would consume the slot an editor needs for
+a composition.
+
+**A pattern is core blocks and nothing else.** Structure, spacing, borders and type come
+from each block's own controls. The only classes a pattern may carry are the composition
+on its container and the role utilities that bind its accent (`accent-fill`, `accent-text`,
+`hairline`) — the parts that make it _that_ pattern rather than a look an editor picks.
+A registered block style prefilled as a sensible default is fine; a bespoke class carrying
+padding or a border is not. That is a sign the primitive is missing — add it to
+`_base.scss` or express it through the block's controls, not through a class only the
+pattern knows about. `brand-section` and `is-style-specimen` predate this rule and are the
+two standing exceptions, not precedent.
+
 ## Gotchas that have already bitten
 
 -   **Preset slugs get kebab-cased.** A slug of `h1` produces
@@ -32,7 +78,7 @@ Corollary: don't ship near-duplicate patterns for color variants.
     links and the `lead` / `eyebrow` / `meta` helpers read `--brand-*` custom properties;
     a background that sets none of them inherits the enclosing one, so a light card
     nested in a dark section would keep the dark section's grey copy. Add a row to
-    `$on-background` in `_accents.scss` and `@include on-background(...)`. Never recolor
+    `$treatments` in `_compositions.scss` and `@include treatment(...)`. Never recolor
     these with a descendant selector like `.is-style-on-dark p` — inheritance never beats
     a matching rule, so that version leaks into every nested card that has its own
     background. That bug shipped once already.

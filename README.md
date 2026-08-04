@@ -131,16 +131,31 @@ loop in `functions.php`.
 
 ### Patterns (`patterns/`)
 
-| Pattern                    | Built from                                                 |
-| -------------------------- | ---------------------------------------------------------- |
-| `ucf-brand/color-swatches` | The two blocks above, pre-filled with the six core colors. |
-| `ucf-brand/type-specimens` | Core Group + Paragraph. One row per typeface.              |
-| `ucf-brand/type-scale`     | Core Group + Paragraph, generated from a PHP array.        |
+Patterns are filed in a compositional ladder, small to large — `ucf-brand-units` (single
+primitives) → `ucf-brand-groups` (clusters of units) → `ucf-brand-sections` (full-width
+bands) → `ucf-brand-pages` (whole-page layouts).
 
-The type patterns use **no custom markup at all** — a specimen row is a Group with the
-`Type Specimen` block style, an eyebrow paragraph, and a sample paragraph whose face and
-size are set through ordinary block controls (`fontFamily`, `fontSize`). An editor can
-build one from the inserter without touching code.
+| Pattern                    | Category | Built from                                                  |
+| -------------------------- | -------- | ----------------------------------------------------------- |
+| `ucf-brand/detail-card`    | units    | Core Group. Accent header bar over an open body drop zone.  |
+| `ucf-brand/list-card`      | units    | Core Group + Columns. Numbered rows divided by a bottom rule. |
+| `ucf-brand/color-swatches` | groups   | The two blocks above, pre-filled with the six core colors.  |
+| `ucf-brand/index`          | groups   | Core Columns + Separator. A numbered index of a section.    |
+| `ucf-brand/type-specimens` | groups   | Core Group + Paragraph. One row per typeface.               |
+| `ucf-brand/type-scale`     | groups   | Core Group + Paragraph, generated from a PHP array.         |
+| `ucf-brand/section`        | sections | Core Group (`section`, alignfull). H2, intro, drop zone.    |
+
+**A pattern is core blocks and nothing else.** Every pattern here is vanilla Gutenberg
+markup — structure, spacing, borders and type all come from the blocks' own controls. The
+only classes a pattern carries are the composition on its container and the role utilities
+that bind its accent (`accent-fill`, `accent-text`, `hairline`), which is how a pattern
+holds a look without holding a color. Drop any of them into a Dark or Bold Gold group and
+it recolors; none of them names a token. See `CLAUDE.md` for the full rule.
+
+A specimen row, for instance, is a Group with the `Type Specimen` block style, an eyebrow
+paragraph, and a sample paragraph whose face and size are set through ordinary block
+controls (`fontFamily`, `fontSize`) — an editor can build one from the inserter without
+touching code.
 
 `type-scale.php` renders each row _using the preset it documents_, so the page is a live
 read of `theme.json` rather than a transcription of it — change a size there and the demo
@@ -148,8 +163,24 @@ follows.
 
 ### Block styles
 
-`on-dark`, `gold-edge`, `halftone`, `specimen` (Group); `lead`, `eyebrow`, `meta`
-(Paragraph and Heading). Registered in `functions.php`, defined in `src/scss/`.
+Registered in `functions.php`, defined in `src/scss/`.
+
+| Block                | Styles                                                                  |
+| -------------------- | ----------------------------------------------------------------------- |
+| Group                | `light`, `paper`, `dark`, `bold-gold` — each also in an `-accent` flavor |
+| Group                | `on-dark`, `halftone`, `specimen`                                       |
+| Paragraph, Heading   | `lead`, `eyebrow`, `meta`, `muted`                                      |
+| Group, Columns, Paragraph, Heading, List | `reading-width`                                     |
+| Button               | `glyph`                                                                  |
+| Accordion            | `brand`                                                                  |
+
+The four Group color pairs are the **compositions** — a background plus everything that has
+to be true of what sits on it. Each declares a set of `--brand-*` roles (`accent`, `line`,
+`body`, `lead`, `eyebrow`, `meta`, `link`, …) that every downstream rule reads instead of
+naming a color, which is what lets a card invert correctly when it is nested in a darker
+one. The `-accent` flavor adds a 3px rule on the leading edge. Defined by the `$treatments`
+and `$compositions` maps in `src/scss/_compositions.scss`; adding a pair means a row in
+each of those maps plus a row in `ucf_brand_register_callout_styles()`.
 
 ## Architecture notes
 

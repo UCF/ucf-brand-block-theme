@@ -1,0 +1,34 @@
+// Role utilities — plain classes a pattern prefills on a block to bind the enclosing
+// composition's roles to a specific part of itself.
+//
+// Deliberately not registered block styles. The accent on a detail card's header bar is
+// part of what that pattern *is*, not a look an editor picks, so it belongs in the
+// pattern's markup as a `className`. Keeping these out of the Styles panel also leaves
+// each block's single style slot free — an editor can still apply Meta, Lead or a
+// composition to the same block.
+//
+// This is the seam that lets a pattern hold no color at all. `_compositions.scss` decides
+// what a role *is*; these classes decide what a component does with it; the pattern names
+// only the class. Drop the pattern into a Dark group and every one of them re-resolves.
+//
+// Color only — width, side, padding and size stay with the block's own controls, so the
+// same class works for a card header, a chip, a divider or a callout at any scale.
+
+@use "compositions";
+
+// Background + its paired foreground. Always together: a background without a legible
+// text color is the bug CLAUDE.md warns about.
+.accent-fill {
+	background-color: var(--brand-accent, #{compositions.role-default("accent")});
+	color: var(--brand-on-accent, #{compositions.role-default("on-accent")});
+}
+
+.accent-text {
+	color: var(--brand-accent, #{compositions.role-default("accent")});
+}
+
+// Hairline color for a block that declares its own border width through the block's
+// border controls. Sets color on every side; only the sides given a width will paint.
+.hairline {
+	border-color: var(--brand-line, #{compositions.role-default("line")});
+}

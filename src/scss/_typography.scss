@@ -1,12 +1,18 @@
 @use "sass:map";
+@use "compositions";
 @use "variables" as *;
 
 // Each rule is paired with its `.is-style-*` selector so a registered block style and
 // a hand-applied class share one definition. Matches ucf-wordpress-block-theme.
+//
+// This file assigns roles — `.lead` takes the lead color role — but never decides what a
+// role is worth. Both the live value (`--brand-lead`) and the no-composition fallback
+// (`compositions.role-default()`) come from _compositions.scss, so no color token is
+// named here.
 
 .lead,
 .is-style-lead {
-	color: var(--brand-lead, #{map.get($color, "text-body")});
+	color: var(--brand-lead, #{compositions.role-default("lead")});
 	font-family: map.get($font, "body");
 	font-size: map.get($size, "lead");
 	font-weight: 600;
@@ -19,7 +25,7 @@
 .eyebrow,
 .is-style-eyebrow {
 	align-items: center;
-	color: var(--brand-eyebrow, #{map.get($color, "link-blue")});
+	color: var(--brand-eyebrow, #{compositions.role-default("eyebrow")});
 	display: flex;
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "eyebrow");
@@ -38,9 +44,17 @@
 	}
 }
 
+// De-emphasized body copy. Same family and size as `p` — only the color role differs, so
+// a pattern can ask for grey copy without naming a token and freezing it to a light field.
+// `.meta` is not a substitute: it also switches to mono at meta size.
+.muted,
+.is-style-muted {
+	color: var(--brand-body-muted, #{compositions.role-default("body-muted")});
+}
+
 .meta,
 .is-style-meta {
-	color: var(--brand-meta, #{map.get($color, "text-secondary")});
+	color: var(--brand-meta, #{compositions.role-default("meta")});
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "meta");
 	letter-spacing: 0.03em;
@@ -56,7 +70,7 @@
 
 // Body copy and links read the same `--brand-*` properties the helper classes do. Which
 // background declares them, and why they are properties rather than descendant selectors,
-// is documented in _accents.scss.
+// is documented in _compositions.scss.
 //
 // `--brand-body` falls back to `inherit` so that outside a declared background nothing
 // changes — copy keeps inheriting whatever the page sets. `:hover` is listed alongside the
@@ -72,5 +86,5 @@ li {
 // outrank. Both halves keep the exclusion so the two states cannot drift apart.
 a:where(:not(.wp-block-button__link, [class*="brand-"])),
 a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
-	color: var(--brand-link, #{map.get($color, "link-blue")});
+	color: var(--brand-link, #{compositions.role-default("link")});
 }

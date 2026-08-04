@@ -129,7 +129,7 @@ add_action( 'init', 'ucf_brand_register_blocks' );
  *
  * These are the prototype's `.on-dark` / `.ht` section modifiers, expressed so an editor
  * can apply them from the block sidebar instead of hand-writing a class. Definitions live
- * in src/scss/_sections.scss and _accents.scss.
+ * in src/scss/_sections.scss and _compositions.scss.
  *
  * @return void
  */
@@ -152,10 +152,14 @@ function ucf_brand_register_block_styles() {
 
 	ucf_brand_register_callout_styles();
 
+	// `muted` is de-emphasized body copy — the same family and size as body text, one step
+	// down in emphasis. It exists so a pattern can ask for grey copy without naming a color
+	// token, which would freeze it to a light field. See src/scss/_compositions.scss.
 	$text_styles = array(
 		'lead'    => __( 'Lead', 'ucf-brand-block-theme' ),
 		'eyebrow' => __( 'Eyebrow', 'ucf-brand-block-theme' ),
 		'meta'    => __( 'Meta', 'ucf-brand-block-theme' ),
+		'muted'   => __( 'Muted', 'ucf-brand-block-theme' ),
 	);
 
 	foreach ( $text_styles as $name => $label ) {
@@ -218,10 +222,10 @@ add_action( 'init', 'ucf_brand_register_block_styles' );
  *     is-style-paper           background + text only
  *     is-style-paper-accent    the same pair plus the edge rule
  *
- * Definitions live in src/scss/_callouts.scss, and the dark and gold pairs also appear in
- * the on-background inversions in _typography.scss so `.eyebrow` and `.meta` stay legible
- * on them. Adding a pair means a row here plus a row in the `$callouts` map in
- * _callouts.scss.
+ * Definitions live in src/scss/_compositions.scss, which also declares the `--brand-*`
+ * roles each pair supplies — including `--brand-accent`, set by both flavors so a
+ * component can bind it whether or not the edge rule is showing. Adding a pair means a
+ * row here plus a row in the `$compositions` map there.
  *
  * Replaces the old single-purpose `gold-edge` style.
  *
