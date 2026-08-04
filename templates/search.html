@@ -20,7 +20,7 @@
 	<div class="wp-block-group brand-content">
 		<!-- wp:query-title {"type":"search","level":1,"fontSize":"heading-1"} /-->
 
-		<!-- wp:query {"queryId":1,"query":{"perPage":10,"pages":0,"offset":0,"postType":"page","order":"asc","orderBy":"title","inherit":true},"layout":{"type":"default"}} -->
+		<!-- wp:query {"queryId":1,"query":{"postType":"page","inherit":true},"layout":{"type":"default"}} -->
 		<div class="wp-block-query">
 			<!-- wp:post-template -->
 			<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20","padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20"}}},"border":{"bottom":{"color":"line","width":"1px"}},"layout":{"type":"constrained"}} -->
@@ -28,6 +28,8 @@
 				<!-- wp:post-title {"level":2,"isLink":true,"fontSize":"heading-3"} /-->
 
 				<!-- wp:post-excerpt {"showMoreOnNewLine":false,"excerptLength":28} /-->
+
+				<!-- wp:ucf-brand/search-subsections /-->
 			</div>
 			<!-- /wp:group -->
 			<!-- /wp:post-template -->

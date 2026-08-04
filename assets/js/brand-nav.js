@@ -42,45 +42,23 @@
 	}
 
 	/**
-	 * Turn heading text into a URL-safe id.
+	 * Read a heading's id.
 	 *
-	 * @param {string} value Heading text.
-	 * @return {string} Slug.
-	 */
-	function slugify( value ) {
-		return value
-			.toLowerCase()
-			.trim()
-			.replace( /[^a-z0-9\s-]/g, '' )
-			.replace( /\s+/g, '-' )
-			.replace( /-+/g, '-' );
-	}
-
-	/**
-	 * Give a heading a stable, unique id, preserving any id the author already set.
+	 * Ids are generated server-side during render_block — see includes/headings.php, which
+	 * owns the slug so that search can emit `/page/#heading` links that agree with the
+	 * page. Nothing here derives one; this only supplies a positional fallback for an H2
+	 * that reached the DOM without passing through that filter.
 	 *
 	 * @param {HTMLElement} heading Heading element.
-	 * @param {number}      index   Position, used when the heading has no text.
+	 * @param {number}      index   Position within the content area.
 	 * @return {string} The heading's id.
 	 */
-	function ensureHeadingId( heading, index ) {
-		if ( heading.id ) {
-			return heading.id;
+	function headingId( heading, index ) {
+		if ( ! heading.id ) {
+			heading.id = 'section-' + ( index + 1 );
 		}
 
-		var base =
-			slugify( heading.textContent || '' ) || 'section-' + ( index + 1 );
-		var candidate = base;
-		var suffix = 1;
-
-		while ( document.getElementById( candidate ) ) {
-			suffix += 1;
-			candidate = base + '-' + suffix;
-		}
-
-		heading.id = candidate;
-
-		return candidate;
+		return heading.id;
 	}
 
 	/**
@@ -150,7 +128,7 @@
 		list.className = 'brand-subnav';
 
 		headings.forEach( function ( heading, index ) {
-			var id = ensureHeadingId( heading, index );
+			var id = headingId( heading, index );
 			var item = document.createElement( 'li' );
 			var link = document.createElement( 'a' );
 
@@ -359,7 +337,7 @@
 		document.body.appendChild( live );
 
 		headings.forEach( function ( heading, index ) {
-			var id = ensureHeadingId( heading, index );
+			var id = headingId( heading, index );
 			var anchor = document.createElement( 'a' );
 
 			anchor.className = 'brand-heading__anchor';

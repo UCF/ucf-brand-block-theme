@@ -1,5 +1,21 @@
 # Search Feature Implementation Plan
 
+> **Status: all three phases shipped.** Phase 3 was built from Option A below, but not the
+> way this plan first described it. Two things changed once the code was written:
+>
+> 1. **No post meta and no `save_post` indexing.** Sections are resolved at render time from
+>    `post_content` (`includes/search.php`). Nothing is stored, so nothing can go stale and
+>    no reindex is needed when a page is edited. The "Risk: performance when parsing content
+>    on every save" below stopped applying.
+> 2. **Relevanssi Premium is not required, and would not have helped.** Relevanssi's index
+>    unit is the post in both editions — neither returns a fragment of a page. Relevanssi
+>    (free, already installed) ranks the pages; the theme picks the H2 within each one.
+>    Premium is worth buying for PDF/attachment indexing, which is a separate feature.
+>
+> The anchor-drift risk this plan flagged was real and was fixed first: ids now come from
+> `includes/headings.php` during `render_block` instead of from `brand-nav.js` in the
+> browser, so there is one implementation rather than two that must agree. See CLAUDE.md.
+
 ## Goals
 
 - Add a search input above the sidebar nav menu.

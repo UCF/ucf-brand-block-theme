@@ -149,3 +149,18 @@ A page render is not a sufficient check — invalid blocks still render on the f
 
 Sub-navigation is generated from each page's `<h2>` elements. An H2 is a drawer entry.
 Use H3 for anything that should not appear in the drawer.
+
+**`includes/headings.php` owns the anchor id.** Ids are assigned during `render_block`, so
+they are in the HTML the server sends. Don't derive them anywhere else. `brand-nav.js` used
+to slugify in the browser, and the moment search needed to emit a `/page/#heading` link
+server-side there were two implementations that had to agree byte for byte — they didn't,
+and the deep links landed at the top of the page.
+
+Two consequences worth knowing:
+
+-   `ucf_brand_heading_slug()` is a port of the old JS `slugify()`, **not** a call to
+    `sanitize_title()`, which transliterates accents and handles entities differently.
+    Anchors already shared or bookmarked keep resolving. Don't "simplify" it.
+-   Anything server-side that needs a page's sections should call
+    `ucf_brand_get_post_sections()` rather than re-parsing content. It reuses the same two
+    slug helpers in the same order, which is the only reason its anchors match the page's.

@@ -5,9 +5,9 @@
  *   1. A "Brand" panel on the Page document sidebar with a number field bound to the
  *      `ucf_brand_number` post meta. That value orders the page in the drawer and prints
  *      as its decimal label — see functions.php (`ucf_brand_get_ordered_sections`).
- *   2. A client registration for the server-rendered `ucf-brand/section-nav` block so the
- *      Site Editor previews the real drawer menu (via ServerSideRender) instead of showing
- *      an "unsupported block" placeholder. The markup itself is rendered in PHP.
+ *   2. Client registrations for the server-rendered `ucf-brand/section-nav` and
+ *      `ucf-brand/search-subsections` blocks, so the Site Editor shows them as real blocks
+ *      rather than "unsupported block" placeholders. Both render their markup in PHP.
  */
 import { registerPlugin } from '@wordpress/plugins';
 import {
@@ -15,11 +15,16 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { registerBlockType } from '@wordpress/blocks';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import {
+	PanelBody,
+	Placeholder,
+	TextControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -158,5 +163,33 @@ registerBlockType( 'ucf-brand/section-nav', {
 	icon: 'menu',
 	supports: { html: false, inserter: false, reusable: false },
 	edit: () => <ServerSideRender block="ucf-brand/section-nav" />,
+	save: () => null,
+} );
+
+// Unlike section-nav this one gets a static placeholder rather than a ServerSideRender
+// preview: it renders per result row, from the live search query, so outside a search
+// there is nothing for it to draw and the preview would only ever report itself empty.
+registerBlockType( 'ucf-brand/search-subsections', {
+	apiVersion: 3,
+	title: __( 'Matching sections', 'ucf-brand-block-theme' ),
+	description: __(
+		'Deep links to the headings within a result that match the search query.',
+		'ucf-brand-block-theme'
+	),
+	category: 'theme',
+	icon: 'search',
+	supports: { html: false, inserter: false, reusable: false },
+	edit: () => (
+		<div { ...useBlockProps() }>
+			<Placeholder
+				icon="search"
+				label={ __( 'Matching sections', 'ucf-brand-block-theme' ) }
+				instructions={ __(
+					'Renders on the search results page only, beneath each result.',
+					'ucf-brand-block-theme'
+				) }
+			/>
+		</div>
+	),
 	save: () => null,
 } );

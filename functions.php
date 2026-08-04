@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once get_theme_file_path( 'includes/patterns.php' );
+require_once get_theme_file_path( 'includes/headings.php' );
+require_once get_theme_file_path( 'includes/search.php' );
 
 /**
  * Theme supports and editor styles.
@@ -71,25 +73,6 @@ function ucf_brand_enqueue_assets() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'ucf_brand_enqueue_assets' );
-
-/**
- * Keep guide search results focused on section pages.
- *
- * The theme's search UI targets pages, but direct links to `?s=...` should resolve the
- * same way. Constrain only the front-end main query, leaving admin and secondary queries
- * untouched.
- *
- * @param WP_Query $query The query instance (passed by reference).
- * @return void
- */
-function ucf_brand_limit_main_search_to_pages( $query ) {
-	if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() ) {
-		return;
-	}
-
-	$query->set( 'post_type', 'page' );
-}
-add_action( 'pre_get_posts', 'ucf_brand_limit_main_search_to_pages' );
 
 /**
  * Register the theme's custom blocks.
