@@ -100,8 +100,9 @@
 			opacity: 1;
 		}
 
-		&:focus {
-			outline: 0;
+		&:focus-visible {
+			outline: 3px solid map.get($color, "gold");
+			outline-offset: 2px;
 		}
 	}
 

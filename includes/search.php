@@ -84,7 +84,7 @@ function ucf_brand_search_terms( $query = null ) {
 	}
 
 	foreach ( preg_split( '/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY ) as $word ) {
-		if ( mb_strlen( $word ) > 1 ) {
+		if ( wp_strlen( $word ) > 1 ) {
 			$terms[] = $word;
 		}
 	}
