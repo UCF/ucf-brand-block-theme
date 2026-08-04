@@ -54,9 +54,28 @@
 	 * @return {string} The heading's id.
 	 */
 	function headingId( heading, index ) {
-		if ( ! heading.id ) {
-			heading.id = 'section-' + ( index + 1 );
+		if ( heading.id ) {
+			return heading.id;
 		}
+
+		// Positional, never derived from the heading text. Building a slug here would put
+		// a second implementation of the server's rule in the browser, which is the bug
+		// includes/headings.php exists to prevent.
+		//
+		// Still collision-checked: on a page old enough to predate the render_block filter
+		// every H2 lands here at once, and `section-2` is a name an authored anchor could
+		// already hold. Positions are unique, so this only guards against ids owned by
+		// something other than another heading.
+		var base = 'section-' + ( index + 1 );
+		var candidate = base;
+		var suffix = 1;
+
+		while ( document.getElementById( candidate ) ) {
+			suffix += 1;
+			candidate = base + '-' + suffix;
+		}
+
+		heading.id = candidate;
 
 		return heading.id;
 	}
