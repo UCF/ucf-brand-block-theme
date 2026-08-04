@@ -1,6 +1,6 @@
 {
 	"name": "ucf-brand-block-theme",
-	"version": "0.1.0",
+	"version": "1.0.0-alpha.2",
 	"description": "Foundation-first block theme for UCF brand documentation.",
 	"private": true,
 	"license": "GPL-2.0-or-later",
