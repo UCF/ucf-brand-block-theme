@@ -36,7 +36,7 @@ PHP follows the WordPress Coding Standards, configured in `phpcs.xml.dist` (the 
 ruleset, `ucf_brand` global prefix, theme text domain). JS/JSON/SCSS/Markdown follow the
 shared `@wordpress/prettier-config`.
 
-Block-markup files — `parts/`, `templates/`, the `patterns/` PHP and `tools/seed/` content —
+Block-markup files — `parts/`, `templates/`, and the `patterns/` PHP —
 are deliberately excluded from Prettier in `.prettierignore`. Their canonical form is whatever
 the block editor emits; reformatting the serialized markup diverges from each block's `save()`
 and triggers invalid-block warnings. Leave it as the editor writes it.
@@ -56,7 +56,7 @@ mapped in `src/scss/_variables.scss`.
 
 ### Swapping the typefaces
 
-The prototype's Oswald / Montserrat / JetBrains Mono are **web stand-ins** for the licensed
+The prototype's Oswald / Montserrat / Roboto Mono are **web stand-ins** for the licensed
 brand faces (Gotham and URW DIN Condensed). Because the font family slugs are abstract —
 `display`, `body`, `mono` rather than font names — swapping them is a `theme.json`-only
 change: drop the new `woff2` files into `assets/fonts/`, repoint the three `fontFamily`
@@ -185,22 +185,9 @@ each of those maps plus a row in `ucf_brand_register_callout_styles()`.
 ## Architecture notes
 
 -   **Nothing is server-rendered.** No `render.php`, no `render_callback`, and no
-    `core/pattern` references in seeded content — pages hold real block markup an editor
+    `core/pattern` references in page content — pages hold real block markup an editor
     can change.
 -   **Distribution.** Blocks live in the theme for now because the design is still moving.
     See the note above on lifting them into a plugin.
 -   Follows the conventions in `ucf-wordpress-block-theme/CLAUDE.md`: tokens first, then
     existing classes, then core block controls, and only then something new.
-
-## Local development content
-
-`tools/seed/` holds a dev-only seeder that populates a local site with the eleven brand
-sections. It is not part of the distributed theme.
-
-```bash
-wp --path=/path/to/wordpress --url=http://localhost/wordpress/brand/ \
-   eval-file tools/seed/seed-brand.php
-```
-
-Idempotent — pages are matched by slug and updated in place, so re-running after editing
-`tools/seed/pages/*.html` refreshes content without creating duplicates.

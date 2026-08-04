@@ -1,0 +1,79 @@
+@use "sass:map";
+@use "compositions";
+@use "variables" as *;
+
+// Search results.
+//
+// The sidebar's search input is styled with the rest of the drawer in _drawer.scss. This
+// file covers the results page: specifically the subsection deep links that
+// ucf-brand/search-subsections renders beneath each result (see includes/search.php).
+//
+// Colors go through the `--brand-*` roles rather than palette tokens directly, so a result
+// list dropped onto a dark or paper field re-reads its own field instead of inheriting the
+// enclosing one. See CLAUDE.md.
+
+.brand-search__sections {
+	margin-top: map.get($space, "10");
+}
+
+.brand-search__list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.brand-search__item {
+	margin: 0;
+}
+
+// Mono at meta size, matching the `.meta` idiom — these are wayfinding labels, not body
+// copy. The marker is the only colored element at rest, so the row reads as secondary
+// until hovered.
+.brand-search__link {
+	align-items: baseline;
+	color: var(--brand-meta, #{compositions.role-default("meta")});
+	display: inline-flex;
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "meta");
+	gap: 0.5rem;
+	letter-spacing: 0.03em;
+	line-height: 1.6;
+	text-decoration: none;
+
+	&:hover,
+	&:focus-visible {
+		color: var(--brand-link, #{compositions.role-default("link")});
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+}
+
+.brand-search__marker {
+	color: var(--brand-accent, #{compositions.role-default("accent")});
+	flex: none;
+	font-weight: 700;
+}
+
+// Indented to sit under the heading text rather than under the `#`, which reads as a
+// caption on the link above it. Approximates the marker's width plus the link's gap.
+.brand-search__snippet {
+	color: var(--brand-body-muted, #{compositions.role-default("body-muted")});
+	font-size: map.get($size, "meta");
+	line-height: 1.65;
+	margin: 0.15rem 0 0;
+	padding-left: 1.15rem;
+}
+
+// Scoped rather than a bare `mark` rule: restyling every mark on the site is a bigger
+// decision than search wants to make. `accent` / `on-accent` are declared as a pair by
+// every composition precisely so a component can use the accent as a background and still
+// have legible text on it — which is exactly what a highlight is.
+.brand-search__snippet mark,
+.brand-search__text mark {
+	background: var(--brand-accent, #{compositions.role-default("accent")});
+	color: var(--brand-on-accent, #{compositions.role-default("on-accent")});
+	padding: 0 0.15em;
+}

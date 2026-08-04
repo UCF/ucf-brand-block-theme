@@ -1,0 +1,57 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:html -->
+<div class="brand-mobile-bar">
+	<button class="brand-mobile-bar__toggle" type="button" aria-expanded="false" aria-controls="brand-sidebar" aria-label="Open navigation">&#9776;</button>
+	<p class="brand-mobile-bar__label">Brand Central</p>
+</div>
+<div class="brand-scrim" hidden></div>
+<!-- /wp:html -->
+
+<!-- wp:group {"tagName":"main","className":"brand-shell","style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}}},"layout":{"type":"default"}} -->
+<main class="wp-block-group brand-shell" style="padding-top:0;padding-right:0;padding-bottom:0;padding-left:0">
+	<!-- wp:group {"tagName":"aside","metadata":{"name":"Brand Sidebar"},"anchor":"brand-sidebar","className":"brand-sidebar","layout":{"type":"default"}} -->
+	<aside id="brand-sidebar" class="wp-block-group brand-sidebar">
+		<!-- wp:template-part {"slug":"brand-sidebar"} /-->
+	</aside>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"className":"brand-content","layout":{"type":"default"}} -->
+	<div class="wp-block-group brand-content">
+		<!-- wp:query-title {"type":"search","level":1,"fontSize":"heading-1"} /-->
+
+		<!-- wp:query {"queryId":1,"query":{"postType":"page","inherit":true},"layout":{"type":"default"}} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template -->
+			<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20","padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20"}}},"border":{"bottom":{"color":"line","width":"1px"}},"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group" style="border-bottom-color:var(--wp--preset--color--line);border-bottom-width:1px;padding-top:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20)">
+				<!-- wp:post-title {"level":2,"isLink":true,"fontSize":"heading-3"} /-->
+
+				<!-- wp:post-excerpt {"showMoreOnNewLine":false,"excerptLength":28} /-->
+
+				<!-- wp:ucf-brand/search-subsections /-->
+			</div>
+			<!-- /wp:group -->
+			<!-- /wp:post-template -->
+
+			<!-- wp:query-pagination -->
+			<!-- wp:query-pagination-previous /-->
+
+			<!-- wp:query-pagination-numbers /-->
+
+			<!-- wp:query-pagination-next /-->
+			<!-- /wp:query-pagination -->
+
+			<!-- wp:query-no-results -->
+			<!-- wp:paragraph {"className":"lead"} -->
+			<p class="lead">No matching pages found. Try a different keyword.</p>
+			<!-- /wp:paragraph -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+	</div>
+	<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once get_theme_file_path( 'includes/patterns.php' );
+require_once get_theme_file_path( 'includes/headings.php' );
+require_once get_theme_file_path( 'includes/search.php' );
 
 /**
  * Theme supports and editor styles.
@@ -167,8 +169,6 @@ function ucf_brand_register_block_styles() {
 			)
 		);
 	}
-
-
 
 	// Glyph: a transparent, borderless button for a clickable icon/glyph. This is a
 	// look, so it stays a block style. The orthogonal "stretch to container" behavior

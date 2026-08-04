@@ -19,7 +19,7 @@
 	<exclude-pattern>/build/</exclude-pattern>
 	<exclude-pattern>/assets/</exclude-pattern>
 
-	<!-- Dev-only local seeding content; not part of the distributed theme. -->
+	<!-- Local tooling and non-theme sources. -->
 	<exclude-pattern>/tools/</exclude-pattern>
 
 	<!-- Target the versions the theme supports (style.css: 6.5+, PHP 8.1+). -->
