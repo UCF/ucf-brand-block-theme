@@ -83,8 +83,11 @@ function ucf_brand_search_terms( $query = null ) {
 		$query = preg_replace( '/"[^"]+"/', ' ', $query );
 	}
 
+	// mb_strlen(), not a `wp_`-prefixed wrapper — no such wrapper exists. Core polyfills
+	// this one in wp-includes/compat.php when the mbstring extension is missing, so it is
+	// always safe to call here.
 	foreach ( preg_split( '/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY ) as $word ) {
-		if ( wp_strlen( $word ) > 1 ) {
+		if ( mb_strlen( $word ) > 1 ) {
 			$terms[] = $word;
 		}
 	}
