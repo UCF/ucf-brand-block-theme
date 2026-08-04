@@ -18,5 +18,4 @@ composer.lock
 # the editor emits and risks invalid-block warnings, so leave it untouched.
 parts/
 templates/
-tools/seed/pages/
 patterns/

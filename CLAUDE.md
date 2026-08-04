@@ -54,7 +54,7 @@ Corollary: don't ship near-duplicate patterns for color variants.
 **Never use a Custom HTML (`core/html`) block in page content.** If content needs
 structure that core blocks don't express, the answer is a custom block, a pattern, or a
 registered block style — not raw markup pasted into a page. There is currently zero
-`wp:html` in any seeded page; keep it that way.
+`wp:html` in authored pages; keep it that way.
 
 Custom blocks live in `blocks/<name>/`, built by `wp-scripts` to `build/<name>/`, and
 registered by the loop in `ucf_brand_register_blocks()`.
@@ -73,7 +73,7 @@ Pattern PHP must serialize **exactly** what `save()` would produce or the editor
 the block invalid. Class and inline-style _order_ doesn't matter (Gutenberg compares
 class tokens as a set and parses style declarations), but presence and values do.
 
-Verify by opening a seeded page in the block editor and asking the store directly:
+Verify by opening a page in the block editor and asking the store directly:
 
 ```js
 wp.data.select( 'core/block-editor' ).getBlocks(); // walk innerBlocks, check isValid
@@ -98,7 +98,6 @@ A page render is not a sufficient check — invalid blocks still render on the f
     (full-width content bands) → `ucf-brand-pages` (whole-page layouts). Registered in
     `includes/patterns.php`. **Avoid the bare `ucf-sections` slug** — it is reserved by the
     UCF Section plugin.
--   `tools/seed/` is dev-only local content, not part of the distributed theme.
 
 ## H2s are structural
 
