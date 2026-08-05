@@ -575,7 +575,7 @@ add_action( 'enqueue_block_editor_assets', 'ucf_brand_enqueue_editor_assets' );
  * @return array Filtered settings.
  */
 function ucf_brand_editor_section_style( $settings, $context ) {
-	if ( empty( $context->post ) ) {
+	if ( empty( $context->post ) || 'page' !== $context->post->post_type ) {
 		return $settings;
 	}
 
