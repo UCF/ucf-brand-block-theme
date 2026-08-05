@@ -94,6 +94,53 @@ two standing exceptions, not precedent.
     `src/scss/_base.scss` — put new cases there rather than scattering `!important`.
 -   **The footer must stay outside `<main>`.** That is the only thing making the drawer
     stop at the footer.
+-   **Pages open `template-locked`, so anything editable must be in the template itself.**
+    `ucf_brand_page_rendering_mode()` turns "Show template" on by default for pages, which
+    is what makes the hero visible while writing. In that mode core disables every block in
+    the template except `core/post-title`, `core/post-featured-image` and
+    `core/post-content` — and it disables template parts *and their children* outright. Move
+    the hero into `parts/` and it renders but goes inert. It is also a default, not a lock:
+    the per-user preference beats it, so don't rely on it for anything but visibility.
+-   **To keep something in a template editable, add it to `editor.postContentBlockTypes`.**
+    That filter is the allowlist above, and it is the only supported seam for this — don't
+    invent a `setBlockEditingMode` effect that races core's. It matches by **block type**, so
+    the thing you name has to be a block of your own: allowlisting `core/paragraph` would
+    unlock every paragraph in every template. `ucf-brand/page-hero` exists for exactly this
+    reason and holds no content of its own.
+    Inside such a wrapper, `templateLock: 'contentOnly'` sorts the children — core keeps the
+    ones whose block type declares a `role: "content"` attribute and disables the rest. A
+    bound block is a further case: core refuses to let it be typed into unless its binding
+    source defines `setValues`, which is why `core/post-meta` fields are editable in place
+    and `ucf-brand/section-number` stays derived.
+-   **Per-page values cannot live in a template block's content.** A template is one object
+    shared by every page, so a paragraph typed into `templates/page.html` is the same
+    paragraph everywhere. Per-page hero copy is post meta reached through a binding. One
+    binding resolves to one string — that is why the deck is a single paragraph and the
+    closing note is a second field rather than one multi-paragraph blob.
+-   **A binding needs `show_in_rest` on the meta or it dies silently on the front end.**
+    `_block_bindings_post_meta_get_value()` refuses any key not exposed to REST and returns
+    null, which leaves the block's saved (empty) content in place. It looks like a CSS bug.
+-   **`register_block_bindings_source()` is the front end only — the editor needs a second,
+    JS registration.** A PHP-only source reaches the client as a label with no `getValues`,
+    so the canvas prints the source's *name* where the value belongs. Register the client
+    half with `registerBlockBindingsSource()` (blocks/index.js), passing neither `label` nor
+    `usesContext` — the server already supplied both and a second label warns. Omit
+    `setValues` to keep the field read-only. Accept that this restates the PHP formatter in
+    JS; the copies must be kept in step, and the reason it is tolerable here and not for
+    heading slugs is that nothing on the front end runs the JS copy.
+-   **Nothing in the hero may depend on the photo.** Copy sits on a featured image, so the
+    `scrim` gradient carries the contrast and the type stays at full strength — the closing
+    note is ordinary body copy, not `muted`, and the same goes for anything added later.
+    Grey on an arbitrary photograph fails whatever the gradient does. Note that with no
+    featured image `core/post-featured-image` renders nothing *including its overlay*, so
+    the fallback field is whatever the composition class paints — currently `is-style-dark`.
+-   **The hero's copy needs `width: 100%` and `position: relative`, and both are load-bearing.**
+    Core's constrained layout centers children with `margin-inline: auto !important`; inside
+    a flex container those auto margins beat `align-items: stretch`, so a short title shrinks
+    to its text and floats to the middle of the band. And painting order puts every
+    positioned box above every non-positioned one regardless of source order, so the
+    absolutely positioned featured image covers copy that merely comes later in the document.
+    Both are in `_hero.scss` with the reasoning; don't "clean them up".
 
 ## Blocks
 

@@ -8,6 +8,14 @@
 			"defaultGradients": false,
 			"defaultDuotone": false,
 			"custom": false,
+			"customGradient": false,
+			"gradients": [
+				{
+					"gradient": "linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.85) 45%, rgba(0, 0, 0, 0.55) 75%, rgba(0, 0, 0, 0.3) 100%)",
+					"name": "Scrim",
+					"slug": "scrim"
+				}
+			],
 			"palette": [
 				{
 					"color": "#EDB80D",

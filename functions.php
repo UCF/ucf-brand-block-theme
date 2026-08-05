@@ -30,6 +30,30 @@ function ucf_brand_setup() {
 add_action( 'after_setup_theme', 'ucf_brand_setup' );
 
 /**
+ * Open the page editor with the template rendered around the content.
+ *
+ * Pages default to `post-only` in core, which hides everything the template supplies —
+ * including the page header — so an author never sees it while writing. `template-locked`
+ * is the "Show template" state: the template renders, every block in it is disabled, and
+ * core re-enables exactly `core/post-title`, `core/post-featured-image` and
+ * `core/post-content` (see `DisableNonPageContentBlocks` in @wordpress/editor). The header
+ * is therefore visible *and* its title stays editable in place.
+ *
+ * Two consequences worth knowing:
+ *
+ * - This is a default, not a lock. The per-user preference (`core` → `renderingModes` →
+ *   stylesheet → post type) wins, so an author who switches "Show template" off stays off.
+ * - It follows that anything meant to be editable must live in `templates/page.html`
+ *   directly. Template parts and their children are disabled outright in this mode.
+ *
+ * @return void
+ */
+function ucf_brand_page_rendering_mode() {
+	add_post_type_support( 'page', 'editor', array( 'default-mode' => 'template-locked' ) );
+}
+add_action( 'init', 'ucf_brand_page_rendering_mode' );
+
+/**
  * Enqueue front-end assets.
  *
  * Webfonts are deliberately absent here — they are declared as `fontFace` entries in
@@ -95,6 +119,7 @@ function ucf_brand_register_blocks() {
 		'tab',
 		'tab-label',
 		'tab-panel',
+		'page-hero',
 	);
 
 	foreach ( $blocks as $block ) {
@@ -134,6 +159,17 @@ function ucf_brand_register_block_styles() {
 	}
 
 	ucf_brand_register_callout_styles();
+
+	// Accent Rule: the short, heavy rule that sits under a hero or section title. Reads
+	// `--brand-accent`, so it follows whatever composition encloses it rather than naming
+	// gold. Styling lives in src/scss/_hero.scss.
+	register_block_style(
+		'core/separator',
+		array(
+			'name'  => 'accent-rule',
+			'label' => __( 'Accent Rule', 'ucf-brand-block-theme' ),
+		)
+	);
 
 	// `muted` is de-emphasized body copy — the same family and size as body text, one step
 	// down in emphasis. It exists so a pattern can ask for grey copy without naming a color
@@ -254,7 +290,18 @@ function ucf_brand_register_callout_styles() {
  */
 
 /**
- * Register the per-page order/label field, exposed to the editor and REST.
+ * Register the per-page fields the hero and drawer read, exposed to the editor and REST.
+ *
+ * `ucf_brand_number` orders the page in the drawer and prints as its label.
+ * `ucf_brand_deck` and `ucf_brand_hero_note` are the hero's two lines of copy under the
+ * title. Both are written straight into the canvas: templates/page.html binds a paragraph
+ * to each through core's `core/post-meta` source, which is editable in place because that
+ * source ships a setter. Each holds one paragraph's worth of rich text — a binding resolves
+ * to a single string, so the deck is one paragraph and the note is the second.
+ *
+ * `show_in_rest` is not optional here. `_block_bindings_post_meta_get_value()` refuses to
+ * read a key that isn't exposed to REST, so dropping it would empty the hero on the front
+ * end, not just in the editor.
  *
  * @return void
  */
@@ -273,6 +320,23 @@ function ucf_brand_register_meta() {
 			},
 		)
 	);
+
+	foreach ( array( 'ucf_brand_deck', 'ucf_brand_hero_note' ) as $key ) {
+		register_post_meta(
+			'page',
+			$key,
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'default'           => '',
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'wp_kses_post',
+				'auth_callback'     => static function () {
+					return current_user_can( 'edit_pages' );
+				},
+			)
+		);
+	}
 }
 add_action( 'init', 'ucf_brand_register_meta' );
 
@@ -379,7 +443,12 @@ add_action( 'init', 'ucf_brand_register_bindings' );
 /**
  * Resolve the bound value: the queried page's zero-padded number, or '' when unset.
  *
- * @param array         $source_args    Binding arguments (unused).
+ * With a `label` argument the number is expanded into the hero's eyebrow line —
+ * "Brand Guidelines · Section 05" — rather than returned bare. Both forms come off the
+ * same meta value on purpose: the drawer prints one number per page and the hero prints
+ * the same one, so the two cannot drift the way a hand-typed eyebrow does.
+ *
+ * @param array         $source_args    Binding arguments. `label` prefixes the number.
  * @param WP_Block|null $block_instance The block being rendered.
  * @return string Decimal label, or ''.
  */
@@ -394,7 +463,20 @@ function ucf_brand_binding_section_number( $source_args, $block_instance = null 
 		$post_id = (int) get_queried_object_id();
 	}
 
-	return ucf_brand_format_number( get_post_meta( $post_id, 'ucf_brand_number', true ) );
+	$number = ucf_brand_format_number( get_post_meta( $post_id, 'ucf_brand_number', true ) );
+
+	// An unnumbered page returns '' either way, which empties the paragraph — and
+	// `.brand-page-number:empty` then hides it. See src/scss/_typography.scss.
+	if ( '' === $number || empty( $source_args['label'] ) ) {
+		return $number;
+	}
+
+	return sprintf(
+		/* translators: 1: guide name, e.g. "Brand Guidelines". 2: zero-padded section number, e.g. "05". */
+		__( '%1$s · Section %2$s', 'ucf-brand-block-theme' ),
+		$source_args['label'],
+		$number
+	);
 }
 
 /**
