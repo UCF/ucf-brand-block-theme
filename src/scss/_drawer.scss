@@ -149,25 +149,30 @@
 	padding-inline: var(--brand-gutter);
 }
 
-// The eyebrow and post title are direct (flow) children of `.brand-content`, so core does not
-// constrain them — hold them to the reading measure and center them, so the page header lines
-// up with the centered content below.
-.brand-content > .brand-page-number,
-.brand-content > .wp-block-post-title {
-	margin-inline: auto;
-	max-width: var(--wp--style--global--content-size);
+// A hero leads the column flush with the header: its image has to reach the top edge, and it
+// carries its own vertical rhythm through the hero block's padding controls. Only the top
+// inset goes — the column keeps its bottom one. Pages without a hero are untouched.
+.brand-content:has(> .brand-hero:first-child) {
+	padding-block-start: 0;
 }
 
 // Full-bleed: cancel the band gutter so image/color backgrounds reach the content-column
 // edges, then restore it as padding so the callout's own inner content keeps the reading
 // inset and lines up with the rest of the page. An editor's own horizontal padding, set
 // inline via the block's dimension controls, still wins over this default.
+//
+// Both levels of the column qualify: bands an editor aligns full inside the page content,
+// and the hero, which the template places as a direct child of the column rather than inside
+// `<post-content>`. Symmetric padding doesn't move a centered box, so the restored gutter
+// leaves the constrained content lined up either way.
+.brand-content > .alignfull,
 .brand-content .wp-block-post-content > .alignfull {
 	margin-inline: calc(-1 * var(--brand-gutter)) !important;
 	max-width: none;
 
 	&.has-background,
-	&.wp-block-cover {
+	&.wp-block-cover,
+	&.brand-hero {
 		padding-inline: var(--brand-gutter);
 	}
 }

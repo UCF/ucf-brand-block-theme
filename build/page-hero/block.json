@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "ucf-brand/page-hero",
+  "title": "Page Hero",
+  "category": "theme",
+  "icon": "cover-image",
+  "description": "The band at the top of a brand page: the featured image behind a scrim, carrying the section eyebrow, the page title, an accent rule and the deck.",
+  "textdomain": "ucf-brand-block-theme",
+  "supports": {
+    "align": [
+      "full"
+    ],
+    "html": false,
+    "inserter": false,
+    "multiple": false,
+    "reusable": false,
+    "spacing": {
+      "padding": true
+    },
+    "layout": {
+      "allowEditing": false,
+      "default": {
+        "type": "constrained"
+      }
+    }
+  },
+  "editorScript": "file:./index.js"
+}
