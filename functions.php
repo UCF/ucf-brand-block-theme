@@ -587,6 +587,10 @@ function ucf_brand_editor_section_style( $settings, $context ) {
 		return $settings;
 	}
 
+	if ( empty( $settings['styles'] ) || ! is_array( $settings['styles'] ) ) {
+		$settings['styles'] = array();
+	}
+
 	$settings['styles'][] = array(
 		'css' => sprintf( '.is-root-container{--brand-section:"%s.";}', $section ),
 	);
