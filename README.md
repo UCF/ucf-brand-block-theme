@@ -102,11 +102,66 @@ each entry as its heading passes through the upper third of the viewport.
 **This makes H2s structurally significant.** An H2 is a sub-nav entry; use H3 for anything
 that shouldn't appear in the drawer.
 
+## The page hero
+
+Every brand page opens with a full-bleed band: the featured image behind a scrim, carrying
+the section eyebrow, the page title, an accent rule and the deck. It lives in
+`templates/page.html` rather than in page content, so it is the same object on every page
+and cannot be deleted or drift out of shape.
+
+Nothing in it is typed twice. The eyebrow — `Brand Guidelines · Section 05` — is the
+`ucf-brand/section-number` binding reading the same `ucf_brand_number` the drawer orders by,
+so the hero and the menu can never disagree about which section this is. The image is the
+featured image. The title is the page title.
+
+**All of it is edited in the canvas.** Click the image to replace it, the title to retype it,
+either line of copy to rewrite it — no sidebar round trip. The two lines of copy are core
+paragraphs bound to the `ucf_brand_deck` and `ucf_brand_hero_note` post meta through core's
+`core/post-meta` source, which is editable in place because that source ships a setter. One
+binding is one string, so the deck is one paragraph and the note is the second; inline links
+work in both. Nothing in the hero can be added, removed or reordered.
+
+That took one small block, `ucf-brand/page-hero`. It holds no content — it is a container
+that exists so the editor has a block *type* to keep unlocked, because the allowlist that
+decides what stays editable while a page is open matches by name (see below). Its
+`templateLock: 'contentOnly'` then sorts its children: core keeps the ones that declare a
+`role: "content"` attribute and disables the rest, which is why the separator is inert and
+the eyebrow is too — the eyebrow's binding source is read-only, so core will not let it be
+typed into.
+
+**Contrast is the constraint.** The copy sits on a photograph, so nothing in the hero may
+depend on the photo being dark. The `scrim` gradient runs to 0.85–0.95 alpha over the lower
+half where the copy sits, which clears 4.5:1 for white type even against a white frame — and
+the closing note is ordinary body copy rather than `muted`, because grey-on-photo is the one
+thing this band cannot afford. A page with no featured image renders no image *and no
+scrim* — `core/post-featured-image` emits nothing at all — so what shows through is the
+black fill `is-style-dark` supplies. Legible rather than broken.
+
+### Pages open with the template showing
+
+`functions.php` sets `default-mode` to `template-locked` for the `page` post type, which is
+the "Show template" state: the template renders in the editor and everything in it is
+disabled except `core/post-title`, `core/post-featured-image` and `core/post-content`.
+
+That allowlist is filterable, and `blocks/index.js` adds `ucf-brand/page-hero` to it through
+`editor.postContentBlockTypes`. **This is the only mechanism that keeps something in a
+template editable while a page is open** — reach for it before inventing anything else. It
+matches by block type, so the thing you name has to be a block of your own; allowlisting
+`core/paragraph` would unlock every paragraph in every template.
+
+Two more consequences. It is a **default**, not a lock — the per-user preference wins, so an
+author who switches "Show template" off stays off. And anything meant to stay editable has
+to live in `templates/page.html` directly: template parts and their children are disabled
+outright in this mode, which is why the hero is inline in the template rather than a part.
+
 ## Authoring
 
 1. Create a Page for each top-level section.
 2. Add it to the Navigation block in the Brand Sidebar template part — one level, no children.
-3. Write the page using H2s for its named subsections. The drawer updates itself.
+3. Set its Brand order in the Brand panel of the document sidebar.
+4. Fill in the hero by clicking straight into it: replace the image, retype the title, write
+   the deck and the closing note.
+5. Write the page using H2s for its named subsections. The drawer updates itself.
 
 ## Blocks and patterns
 
@@ -119,6 +174,7 @@ either a custom block, a pattern, or core blocks carrying a registered block sty
 | -------------------------- | --------------------------------------------------------------------------- |
 | `ucf-brand/color-swatches` | The swatch grid. Accepts only Color Swatch children.                        |
 | `ucf-brand/color-swatch`   | One color: chip, name, HEX/RGB/CMYK/Pantone, usage note, measured contrast. |
+| `ucf-brand/page-hero`      | The page hero's container. Holds no content; locks and unlocks what it wraps. |
 
 Every block is **static** — `save()` emits real markup and there is no `render.php`, so
 nothing renders on the server. The swatch chip takes its color from a palette **slug**
@@ -169,6 +225,7 @@ Registered in `functions.php`, defined in `src/scss/`.
 | -------------------- | ----------------------------------------------------------------------- |
 | Group                | `light`, `paper`, `dark`, `bold-gold` — each also in an `-accent` flavor |
 | Group                | `on-dark`, `halftone`, `specimen`                                       |
+| Separator            | `accent-rule` — the short, heavy rule under a hero or section title      |
 | Paragraph, Heading   | `lead`, `eyebrow`, `meta`, `muted`                                      |
 | Group, Columns, Paragraph, Heading, List | `reading-width`                                     |
 | Button               | `glyph`                                                                  |
