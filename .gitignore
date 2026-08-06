@@ -24,6 +24,15 @@ npm-debug.log*
 *.map
 .sass-cache/
 
+# Test caches and reports. The suites themselves are committed; only their scratch output
+# is ignored. Jest snapshots under tests/js/__snapshots__/ ARE committed — they are the
+# record of what save() currently emits, and reviewing a change to one is the point.
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+playwright-report/
+test-results/
+
 # Editor / IDE
 .vscode/
 .idea/

@@ -13,13 +13,22 @@
 		"build:css": "sass src/scss/main.scss build/css/main.css --style=compressed --no-source-map",
 		"start": "wp-scripts start --webpack-src-dir=src/blocks --output-path=build",
 		"watch": "sass --watch src/scss/main.scss build/css/main.css --style=expanded",
-		"lint:js": "wp-scripts lint-js src/blocks src/js",
+		"lint:js": "wp-scripts lint-js src/blocks src/js tests/js",
 		"lint:css": "wp-scripts lint-style \"src/scss/**/*.scss\"",
 		"lint:version": "node tools/check-version.js",
 		"format": "prettier --write .",
-		"format:check": "prettier --check ."
+		"format:check": "prettier --check .",
+		"test": "npm run test:php && npm run test:js",
+		"test:php": "composer test",
+		"test:js": "wp-scripts test-unit-js --config jest.config.js",
+		"test:js:watch": "wp-scripts test-unit-js --config jest.config.js --watch"
 	},
 	"devDependencies": {
+		"@wordpress/block-editor": "^16.1.0",
+		"@wordpress/block-library": "^10.3.0",
+		"@wordpress/blocks": "^15.25.0",
+		"@wordpress/components": "^38.0.0",
+		"@wordpress/data": "^10.52.0",
 		"@wordpress/prettier-config": "^4.51.0",
 		"@wordpress/scripts": "^30.0.0",
 		"sass": "^1.100.0"
