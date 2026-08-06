@@ -4,7 +4,9 @@
  * Three jobs:
  *   1. A "Brand" panel on the Page document sidebar with a number field bound to the
  *      `ucf_brand_number` post meta. That value orders the page in the drawer and prints
- *      as its decimal label — see functions.php (`ucf_brand_get_ordered_sections`).
+ *      as its decimal label — see functions.php (`ucf_brand_get_ordered_sections`). Edits
+ *      to it are mirrored into the editor canvas as `--brand-section` so the H2
+ *      subsection badges stay correct while editing.
  *   2. Adding the page hero to the list of block types that stay editable while a page is
  *      open, which is what makes the hero editable in place rather than through the
  *      sidebar. See the `editor.postContentBlockTypes` filter below.
@@ -24,6 +26,7 @@ import {
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	PanelBody,
@@ -81,6 +84,67 @@ function BrandOrderPanel() {
 registerPlugin( 'ucf-brand-order', { render: BrandOrderPanel } );
 
 /**
+ * Port of `ucf_brand_format_number()` in functions.php, shared by the two editor-only
+ * consumers below — the canvas `--brand-section` and the hero's eyebrow binding.
+ *
+ * Two copies of one format can drift, the hazard CLAUDE.md flags over the heading slugs.
+ * The blast radius is much smaller here: the front end never runs this code, so drift
+ * shows up as a wrong preview, never a wrong page. Keep them in step anyway. PHP is the
+ * original.
+ *
+ * @param {number|string} value Raw meta value.
+ * @return {string} Zero-padded number, or '' when unset/0.
+ */
+function formatSectionNumber( value ) {
+	const number = parseInt( value, 10 );
+
+	return number > 0 ? String( number ).padStart( 2, '0' ) : '';
+}
+
+/**
+ * Keep the canvas's `--brand-section` in step with the Brand order field.
+ *
+ * ucf_brand_editor_section_style() in functions.php already puts the page's number into
+ * the canvas at load, and Gutenberg re-renders it on every canvas re-mount — so all this
+ * has to cover is an author editing the field mid-session, by which point the canvas is
+ * mounted. That is why there is no mount detection here.
+ */
+const CANVAS_IFRAME = 'iframe[name="editor-canvas"]';
+const CANVAS_ROOT = '.is-root-container';
+
+function BrandSectionVariable() {
+	const section = useSelect( ( select ) => {
+		const editor = select( editorStore );
+
+		if ( editor.getCurrentPostType() !== 'page' ) {
+			return '';
+		}
+
+		return formatSectionNumber(
+			editor.getEditedPostAttribute( 'meta' )?.[ META_KEY ]
+		);
+	}, [] );
+
+	useEffect( () => {
+		// Non-iframed canvases (the mobile editor) keep the wrapper in the main document.
+		const canvas =
+			document.querySelector( CANVAS_IFRAME )?.contentDocument ?? document;
+
+		// Written on the same element the PHP rule targets, so the inline style wins.
+		// `initial` is the guaranteed-invalid value: it makes the badge's `content`
+		// invalid and hides it, matching a page with no Brand order.
+		canvas.querySelector( CANVAS_ROOT )?.style.setProperty(
+			'--brand-section',
+			section ? `"${ section }."` : 'initial'
+		);
+	}, [ section ] );
+
+	return null;
+}
+
+registerPlugin( 'ucf-brand-section-variable', { render: BrandSectionVariable } );
+
+/**
  * Keep the page hero editable while a page is open.
  *
  * Pages open in `template-locked` mode (functions.php). In that mode core disables the root
@@ -117,17 +181,9 @@ addFilter(
  * And deliberately no `label` or `usesContext` — the server already supplied both, and
  * passing a second label only earns an "overridden" warning.
  *
- * This does restate `ucf_brand_format_number()` and the eyebrow's `sprintf` in JS, and two
- * copies of one format can drift — the hazard CLAUDE.md flags over the heading slugs. The
- * blast radius is much smaller here: the front end never runs this code, so drift shows up
- * as a wrong preview, never a wrong page. Keep them in step anyway. PHP is the original.
+ * The eyebrow's `sprintf` is restated here alongside `formatSectionNumber()` above; the
+ * same keep-in-step caveat applies.
  */
-function formatSectionNumber( value ) {
-	const number = parseInt( value, 10 );
-
-	return number > 0 ? String( number ).padStart( 2, '0' ) : '';
-}
-
 registerBlockBindingsSource( {
 	name: 'ucf-brand/section-number',
 	getValues( { select, bindings } ) {

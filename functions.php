@@ -557,6 +557,49 @@ function ucf_brand_enqueue_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'ucf_brand_enqueue_editor_assets' );
 
 /**
+ * Expose the page's number to the editor canvas, so the H2 subsection badges render
+ * there the way they do on the front end.
+ *
+ * The front-end equivalent is the inline style in ucf_brand_enqueue_assets(); this is the
+ * canvas's copy. It goes through the editor's `styles` setting rather than
+ * wp_enqueue_style() because the canvas is an iframe with its own document — an enqueued
+ * editor style never reaches inside it, while everything in `styles` is rendered into the
+ * canvas by Gutenberg on every mount and re-mount (device preview, editor mode switches).
+ * That lifecycle handling is the reason this is here and not all in JS.
+ *
+ * The value is fixed at page load. blocks/index.js overrides it inline when an author
+ * edits the Brand order field, so the badges stay live without this needing to know.
+ *
+ * @param array                   $settings Block editor settings.
+ * @param WP_Block_Editor_Context $context  The current editor context.
+ * @return array Filtered settings.
+ */
+function ucf_brand_editor_section_style( $settings, $context ) {
+	if ( empty( $context->post ) || 'page' !== $context->post->post_type ) {
+		return $settings;
+	}
+
+	$section = ucf_brand_format_number(
+		get_post_meta( $context->post->ID, 'ucf_brand_number', true )
+	);
+
+	if ( '' === $section ) {
+		return $settings;
+	}
+
+	if ( empty( $settings['styles'] ) || ! is_array( $settings['styles'] ) ) {
+		$settings['styles'] = array();
+	}
+
+	$settings['styles'][] = array(
+		'css' => sprintf( '.is-root-container{--brand-section:"%s.";}', $section ),
+	);
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'ucf_brand_editor_section_style', 10, 2 );
+
+/**
  * Register the "Badge" rich-text inline formats in the block editor.
  *
  * A no-build script (uses the global wp.* packages declared as dependencies)
