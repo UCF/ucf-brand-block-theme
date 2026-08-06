@@ -178,6 +178,15 @@
 }
 
 // ── Sidebar masthead ─────────────────────────────────────────────────────────
+//
+// Both lines come from the site's own identity fields — core/site-title and
+// core/site-tagline, set in Settings → General — rather than being typed into
+// parts/brand-sidebar.html. The masthead names the guide, so it should say whatever the
+// install says it is, and the tagline had nowhere else to appear once the header became
+// the university lockup.
+//
+// Colors are direct tokens rather than `--brand-*` roles. The drawer is fixed chrome: it
+// is always the black rail and must not invert, which is the test in docs/architecture.md.
 
 .brand-sidebar__brand {
 	display: block;
@@ -188,7 +197,7 @@
 .brand-sidebar__title {
 	color: map.get($color, "white");
 	font-family: map.get($font, "display");
-	font-size: 1.5rem;
+	font-size: 1.6rem;
 	font-weight: 700;
 	letter-spacing: 0.01em;
 	line-height: 1;
@@ -201,13 +210,18 @@
 	}
 }
 
+// Gold and bold rather than the grey mono it used to be. This is the drawer's one piece
+// of branding — it labels what the guide *is* — so it reads as a companion to the title
+// above it, not as the caption the `meta` idiom would make it.
 .brand-sidebar__sub {
-	color: map.get($color, "text-meta-dark");
-	font-family: map.get($font, "mono");
-	font-size: map.get($size, "meta");
-	letter-spacing: 0.03em;
-	line-height: 1.7;
+	color: map.get($color, "gold");
+	font-family: map.get($font, "body");
+	font-size: map.get($size, "ui");
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	line-height: 1.4;
 	margin: map.get($space, "20") 0 0;
+	text-transform: uppercase;
 }
 
 // ── Sidebar footer, pinned to the bottom of the drawer viewport ──────────────
