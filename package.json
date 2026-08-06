@@ -23,5 +23,8 @@
 		"@wordpress/prettier-config": "^4.51.0",
 		"@wordpress/scripts": "^30.0.0",
 		"sass": "^1.100.0"
+	},
+	"overrides": {
+		"typescript": "~5.3.3"
 	}
 }
