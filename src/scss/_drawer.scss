@@ -357,6 +357,16 @@
 
 // ── Mobile bar, off-canvas drawer, scrim ─────────────────────────────────────
 
+// The bar and scrim live in parts/mobile-bar.html so the three drawer templates share one
+// copy. Core always wraps a template part in a div — there is no opt-out — and that wrapper
+// would become the containing block for the `position: sticky` bar below. Its height is
+// exactly the bar's height, so the bar would have nowhere to travel and would silently stop
+// sticking. `display: contents` removes the wrapper from the box tree entirely, restoring
+// the flow the markup had when it was pasted inline in each template. Load-bearing.
+.brand-mobile-bar-part {
+	display: contents;
+}
+
 .brand-mobile-bar {
 	display: none;
 }

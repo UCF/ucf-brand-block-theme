@@ -4,7 +4,7 @@
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 //
 // Four blocks (ucf-brand/tabs → tab → tab-label + tab-panel) serialize to a stack of
-// label/panel pairs. blocks/tabs/view.js is the only thing that turns that stack into
+// label/panel pairs. src/blocks/tabs/view.js is the only thing that turns that stack into
 // tabs, and only at or above $breakpoint-tabs; it adds `is-enhanced` and the ARIA roles
 // (including `aria-selected`, which the state colors below key off) at runtime. So this
 // file has two jobs:
@@ -29,7 +29,7 @@
 
 // Temporary badge treatment: borrows the eyebrow's mono/uppercase/letterspaced type but
 // boxed in gold. A more permanent badge primitive is in the works — when it lands, swap
-// this rule and the `.ucf-tabs__badge` span in blocks/tab-label without touching layout.
+// this rule and the `.ucf-tabs__badge` span in src/blocks/tab-label without touching layout.
 .ucf-tabs__badge {
 	align-self: start;
 	background: map.get($color, "gold");

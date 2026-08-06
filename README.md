@@ -4,26 +4,69 @@ Block theme for UCF brand documentation, modeled on [brand.utah.edu](https://bra
 and the UCF Brand Hub prototype. This pass establishes the foundations — color, typography
 and the drawer navigation. Components come later.
 
+This file covers what the theme is and where things live.
+[`docs/architecture.md`](docs/architecture.md) covers the rules for changing it, and is
+required reading before you do.
+
+## Where everything lives
+
+One rule governs the layout: **everything hand-written is in `src/`, everything generated
+is in `build/`, and `assets/` holds only static files that are neither.**
+
+| Path | What's in it |
+| --- | --- |
+| `src/blocks/` | Custom block sources, one folder per block. Discovered by their `block.json`. |
+| `src/js/editor/` | Block-editor customizations, one job per module, bundled into `build/editor.js`. |
+| `src/js/brand-nav.js` | The drawer's sub-navigation, scroll-spy and mobile toggle. |
+| `src/js/badge-format.js` | The Badge rich-text format on the editor toolbar. |
+| `src/scss/` | Every stylesheet, one partial per concern, compiled to `build/css/main.css`. |
+| `build/` | **Generated and committed.** Blocks, bundled scripts, the stylesheet. Never edit. |
+| `assets/fonts/` | Self-hosted webfonts, referenced from `theme.json`. |
+| `includes/` | All PHP behavior, one topic per file (table below). |
+| `functions.php` | A loader for `includes/` and nothing else. |
+| `templates/` | Page templates: `404`, `front-page`, `index`, `page`, `search`, `single`. |
+| `parts/` | Template parts: `header`, `footer`, `brand-sidebar`, `mobile-bar`. |
+| `patterns/` | Block patterns, filed by rung of the composition ladder. |
+| `theme.json` | Every design token: palette, type scale, spacing, layout, webfonts. |
+| `style.css` | Theme header only — name, version, requirements. No CSS. |
+| `docs/` | Developer documentation. |
+
+### What each `includes/` file owns
+
+| File | Owns |
+| --- | --- |
+| `setup.php` | Theme supports; the `template-locked` page editing mode |
+| `enqueue.php` | Every script and stylesheet, front end and editor canvas |
+| `blocks.php` | Static custom block registration |
+| `block-styles.php` | Every `register_block_style()` |
+| `pattern-categories.php` | The four pattern categories |
+| `meta.php` | Per-page fields: brand number, hero deck, hero note |
+| `sections.php` | Section numbering, drawer ordering, the number binding |
+| `section-nav.php` | The drawer's server-rendered navigation block |
+| `headings.php` | H2 anchor ids and section extraction |
+| `search.php` | Search scoping and subsection deep links |
+
 ## Getting started
 
 ```bash
 npm install
-npm run build         # blocks -> build/, and src/scss/main.scss -> assets/css/main.css
-npm run build:blocks  # blocks only  (wp-scripts)
+npm run build         # everything: src/blocks/ + src/js/ -> build/, src/scss/ -> build/css/
+npm run build:blocks  # blocks and scripts only  (wp-scripts)
 npm run build:css     # stylesheet only  (sass)
-npm run start         # watch blocks
+npm run start         # watch blocks and scripts
 npm run watch         # watch stylesheet
 ```
 
-Both `build/` and `assets/css/main.css` are compiled **and committed**, so the theme can
-be deployed without running a build. Never edit either by hand — edit the source and
-rebuild.
+Everything hand-written lives in `src/`; everything generated lands in `build/`, which is
+**committed** so the theme can be deployed without running a build. Never edit anything in
+`build/` by hand — edit the source and rebuild.
 
 ## Linting and formatting
 
 ```bash
-npm run lint:js       # ESLint over blocks/            (wp-scripts)
-npm run lint:css      # stylelint over src/scss/        (wp-scripts)
+npm run lint:js       # ESLint over src/blocks/ and src/js/  (wp-scripts)
+npm run lint:css      # stylelint over src/scss/             (wp-scripts)
+npm run lint:version  # style.css and package.json agree on the version
 npm run format        # Prettier: JS, JSON, SCSS, Markdown, YAML
 npm run format:check  # verify formatting, write nothing
 
@@ -94,13 +137,42 @@ disables sticky on every descendant).
 one link per top-level brand page. Edit it under Appearance → Editor → Patterns → Brand
 Sidebar.
 
-**3. Sub-navigation comes from the page's H2s.** Never authored. `assets/js/brand-nav.js`
+**3. Sub-navigation comes from the page's H2s.** Never authored. `src/js/brand-nav.js`
 finds the nav item matching the current URL, reads the `<h2>`s out of `.brand-content`,
 builds a list, and injects it beneath that one item. An `IntersectionObserver` highlights
 each entry as its heading passes through the upper third of the viewport.
 
 **This makes H2s structurally significant.** An H2 is a sub-nav entry; use H3 for anything
 that shouldn't appear in the drawer.
+
+**The anchor ids come from the server, not the browser.** `includes/headings.php` assigns
+an `id` to every H2 during `render_block`, so it is already in the HTML that arrives. That
+matters because search emits `/page/#heading` links from PHP: when the browser and the
+server each derived slugs independently, the two disagreed and deep links landed at the top
+of the page. One owner, one implementation.
+
+The mobile toggle lives in `parts/mobile-bar.html` and is included by the three templates
+that actually have a drawer (`page`, `front-page`, `search`). The other three templates have
+no sidebar, so they deliberately have no toggle.
+
+## Search
+
+Search resolves to a *section*, not just a page: each result lists up to three matching H2s
+beneath it, linked to their anchors, with the query highlighted in a snippet. If Relevanssi
+is installed it ranks the pages; the theme picks the heading within each one. Without
+Relevanssi, core's search picks the pages and everything else behaves the same.
+
+Nothing is indexed or stored — sections are resolved from `post_content` at render time, so
+no reindex is ever needed. Full write-up in [`docs/search.md`](docs/search.md).
+
+## The Badge format
+
+A **Badge** button on the rich-text toolbar wraps a run of text in a small uppercase chip,
+in any paragraph, heading or list item. Clicking it opens a swatch popover — built from the
+same `ColorPalette` component core's Highlight dialog uses — and the tones are mutually
+exclusive. Each swatch resolves its fill from the theme palette by slug at runtime, so no
+hex is hard-coded and a palette change flows straight through. Source in
+`src/js/badge-format.js`, styling in `src/scss/_badge.scss`.
 
 ## The page hero
 
@@ -139,11 +211,11 @@ black fill `is-style-dark` supplies. Legible rather than broken.
 
 ### Pages open with the template showing
 
-`functions.php` sets `default-mode` to `template-locked` for the `page` post type, which is
+`includes/setup.php` sets `default-mode` to `template-locked` for the `page` post type, which is
 the "Show template" state: the template renders in the editor and everything in it is
 disabled except `core/post-title`, `core/post-featured-image` and `core/post-content`.
 
-That allowlist is filterable, and `blocks/index.js` adds `ucf-brand/page-hero` to it through
+That allowlist is filterable, and `src/js/editor/page-hero-editable.js` adds `ucf-brand/page-hero` to it through
 `editor.postContentBlockTypes`. **This is the only mechanism that keeps something in a
 template editable while a page is open** — reach for it before inventing anything else. It
 matches by block type, so the thing you name has to be a block of your own; allowlisting
@@ -168,22 +240,46 @@ outright in this mode, which is why the hero is inline in the template rather th
 **No page should contain a Custom HTML block.** Anything that looks like a component is
 either a custom block, a pattern, or core blocks carrying a registered block style.
 
-### Custom blocks (`blocks/` → `build/`)
+### Custom blocks (`src/blocks/` → `build/`)
 
-| Block                      | What it's for                                                               |
-| -------------------------- | --------------------------------------------------------------------------- |
-| `ucf-brand/color-swatches` | The swatch grid. Accepts only Color Swatch children.                        |
-| `ucf-brand/color-swatch`   | One color: chip, name, HEX/RGB/CMYK/Pantone, usage note, measured contrast. |
-| `ucf-brand/page-hero`      | The page hero's container. Holds no content; locks and unlocks what it wraps. |
+| Block                      | What it's for                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `ucf-brand/color-swatches` | The swatch grid. Accepts only Color Swatch children.                          |
+| `ucf-brand/color-swatch`   | One color: chip, name, HEX/RGB/CMYK/Pantone, usage note, measured contrast.   |
+| `ucf-brand/tabs`           | Tab set container. Ships the only front-end `viewScript` in the theme.        |
+| `ucf-brand/tab`            | One tab: a label and a panel. Child of Tabs.                                  |
+| `ucf-brand/tab-label`      | The clickable label. Child of Tab.                                            |
+| `ucf-brand/tab-panel`      | The panel body, an open drop zone. Child of Tab.                              |
+| `ucf-brand/page-hero`      | The page hero's container. Holds no content; locks and unlocks what it wraps.  |
 
 Every block is **static** — `save()` emits real markup and there is no `render.php`, so
-nothing renders on the server. The swatch chip takes its color from a palette **slug**
+none of them renders on the server. The swatch chip takes its color from a palette **slug**
 via core's `has-{slug}-background-color` class rather than an inline hex, so a swatch
 keeps tracking its token if that token's value ever changes.
 
-These are written to lift into a distribution plugin unchanged: nothing in `blocks/`
+Tabs are the exception to "nothing but markup": the saved output is a plain stack of
+label/panel pairs, and `src/blocks/tabs/view.js` is the only thing that turns that stack
+into tabs, above its breakpoint. Below it — and whenever the script does not run — the
+stack *is* the mobile layout, every panel visible. That script is registered as the block's
+`viewScript`, so WordPress loads it only on pages that use the block.
+
+These are written to lift into a distribution plugin unchanged: nothing in `src/blocks/`
 references the theme, so the move is a copy of the folder plus the `register_block_type()`
-loop in `functions.php`.
+loop in `includes/blocks.php`.
+
+### Theme glue that is *not* in `src/blocks/`
+
+Two blocks are server-rendered and stay in `includes/`, with the data they render:
+
+| Block                          | Renders |
+| ------------------------------ | ------------------------------------------------------------------ |
+| `ucf-brand/section-nav`        | The drawer menu, from each page's Brand order.                      |
+| `ucf-brand/search-subsections` | The matching-H2 deep links beneath each search result.              |
+
+They are theme glue rather than distributable design blocks, which is why the static-only
+rule applies to `src/blocks/` and not to them. Each has a client-side stand-in in
+`src/js/editor/dynamic-blocks.js` so the Site Editor draws them instead of an
+"unsupported block" placeholder.
 
 ### Patterns (`patterns/`)
 
@@ -206,20 +302,23 @@ markup — structure, spacing, borders and type all come from the blocks' own co
 only classes a pattern carries are the composition on its container and the role utilities
 that bind its accent (`accent-fill`, `accent-text`, `hairline`), which is how a pattern
 holds a look without holding a color. Drop any of them into a Dark or Bold Gold group and
-it recolors; none of them names a token. See `CLAUDE.md` for the full rule.
+it recolors; none of them names a token. See
+[`docs/architecture.md`](docs/architecture.md#patterns-declare-structure-and-composition-never-color)
+for the full rule.
 
 A specimen row, for instance, is a Group with the `Type Specimen` block style, an eyebrow
 paragraph, and a sample paragraph whose face and size are set through ordinary block
 controls (`fontFamily`, `fontSize`) — an editor can build one from the inserter without
 touching code.
 
-`type-scale.php` renders each row _using the preset it documents_, so the page is a live
-read of `theme.json` rather than a transcription of it — change a size there and the demo
-follows.
+`type-scale.php` renders each row _using the preset it documents_, so the specimen column
+is a live read of `theme.json` — change a size there and the sample follows without anyone
+editing the pattern. The `clamp()` values printed in the middle column are a separate,
+hand-written transcription and **can** drift; update them alongside `theme.json`.
 
 ### Block styles
 
-Registered in `functions.php`, defined in `src/scss/`.
+Registered in `includes/block-styles.php`, defined in `src/scss/`.
 
 | Block                | Styles                                                                  |
 | -------------------- | ----------------------------------------------------------------------- |
@@ -241,10 +340,11 @@ each of those maps plus a row in `ucf_brand_register_callout_styles()`.
 
 ## Architecture notes
 
--   **Nothing is server-rendered.** No `render.php`, no `render_callback`, and no
-    `core/pattern` references in page content — pages hold real block markup an editor
-    can change.
+-   **Page content is never server-rendered.** Nothing in `src/blocks/` has a `render.php`,
+    and no page holds a `core/pattern` reference — pages contain real block markup an editor
+    can change. The two `render_callback` blocks above are chrome the theme generates from
+    live data, not content.
 -   **Distribution.** Blocks live in the theme for now because the design is still moving.
     See the note above on lifting them into a plugin.
--   Follows the conventions in `ucf-wordpress-block-theme/CLAUDE.md`: tokens first, then
-    existing classes, then core block controls, and only then something new.
+-   The conventions — tokens first, then existing classes, then core block controls, and only
+    then something new — are written up in [`docs/architecture.md`](docs/architecture.md).

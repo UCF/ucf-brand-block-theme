@@ -325,7 +325,7 @@ function ucf_brand_find_matching_sections( $post, $terms, $limit = UCF_BRAND_MAX
  * Register the search result's subsection block.
  *
  * Theme glue rendered from live page data, so it follows ucf-brand/section-nav and lives
- * here rather than in blocks/ — see CLAUDE.md on why blocks/ stays static-only.
+ * here rather than in src/blocks/ — see CLAUDE.md on why src/blocks/ stays static-only.
  *
  * @return void
  */

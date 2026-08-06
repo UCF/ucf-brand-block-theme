@@ -70,5 +70,5 @@ $breakpoint-drawer: 960px;
 
 // At and above this width, Tabs engage (tab strip + one visible panel); below it they
 // collapse to a stacked label→panel reading order. Deliberately below $breakpoint-drawer
-// so tabs persist through tablet. Kept in sync by hand with TABS_QUERY in blocks/tabs/view.js.
+// so tabs persist through tablet. Kept in sync by hand with TABS_QUERY in src/blocks/tabs/view.js.
 $breakpoint-tabs: 768px;

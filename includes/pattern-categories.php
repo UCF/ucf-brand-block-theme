@@ -1,6 +1,9 @@
 <?php
 /**
- * Block pattern registration.
+ * Block pattern category registration.
+ *
+ * The patterns themselves need no registration — core discovers every file in patterns/
+ * from its header comment. This file registers only the categories those headers name.
  *
  * @package ucf-brand-block-theme
  */

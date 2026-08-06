@@ -1,7 +1,7 @@
 // Stretch link + glyph button
 //
 // Stretch is a behavior, not a look: a `stretchLink` toggle on core/button (added
-// in blocks/index.js) emits `.has-stretch-link` on the button wrapper. When set, the
+// in src/js/editor/stretch-link.js) emits `.has-stretch-link` on the button wrapper. When set, the
 // button's anchor covers its nearest Group container so the whole card is clickable.
 // Because it's a class and not an `is-style-*` variant, it composes with any button
 // look — default, Outline, or the Glyph style below.

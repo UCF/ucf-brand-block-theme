@@ -19,9 +19,6 @@
 	<exclude-pattern>/build/</exclude-pattern>
 	<exclude-pattern>/assets/</exclude-pattern>
 
-	<!-- Local tooling and non-theme sources. -->
-	<exclude-pattern>/tools/</exclude-pattern>
-
 	<!-- Target the versions the theme supports (style.css: 6.5+, PHP 8.1+). -->
 	<config name="minimum_supported_wp_version" value="6.5"/>
 

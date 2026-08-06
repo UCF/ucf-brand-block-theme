@@ -14,7 +14,7 @@
 // is not present there. It is editor-only markup, and WP prefixes every `add_editor_style`
 // rule with `.editor-styles-wrapper`, so the extra selector is inert on the front end.
 // The initial `--brand-section` value comes from functions.php (`block_editor_settings_all`);
-// blocks/index.js updates it live when the Brand order field changes.
+// src/js/editor/section-variable.js updates it live when the Brand order field changes.
 .wp-block-post-content,
 .is-root-container {
 	counter-reset: brand-subsection;

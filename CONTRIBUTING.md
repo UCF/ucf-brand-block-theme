@@ -37,7 +37,7 @@ Add a descriptive, understandable title and details about the bug in the descrip
 
 ## Feature requests
 
-Feature requests are welcome. Before you submit one, take a moment to review the [escalation ladder in `README.md`](README.md): new color or typography variants should reuse existing `theme.json` tokens and registered block styles before anything new is added. This keeps the theme small and on-brand.
+Feature requests are welcome. Before you submit one, take a moment to review the [escalation ladder in `docs/architecture.md`](docs/architecture.md#the-escalation-ladder): new color or typography variants should reuse existing `theme.json` tokens and registered block styles before anything new is added. This keeps the theme small and on-brand.
 
 [Submit a feature request](https://github.com/UCF/ucf-brand-block-theme/issues/new?template=feature_request.md) using the provided template.
 
@@ -60,14 +60,19 @@ This theme lives at `wp-content/themes/ucf-brand-block-theme` in a WordPress ins
     ```
     npm run build
     ```
-    The `build/` directory and `assets/css/main.css` are **committed** so the theme can be deployed without a build step. Always run `npm run build` and commit the updated output as part of any change that touches `blocks/` or `src/scss/`.
+    The `build/` directory is **committed** so the theme can be deployed without a build step. Always run `npm run build` and commit the updated output as part of any change that touches anything under `src/`.
 
 Other useful scripts:
 
--   `npm run start` — rebuild block scripts on change.
+-   `npm run start` — rebuild block and editor scripts on change.
 -   `npm run watch` — rebuild the stylesheet on change.
--   `npm run lint:js` — lint the block sources.
+-   `npm run lint:js` — lint everything under `src/blocks/` and `src/js/`.
+-   `npm run lint:version` — check that `style.css` and `package.json` agree on the version.
 -   `npm run format` — format JS, JSON, and YAML to the WordPress standard.
+
+The theme's version lives in **two** places — the `Version:` header in `style.css`, which is
+what WordPress reads, and `version` in `package.json`. Bump both together; `npm run
+lint:version` fails if they drift.
 
 ### Submitting a pull request
 
@@ -85,4 +90,4 @@ This project follows the [WordPress Coding Standards](https://developer.wordpres
 -   **SCSS** — declarations are kept alphabetical; block styles live in `src/scss/`, not in the block folders.
 -   **Indentation** — tabs, enforced by `.editorconfig`.
 
-Architectural conventions specific to this theme (the token escalation ladder, static-only custom blocks, and pattern serialization rules) are documented in `README.md`. Please review it before opening a pull request that adds patterns, blocks, or block styles.
+Architectural conventions specific to this theme — the token escalation ladder, the `--brand-*` role layer, static-only custom blocks, the one-topic-per-file rule for `includes/`, and the pattern serialization rules — are documented in [`docs/architecture.md`](docs/architecture.md). Please review it before opening a pull request that adds patterns, blocks, block styles, or PHP.

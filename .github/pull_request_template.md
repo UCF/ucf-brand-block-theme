@@ -30,6 +30,6 @@ Provide a general summary of your changes in the Title above and fill in the tem
 <!-- Put an `x` in all boxes that apply. -->
 
 -   [ ] My code follows the code style of this project.
--   [ ] I have run `npm run build` and committed the updated `build/` and `assets/css/main.css` output.
+-   [ ] I have run `npm run build` and committed the updated `build/` output.
 -   [ ] My change requires an update to documentation.
 -   [ ] I have updated documentation accordingly.
