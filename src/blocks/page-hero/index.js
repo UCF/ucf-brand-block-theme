@@ -8,7 +8,7 @@
  * In `template-locked` mode (the theme's default for pages — see functions.php) core
  * disables the root block and then re-enables a short allowlist of block *types*. Anything
  * not on that list inherits `disabled`, which is why the hero used to be inert. The list is
- * filterable, so blocks/index.js adds this block to it; see the comment there. A wrapper is
+ * filterable, so the theme's editor glue adds this block to it; see the comment there. A wrapper is
  * the unit that works because the filter matches by name — we cannot allowlist
  * `core/paragraph` without unlocking every paragraph in the template.
  *

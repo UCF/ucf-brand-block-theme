@@ -8,7 +8,7 @@
 // section eyebrow, the page title, an accent rule and two lines of copy sitting on it.
 // Built from core blocks in templates/page.html, inside the `ucf-brand/page-hero` wrapper —
 // a container that holds no content and exists so the editor has a block type it can keep
-// unlocked. See blocks/page-hero/index.js for why that indirection is needed.
+// unlocked. See src/blocks/page-hero/index.js for why that indirection is needed.
 //
 // The wrapper carries `is-style-dark`, so every color in the hero resolves through the dark
 // composition's `--brand-*` roles and nothing here or in the template names a token. That

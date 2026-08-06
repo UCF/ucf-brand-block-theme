@@ -15,24 +15,27 @@
  * by slug at runtime (see theme.json / src/scss/_badge.scss), so no hex is
  * hard-coded here and a palette change flows through.
  *
- * Ported from ucf-wordpress-block-theme. No build step: this uses the global
- * `wp.*` packages enqueued as script dependencies in functions.php.
+ * Ported from ucf-wordpress-block-theme, which ran it as a no-build script off the
+ * global `wp.*` objects. Here it is a webpack entry like everything else, so the
+ * imports below are what generate its script dependencies — includes/enqueue.php
+ * reads them from the built badge-format.asset.php rather than restating them.
+ * The `createElement` calls are the original's; there is no JSX to convert.
  */
-( function ( wp ) {
+import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { ColorPalette, Popover } from '@wordpress/components';
+import { select } from '@wordpress/data';
+import { createElement as el, Fragment, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import {
+	getActiveFormat,
+	registerFormatType,
+	removeFormat,
+	toggleFormat,
+	useAnchor,
+} from '@wordpress/rich-text';
+
+( function () {
 	'use strict';
-	var registerFormatType = wp.richText.registerFormatType;
-	var toggleFormat = wp.richText.toggleFormat;
-	var removeFormat = wp.richText.removeFormat;
-	var getActiveFormat = wp.richText.getActiveFormat;
-	var useAnchor = wp.richText.useAnchor;
-	var RichTextToolbarButton = wp.blockEditor.RichTextToolbarButton;
-	var Popover = wp.components.Popover;
-	var ColorPalette = wp.components.ColorPalette;
-	var select = wp.data.select;
-	var el = wp.element.createElement;
-	var Fragment = wp.element.Fragment;
-	var useState = wp.element.useState;
-	var __ = wp.i18n.__;
 
 	// name = format id; className = the class the span carries (and how the
 	// format is recognized on load); bg = palette slug of the badge's fill, used
@@ -199,4 +202,4 @@
 			return el( Fragment, null, children );
 		},
 	} );
-} )( window.wp );
+} )();

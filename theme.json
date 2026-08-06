@@ -469,6 +469,11 @@
 			"area": "uncategorized",
 			"name": "brand-sidebar",
 			"title": "Brand Sidebar"
+		},
+		{
+			"area": "uncategorized",
+			"name": "mobile-bar",
+			"title": "Mobile Bar"
 		}
 	]
 }

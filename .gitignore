@@ -7,7 +7,10 @@ Desktop.ini
 # Dependency directories
 node_modules/
 vendor/
-composer.lock
+
+# composer.lock is deliberately NOT ignored. It pins PHPCS and the WordPress Coding
+# Standards, so every contributor and every CI run lints against the same rules —
+# an unpinned install can fail a review on a sniff nobody else sees.
 
 # Local environment files
 .env
@@ -29,5 +32,6 @@ npm-debug.log*
 *.swp
 *~
 
-# Note: build/ and assets/css/main.css are compiled but ARE committed, so the theme
-# can be deployed without running a build. Rebuild with `npm run build`.
+# Note: build/ holds every compiled artifact — blocks, scripts and the stylesheet — and
+# IS committed, so the theme can be deployed without running a build. Everything in it is
+# generated from src/; never edit it by hand. Rebuild with `npm run build`.

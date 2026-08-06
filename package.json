@@ -9,12 +9,13 @@
 	},
 	"scripts": {
 		"build": "npm run build:blocks && npm run build:css",
-		"build:blocks": "wp-scripts build --webpack-src-dir=blocks --output-path=build",
-		"build:css": "sass src/scss/main.scss assets/css/main.css --style=compressed --no-source-map",
-		"start": "wp-scripts start --webpack-src-dir=blocks --output-path=build",
-		"watch": "sass --watch src/scss/main.scss assets/css/main.css --style=expanded",
-		"lint:js": "wp-scripts lint-js blocks",
+		"build:blocks": "wp-scripts build --webpack-src-dir=src/blocks --output-path=build",
+		"build:css": "sass src/scss/main.scss build/css/main.css --style=compressed --no-source-map",
+		"start": "wp-scripts start --webpack-src-dir=src/blocks --output-path=build",
+		"watch": "sass --watch src/scss/main.scss build/css/main.css --style=expanded",
+		"lint:js": "wp-scripts lint-js src/blocks src/js",
 		"lint:css": "wp-scripts lint-style \"src/scss/**/*.scss\"",
+		"lint:version": "node tools/check-version.js",
 		"format": "prettier --write .",
 		"format:check": "prettier --check ."
 	},
