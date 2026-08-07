@@ -26,19 +26,20 @@ Search has its own document: [`docs/search.md`](docs/search.md).
 ## Tests
 
 `npm test` runs the two fast suites in about three seconds and needs no Docker.
-`npm run test:integration` adds the WordPress tier; `npm run test:all` is everything. Read
-[`tests/README.md`](tests/README.md) before adding to them — it covers what each suite is for
-and the non-obvious parts of the setup.
+`npm run test:integration` adds the WordPress tier, `npm run test:a11y` the accessibility one;
+`npm run test:all` is everything. Read [`tests/README.md`](tests/README.md) before adding to
+them — it covers what each suite is for and the non-obvious parts of the setup.
 
-**New code ships with its test.** What you have to write depends on what you added, and two
-of the four cases are already automatic:
+**New code ships with its test.** What you have to write depends on what you added, and most
+of it is already automatic:
 
 | You added                   | You write                                                                                             |
 | --------------------------- | ----------------------------------------------------------------------------------------------------- |
 | A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
-| A block in `src/blocks/`    | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do                          |
-| A pattern in `patterns/`    | Nothing. The sweep reads the directory — just run it                                                  |
+| A block in `src/blocks/`    | An entry in `tests/js/helpers/register-blocks.js`, and — if no pattern or template renders it — a page in `tests/a11y/seed.php`. Both fail until you do |
+| A pattern in `patterns/`    | Nothing. The markup sweep and the a11y suite both read the directory — just run them                  |
 | A template part in `parts/` | Nothing. Same sweep                                                                                   |
+| A `register_block_style()`  | Nothing, unless it is on a block type `tests/a11y/seed.php` has no sample for — then the seed fails until you add one |
 
 -   **A new function in `includes/` needs a unit test.** Put it with the tests for the file
     that owns the topic. If the function genuinely needs WordPress — a meta query,
@@ -60,6 +61,18 @@ of the four cases are already automatic:
 -   **New patterns and template parts need no new test.** The markup sweep is data-driven off
     disk, so it picks them up on the next run. Run `npm run test:js` and read the result — a
     failure there is the pattern being wrong, not the suite needing an update.
+-   **The accessibility suite reads WordPress's registries, not a checked-in list.** Patterns
+    come from `WP_Block_Patterns_Registry` and block styles from `WP_Block_Styles_Registry`, so
+    new ones are audited on the next `npm run test:a11y` with nothing to add. It gates merges.
+-   **Before filing what the a11y suite reports, read the style's definition in `src/scss/`.**
+    Not every violation on a variant page is a theme defect. `is-style-on-dark` supplies the
+    treatment only — no background, no base color, both from the block's own controls — so
+    auditing it on a bare page produces five failures that belong to the fixture.
+    `ucf_brand_a11y_wrap_in_context()` in `tests/a11y/seed.php` is where that gets corrected.
+-   **An axe assertion on the wrong page passes.** The suite therefore checks the HTTP status,
+    the expected `is-style-*` class and (for tabs) that the runtime enhancement actually ran,
+    all *before* trusting the audit. Keep that habit for anything added: the green version of
+    each of those failures is indistinguishable from a clean site.
 -   **Prove a new test can fail.** Break the code it covers, watch it go red, then restore.
     This is not ceremony: two tests written in this repo passed against nothing at all — one
     because blocks silently failed to register and `serialize()` returned `""`, and one

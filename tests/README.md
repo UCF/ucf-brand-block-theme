@@ -1,12 +1,13 @@
 # Tests
 
-Three suites. `npm test` runs the two fast ones:
+Four suites. `npm test` runs the two fast ones:
 
-| Suite                            | Command                    | Needs                       | Runtime              |
-| -------------------------------- | -------------------------- | --------------------------- | -------------------- |
-| PHP units                        | `npm run test:php`         | PHP + Composer              | ~0.1s                |
-| Block round-trips + markup sweep | `npm run test:js`          | Node, and PHP for the sweep | ~3s                  |
-| PHP integration                  | `npm run test:integration` | Docker (wp-env)             | ~2min cold, ~1s warm |
+| Suite                            | Command                    | Needs                        | Runtime              |
+| -------------------------------- | -------------------------- | ---------------------------- | -------------------- |
+| PHP units                        | `npm run test:php`         | PHP + Composer               | ~0.1s                |
+| Block round-trips + markup sweep | `npm run test:js`          | Node, and PHP for the sweep  | ~3s                  |
+| PHP integration                  | `npm run test:integration` | Docker (wp-env)              | ~2min cold, ~1s warm |
+| Accessibility                    | `npm run test:a11y`        | Docker (wp-env) + Playwright | ~2min cold, ~15s warm |
 
 `npm test` runs the first two and **never touches Docker** — that is deliberate, and worth
 protecting. A suite that needs a container is a suite nobody runs before committing, which is
@@ -187,6 +188,114 @@ Two things account for nearly every case, and the runner prints both:
 
 `.wp-env.json` itself stays on the defaults so the committed config is the standard one.
 
+## Accessibility — `tests/a11y/`
+
+[axe-core](https://github.com/dequelabs/axe-core) through Playwright, against a real
+WordPress, at three viewports. WCAG 2.0/2.1 A + AA.
+
+```bash
+npm run test:a11y   # boots wp-env, seeds the content, audits, stops the environment again
+```
+
+Like the integration tier it always leaves the environment stopped, and for the same reasons —
+see `tools/a11y-tests.js`. The iteration loop is the same shape too:
+
+```bash
+npm run env:start && npm run env:seed   # once
+npm run test:a11y:only                  # ~15s per run
+npm run env:stop                        # when you are done
+```
+
+### Four tiers, and only the first is a list anyone maintains
+
+| Tier         | What it audits                                       | Where the list comes from      |
+| ------------ | ---------------------------------------------------- | ------------------------------ |
+| **Routes**   | One page per template, plus search-with-no-results   | Written out in `seed.php`      |
+| **Blocks**   | Custom blocks no pattern or template already renders | Written out in `seed.php`      |
+| **Patterns** | One page per pattern, in isolation                   | `WP_Block_Patterns_Registry`   |
+| **Variants** | One page per registered block style                  | `WP_Block_Styles_Registry`     |
+
+The bottom two read WordPress's own registries at seed time, so **a new pattern or block style
+is audited on the next run with nothing to add here** — the same property the markup sweep has.
+A new *block* is the one case needing a decision, and `seed.php` fails the seed rather than
+letting it slide: it checks every top-level block in `src/blocks/` renders on some page the
+suite visits, counting templates and patterns as coverage.
+
+### Why per-variant is the tier this theme needed
+
+Per-route coverage would have missed the failure this theme's design makes possible. The
+compositions — `is-style-dark`, `-paper`, `-light`, `-bold-gold` and their `-accent` twins —
+set the `--brand-*` roles their contents read, so **the same `is-style-muted` paragraph
+resolves to a different color in each one**. Grey on paper passes; the same grey on the dark
+field need not. Auditing the default composition proves nothing about the other eleven.
+
+So every `core/group` variant page carries a probe: a heading, body copy, a link, all four
+text styles, a rule, a list and a button. Twelve compositions times that probe is the actual
+cross-product, and it is what a mutation test confirmed — recoloring `.is-style-lead` turned
+ten pages red, including every composition.
+
+### The guards, and why each exists
+
+An axe assertion on the wrong page passes. Every guard below is there because the green
+version of its failure is indistinguishable from a clean site:
+
+-   **HTTP status is asserted before axe runs.** A seeded page that 404s renders the 404
+    template, which is perfectly accessible. This caught a real setup bug immediately — see
+    the `.htaccess` note below.
+-   **A variant page must carry its `is-style-*` class.** The sample markup in `seed.php` is
+    hand-written, so a future WordPress could change what a block's `save()` emits and leave
+    it stale. A stale page still renders — in its *default* colors — and passes.
+-   **The tabs page must have built a tablist** above 768px and must not below it.
+    `src/blocks/tabs/view.js` adds the tab roles at runtime; if it fails to load, the plain
+    stack it leaves behind is valid markup that passes axe at every viewport.
+-   **A missing or partial manifest is a hard error.** Playwright reports "0 tests" as a pass,
+    so a forgotten seed would look exactly like a site with nothing wrong with it.
+
+### `incomplete` is reported, never failed on
+
+axe splits "this is wrong" from "a human has to look at this". The second covers cases it
+cannot compute — text over a background image, mainly — and those are recorded as annotations.
+This policy is carried over verbatim from the news theme, and for the same reason: pa11y
+conflates the two and produces a false positive on every hero.
+
+### The theme must be activated in its own command
+
+`switch_theme()` cannot do this from inside `wp eval-file`. WordPress has already booted by
+then — `functions.php` loaded for whatever theme was active, `init` fired, patterns and block
+styles registered — so the switch writes an option and changes nothing else in that process.
+
+The failure mode is the interesting part, because it is invisible locally. The switch *does*
+take effect for the **next** process, so the seed fails on a clean environment and passes on
+every run after it: green on any machine that has run it once, red on every CI runner. It
+shipped exactly that way, and no amount of local re-running would have shown it.
+
+`tools/a11y-tests.js` runs `wp theme activate` as a separate invocation, and `seed.php` now
+asserts rather than switches — failing loudly beats a fix that hides itself on the second
+attempt. `tests/integration/bootstrap.php` solves the same problem from the other side, at
+`muplugins_loaded`, which is why that tier never had it.
+
+### wp-env will not write `.htaccess`, and the symptom is misleading
+
+`flush_rules( true )` guards its write behind `got_mod_rewrite()`, which asks the *current*
+server whether mod_rewrite is loaded. The current server is PHP-CLI in the `cli` container,
+which has no Apache and says no; the container actually serving port 8888 does have it and is
+never asked. `wp rewrite flush --hard` fails identically.
+
+The symptom does not look like a permalink problem. Every seeded path returns Apache's own
+bare "Not Found" page, so the suite audits a document with no `<html lang>` and reports
+`html-has-lang` against a theme that sets it correctly. `seed.php` writes the file itself.
+
+### Judging a finding
+
+Not every violation on a variant page is a defect in the theme, and getting this wrong wastes
+a designer's afternoon. `is-style-on-dark` is the worked example: it supplies the *treatment*
+only — the `--brand-*` roles the helper classes read — and deliberately sets no background and
+no base color, both of which come from the block's own controls. Audited on a bare page it
+produces five guaranteed failures that are the fixture's fault, not the theme's. So
+`ucf_brand_a11y_wrap_in_context()` reproduces the reference usage from
+`templates/front-page.html` instead. **Read the style's definition in `src/scss/` before
+filing what the suite reports.**
+
 ## CI
 
 Two workflows, split by cost so the every-commit loop stays quick.
@@ -201,12 +310,34 @@ Two workflows, split by cost so the every-commit loop stays quick.
 
 **`.github/workflows/ci-full.yml` — pull requests and main only**
 
-| Job           | Runs                         | Gating   |
-| ------------- | ---------------------------- | -------- |
-| `integration` | wp-env + the WordPress suite | blocking |
+| Job             | Runs                             | Gating   |
+| --------------- | -------------------------------- | -------- |
+| `integration`   | wp-env + the WordPress suite     | blocking |
+| `accessibility` | wp-env + Playwright and axe-core | blocking |
 
-The accessibility suite joins the second workflow when it lands — it is the other tier that
-needs a booted WordPress.
+Both need a booted WordPress, which is what puts them here rather than in `ci.yml`.
+
+The accessibility job **blocks**, unlike the advisory `quality` job. That is deliberate and it
+is not the same judgement call: a contrast failure is a defect with a measured value, not a
+style preference, and the findings are meant to be acted on rather than noted. It also posts
+them, which is the other half of the point — see below.
+
+### The pull request comment
+
+The job renders its findings into a single comment, edited in place on every push rather than
+appended. `tools/a11y-report.js` builds it from structured axe data the specs attach.
+
+It groups **by finding, not by test**, because the raw run misleads in a specific way: the
+header, drawer and footer are on every page, so one bad grey in a template part fails
+thirty-nine checks. Read per-test that is thirty-nine problems; it is one. Each row carries
+the element, both hex values, the measured ratio and the threshold — enough for a designer to
+answer "what should this be instead?" without cloning the repository.
+
+The full `playwright-report` artifact holds everything the comment truncates. Comments are
+skipped for pull requests from forks, which get a read-only token; the job summary and the
+artifact still carry the findings there.
+
+### When each runs
 
 | Event                            | `ci.yml` | `ci-full.yml` |
 | -------------------------------- | -------- | ------------- |
@@ -230,10 +361,9 @@ reporting the wrong version; and the build/ drift check rebuilds and fails if th
 output changed, because stale `build/` means the deployed theme does not match the source it
 was built from.
 
-## Not yet built
+## Not covered by anything yet
 
--   Accessibility suite (Phase 2): Playwright + axe-core, per route, per pattern and per block
-    style variant.
-
-See [`docs/testing-plan.md`](../docs/testing-plan.md) for the order of work and the decisions
-behind it.
+`src/js/brand-nav.js`, `src/js/badge-format.js` and `src/js/editor/*` have no unit tests. The
+accessibility suite exercises `brand-nav.js` and `tabs/view.js` indirectly — it audits the DOM
+those scripts produce, and asserts the tab roles exist — but that is coverage of the result,
+not of the logic.
