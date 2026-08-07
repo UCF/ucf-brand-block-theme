@@ -2,11 +2,11 @@
 
 Three suites. `npm test` runs the two fast ones:
 
-| Suite | Command | Needs | Runtime |
-| --- | --- | --- | --- |
-| PHP units | `npm run test:php` | PHP + Composer | ~0.1s |
-| Block round-trips + markup sweep | `npm run test:js` | Node, and PHP for the sweep | ~3s |
-| PHP integration | `npm run test:integration` | Docker (wp-env) | ~2min cold, ~1s warm |
+| Suite                            | Command                    | Needs                       | Runtime              |
+| -------------------------------- | -------------------------- | --------------------------- | -------------------- |
+| PHP units                        | `npm run test:php`         | PHP + Composer              | ~0.1s                |
+| Block round-trips + markup sweep | `npm run test:js`          | Node, and PHP for the sweep | ~3s                  |
+| PHP integration                  | `npm run test:integration` | Docker (wp-env)             | ~2min cold, ~1s warm |
 
 `npm test` runs the first two and **never touches Docker** — that is deliberate, and worth
 protecting. A suite that needs a container is a suite nobody runs before committing, which is
@@ -47,16 +47,16 @@ a page render is not a sufficient check.
 
 Two complementary assertions per block:
 
-- **Round-trip** — `serialize()` → `parse()` → `isValid`. The same comparison the editor
-  makes. Catches markup that cannot be read back.
-- **Snapshot** — catches any markup change *at all*, including a self-consistent one that
-  round-trips cleanly while silently invalidating every page already saved. Renaming a class
-  in `save()` is exactly this: the round-trip still passes, the snapshot does not. Snapshots
-  are committed, and reviewing a change to one is the point.
+-   **Round-trip** — `serialize()` → `parse()` → `isValid`. The same comparison the editor
+    makes. Catches markup that cannot be read back.
+-   **Snapshot** — catches any markup change _at all_, including a self-consistent one that
+    round-trips cleanly while silently invalidating every page already saved. Renaming a class
+    in `save()` is exactly this: the round-trip still passes, the snapshot does not. Snapshots
+    are committed, and reviewing a change to one is the point.
 
 ### The registration wrinkle
 
-Blocks call `registerBlockType( metadata.name, { edit, save } )` — the *name*, not the
+Blocks call `registerBlockType( metadata.name, { edit, save } )` — the _name_, not the
 metadata object. On a real site that works because PHP's `register_block_type()` has already
 read `block.json` and shipped its contents to the client. Jest has no PHP, so without the
 same step registration silently warns and bails, `serialize()` returns `""`, and every
@@ -78,14 +78,14 @@ produce. `docs/architecture.md` records that `section-index.php` shipped a viola
 once — a paragraph carrying a `textColor` attribute with no matching class, which looked fine
 on white and stayed grey-on-black inside a Dark group.
 
-Template parts are read straight off disk. Patterns cannot be: they interpolate PHP *inside*
+Template parts are read straight off disk. Patterns cannot be: they interpolate PHP _inside_
 their block markup, so `tests/php/render-patterns.php` renders each one the way core does and
 hands back the result. **That is why this suite needs a PHP binary**, unlike `blocks.test.js`.
 
 ### `isValid` is not the assertion — and that matters
 
 `parse()` does not merely validate. When markup fails to match, it walks the block type's
-`deprecated` array for an older `save()` that *does* match, and on a hit it migrates the block
+`deprecated` array for an older `save()` that _does_ match, and on a hit it migrates the block
 and reports `isValid: true`. Core blocks carry many deprecations — `core/heading` has six.
 
 This was measured, not assumed. **Reproducing the exact `section-index.php` bug leaves every
@@ -109,17 +109,17 @@ fails. An ordinary function leaves nothing to find.
 
 `jest.config.js` carries four non-obvious settings, each commented in place:
 
-- Babel is passed **inline to Jest** rather than added as a root `babel.config.js`, which
-  webpack would also pick up. `npm run build` output is byte-identical with the test tooling
-  installed — verify that before changing it.
-- `customExportConditions` selects the CJS builds; jsdom's default `browser` condition
-  points most `@wordpress/*` packages at ESM that Jest cannot load.
-- A short `transformIgnorePatterns` allowlist covers the few dependencies with no CJS build
-  at all. **If that list starts growing on every dependency bump, stop resolving the editor
-  through npm** and validate against the WordPress bundle the site actually runs instead —
-  that is higher fidelity anyway, since npm package versions drift from the deployed WP.
-- `setupFiles` must re-list the preset's own globals file, because naming it replaces the
-  preset's copy rather than adding to it.
+-   Babel is passed **inline to Jest** rather than added as a root `babel.config.js`, which
+    webpack would also pick up. `npm run build` output is byte-identical with the test tooling
+    installed — verify that before changing it.
+-   `customExportConditions` selects the CJS builds; jsdom's default `browser` condition
+    points most `@wordpress/*` packages at ESM that Jest cannot load.
+-   A short `transformIgnorePatterns` allowlist covers the few dependencies with no CJS build
+    at all. **If that list starts growing on every dependency bump, stop resolving the editor
+    through npm** and validate against the WordPress bundle the site actually runs instead —
+    that is higher fidelity anyway, since npm package versions drift from the deployed WP.
+-   `setupFiles` must re-list the preset's own globals file, because naming it replaces the
+    preset's copy rather than adding to it.
 
 ## PHP integration — `tests/integration/`
 
@@ -149,14 +149,14 @@ npm run env:stop               # when you are done
 
 Covers what the fast suite deliberately cannot:
 
-- **`ucf_brand_add_heading_anchor()`** through the real `render_block` pass — including the
-  `static` slug registry resetting between posts. Without that reset, the second page rendered
-  in a request gets every anchor suffixed and every inbound link to it breaks.
-- **`ucf_brand_get_ordered_sections()`** against real posts: that the `meta_key`/`meta_query`
-  pair actually excludes drafts, child pages, posts, and unnumbered pages, and that ordering
-  is numeric rather than lexical (10 must not sort before 2).
-- **Search**: that `pre_get_posts` narrows the *main* query and leaves secondary queries
-  alone, and that the subsections block renders real deep links inside a real search loop.
+-   **`ucf_brand_add_heading_anchor()`** through the real `render_block` pass — including the
+    `static` slug registry resetting between posts. Without that reset, the second page rendered
+    in a request gets every anchor suffixed and every inbound link to it breaks.
+-   **`ucf_brand_get_ordered_sections()`** against real posts: that the `meta_key`/`meta_query`
+    pair actually excludes drafts, child pages, posts, and unnumbered pages, and that ordering
+    is numeric rather than lexical (10 must not sort before 2).
+-   **Search**: that `pre_get_posts` narrows the _main_ query and leaves secondary queries
+    alone, and that the subsections block renders real deep links inside a real search loop.
 
 One test is there specifically to catch the failure `docs/architecture.md` warns about: it
 renders a page, asks search to derive that page's anchors, and asserts every derived anchor is
@@ -176,21 +176,64 @@ The practical consequence: use annotations (`@dataProvider`, `@covers`), not PHP
 
 Two things account for nearly every case, and the runner prints both:
 
-- **Docker is not running.**
-- **Ports 8888/8889 are taken**, almost always by another wp-env project that was left up.
-  Stop that one, or override the ports for your machine only:
+-   **Docker is not running.**
+-   **Ports 8888/8889 are taken**, almost always by another wp-env project that was left up.
+    Stop that one, or override the ports for your machine only:
 
-  ```json
-  // .wp-env.override.json — gitignored, never commit it
-  { "port": 8899, "testsPort": 8898 }
-  ```
+    ```json
+    // .wp-env.override.json — gitignored, never commit it
+    { "port": 8899, "testsPort": 8898 }
+    ```
 
 `.wp-env.json` itself stays on the defaults so the committed config is the standard one.
 
+## CI
+
+Two workflows, split by cost so the every-commit loop stays quick.
+
+**`.github/workflows/ci.yml` — every commit, every branch** (~2 min)
+
+| Job          | Runs                                                           | Gating   |
+| ------------ | -------------------------------------------------------------- | -------- |
+| `php`        | unit suite on PHP 8.1 and 8.2                                  | blocking |
+| `javascript` | version check, build, build/ drift check, block + markup tests | blocking |
+| `quality`    | phpcs, eslint, stylelint, prettier                             | advisory |
+
+**`.github/workflows/ci-full.yml` — pull requests and main only**
+
+| Job           | Runs                         | Gating   |
+| ------------- | ---------------------------- | -------- |
+| `integration` | wp-env + the WordPress suite | blocking |
+
+The accessibility suite joins the second workflow when it lands — it is the other tier that
+needs a booted WordPress.
+
+| Event                            | `ci.yml` | `ci-full.yml` |
+| -------------------------------- | -------- | ------------- |
+| Push to a branch with no PR      | ✓        | –             |
+| Open a pull request              | –        | ✓             |
+| Push to a branch with an open PR | ✓        | ✓             |
+| Merge a PR, or commit to main    | ✓        | ✓             |
+
+`ci-full.yml` deliberately does **not** re-run the fast suites. A `pull_request` event and the
+`push` for its branch fire together, so `ci.yml` has already run them on the same commit —
+duplicating them would double every PR's CI time for no extra signal.
+
+**Style never fails the build.** phpcs, eslint, stylelint and prettier all run and are all
+reported, but the `quality` job carries `continue-on-error` and never gates a merge. A red X
+meaning "an unrelated file has a long comment line" is a red X people learn to ignore, which
+costs more than the findings are worth.
+
+Two checks sound like lint and are deliberately blocking anyway, because neither is about
+style: `lint:version` catches `style.css` and `package.json` disagreeing, which ships a theme
+reporting the wrong version; and the build/ drift check rebuilds and fails if the committed
+output changed, because stale `build/` means the deployed theme does not match the source it
+was built from.
+
 ## Not yet built
 
-- Accessibility suite (Phase 2): Playwright + axe-core, per route, per pattern and per block
-  style variant.
+-   Accessibility suite (Phase 2): Playwright + axe-core, per route, per pattern and per block
+    style variant.
 
 See [`docs/testing-plan.md`](../docs/testing-plan.md) for the order of work and the decisions
 behind it.

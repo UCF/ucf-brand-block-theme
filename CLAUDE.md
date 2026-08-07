@@ -9,17 +9,17 @@ bitten by before. Read `README.md` first for what the theme is and where each fi
 
 Skim this index; go read the section before you touch the area it covers.
 
-| Section | Covers |
-| --- | --- |
-| The escalation ladder | Tokens → existing classes → core controls → something new |
-| Roles, not tokens | `--brand-*` roles, and which file may set one |
-| Patterns declare structure and composition, never color | Why a `textColor` attribute in a pattern is a bug |
-| Blocks | Static-only rule, palette slugs, where dynamic blocks go instead |
-| PHP lives in `includes/` | One topic per file; `functions.php` is a loader only |
-| JavaScript is one pipeline | `src/` → `build/`, generated `.asset.php` dependency lists |
-| Build and content | What `npm run build` does; block CSS belongs in `src/scss/` |
-| H2s are structural | `includes/headings.php` owns every anchor id |
-| Gotchas that have already bitten | The list not to "clean up" |
+| Section                                                 | Covers                                                           |
+| ------------------------------------------------------- | ---------------------------------------------------------------- |
+| The escalation ladder                                   | Tokens → existing classes → core controls → something new        |
+| Roles, not tokens                                       | `--brand-*` roles, and which file may set one                    |
+| Patterns declare structure and composition, never color | Why a `textColor` attribute in a pattern is a bug                |
+| Blocks                                                  | Static-only rule, palette slugs, where dynamic blocks go instead |
+| PHP lives in `includes/`                                | One topic per file; `functions.php` is a loader only             |
+| JavaScript is one pipeline                              | `src/` → `build/`, generated `.asset.php` dependency lists       |
+| Build and content                                       | What `npm run build` does; block CSS belongs in `src/scss/`      |
+| H2s are structural                                      | `includes/headings.php` owns every anchor id                     |
+| Gotchas that have already bitten                        | The list not to "clean up"                                       |
 
 Search has its own document: [`docs/search.md`](docs/search.md).
 
@@ -33,12 +33,12 @@ and the non-obvious parts of the setup.
 **New code ships with its test.** What you have to write depends on what you added, and two
 of the four cases are already automatic:
 
-| You added | You write |
-| --- | --- |
-| A function in `includes/` | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
-| A block in `src/blocks/` | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do |
-| A pattern in `patterns/` | Nothing. The sweep reads the directory — just run it |
-| A template part in `parts/` | Nothing. Same sweep |
+| You added                   | You write                                                                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
+| A block in `src/blocks/`    | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do                          |
+| A pattern in `patterns/`    | Nothing. The sweep reads the directory — just run it                                                  |
+| A template part in `parts/` | Nothing. Same sweep                                                                                   |
 
 -   **A new function in `includes/` needs a unit test.** Put it with the tests for the file
     that owns the topic. If the function genuinely needs WordPress — a meta query,
@@ -94,6 +94,6 @@ These are about how to make a change here, not about what the theme is.
 -   **Watch for opcache when testing PHP changes on a running site.** The usual local stack
     caches with `revalidate_freq=2`; a before/after page capture taken faster than that
     compares stale code against stale code and proves nothing.
--   **This codebase documents *why*, not *what*.** Comments here explain reasoning and record
+-   **This codebase documents _why_, not _what_.** Comments here explain reasoning and record
     bugs that already shipped. Match that when adding code, and when moving code keep its
     comment with it — including the file paths it references.

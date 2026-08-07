@@ -77,7 +77,7 @@ reproduces core's implementation. None of them are blanket.
 The expensive knowledge. Do not rediscover these.
 
 **Block registration silently no-ops under Jest.** Blocks call
-`registerBlockType( metadata.name, { edit, save } )` — the *name*, not the metadata object.
+`registerBlockType( metadata.name, { edit, save } )` — the _name_, not the metadata object.
 On a real site the title and attributes are already present because PHP's
 `register_block_type()` read `block.json` and shipped it to the client. Jest has no PHP, so
 registration warns, returns undefined, `serialize()` returns `""`, and **every round-trip
@@ -90,7 +90,7 @@ server-side definitions. The "registers every block that ships in `src/blocks/`"
 to catch a regression here; it is not decoration.
 
 **Mutation-test anything security-shaped before trusting it.** The first XSS test for
-`ucf_brand_highlight_terms()` put its payload *after* the match, so it exercised the
+`ucf_brand_highlight_terms()` put its payload _after_ the match, so it exercised the
 trailing-text escape and kept passing with `esc_html()` deleted from inside the `<mark>`.
 The payload has to sit inside the matched span. Both suites have been mutation-checked once;
 do the same for new assertions that claim to prove escaping.
@@ -169,17 +169,32 @@ disappears. Both the success and failure paths are verified.
 `.wp-env.json` stays on the default ports; per-machine clashes go in `.wp-env.override.json`,
 which is gitignored.
 
-### 3. CI workflow
+### ~~3. CI workflow~~ — done
 
-`.github/workflows/ci.yml` — the repo currently has only `trigger-packagist-update.yml`.
-Model on the news theme's. Jobs: `composer install` → `phpcs` → `phpunit`; `npm ci` →
-`npm run build` → `npm run test:js`. Then phase 2's a11y job.
+Two workflows, split by cost:
 
-**Pin PHP to 8.2** to match the container. Local development is on 8.5.8, and a suite that
-only ever runs on 8.5 proves less than it looks like it does.
+-   **`ci.yml` — every commit, every branch.** The two Docker-free suites, plus the version
+    check and the build/ drift check. Around two minutes, so the inner loop stays cheap.
+-   **`ci-full.yml` — pull requests and main only.** The WordPress integration tier, and where
+    the accessibility suite goes in phase 2.
 
-Optional and worth considering: fail CI if `build/` is dirty after `npm run build`, since
-`build/` is committed and drifting from `src/` is a known hazard.
+`ci-full.yml` is deliberately not a superset: a `pull_request` event and the `push` for its
+branch fire together, so re-running the fast suites there would double every PR's CI time for
+no extra signal.
+
+**Linting and formatting never fail a build.** phpcs, eslint, stylelint and prettier run in
+the `quality` job, which carries `continue-on-error`. The findings are worth seeing; they are
+not the same claim as "this is broken", and a build that goes red for a long comment line in
+an unrelated file is a build whose signal gets ignored.
+
+PHP is a matrix (8.1, 8.2) because `style.css` promises 8.1 while production runs 8.2 — the
+floor is a promise and the ceiling is what ships.
+
+Two additions not in the original plan, both blocking because neither is style: the **build/
+drift check** (rebuild, fail if the committed output changed — catches the "edited src/,
+forgot to rebuild" commit, and verified to actually catch it) and `lint:version`, which
+despite its name catches a version mismatch that would ship a theme reporting the wrong
+version.
 
 ### 4. Phase 2 — accessibility
 
@@ -213,10 +228,10 @@ Surfaced by `composer audit` while installing PHPUnit. Both are **pre-existing d
 dependencies**, not introduced by this work, and neither ships to production — but both are
 real:
 
-| Package | Installed | Advisory | Fixed in |
-| --- | --- | --- | --- |
-| `squizlabs/php_codesniffer` | 3.13.5 | CVE-2026-67434, OS command injection | `>=3.13.6` |
-| `wp-coding-standards/wpcs` | `^3.1` | CVE-2026-45293, arbitrary code execution (high) | `>=3.4.1` |
+| Package                     | Installed | Advisory                                        | Fixed in   |
+| --------------------------- | --------- | ----------------------------------------------- | ---------- |
+| `squizlabs/php_codesniffer` | 3.13.5    | CVE-2026-67434, OS command injection            | `>=3.13.6` |
+| `wp-coding-standards/wpcs`  | `^3.1`    | CVE-2026-45293, arbitrary code execution (high) | `>=3.4.1`  |
 
 Bumping the `wpcs` constraint to `^3.4.1` should pull a fixed phpcs with it. Worth a separate
 commit so it is reviewable on its own.
@@ -232,7 +247,7 @@ commit so it is reviewable on its own.
 2. **Should `CLAUDE.md` gain a pointer to `tests/README.md`?** Nothing in the contributor
    docs currently mentions that tests exist or that `npm test` runs them, so neither a new
    contributor nor a future agent session would find them.
-3. **How strict should CI be initially?** Failing the build on a11y violations from day one
-   is the right end state, but the first full run across every pattern and variant will
-   almost certainly surface existing issues. Landing it non-blocking first, fixing the
-   backlog, then flipping it to required may be the smoother path — your call.
+3. **How strict should the a11y job be when it lands?** The same question the lint steps
+   already answer with `continue-on-error`: the first full run across every pattern and
+   variant will almost certainly surface existing issues. Landing it non-blocking, fixing the
+   backlog, then flipping it to required is the pattern now established in `ci.yml`.

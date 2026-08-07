@@ -97,12 +97,12 @@ lint:version` fails if they drift.
 New code ships with its test. Two of the four cases are automatic, so this is less work than
 it sounds:
 
-| You added | You write |
-| --- | --- |
-| A function in `includes/` | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
-| A block in `src/blocks/` | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do |
-| A pattern in `patterns/` | Nothing. The markup sweep reads the directory — just run it |
-| A template part in `parts/` | Nothing. Same sweep |
+| You added                   | You write                                                                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
+| A block in `src/blocks/`    | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do                          |
+| A pattern in `patterns/`    | Nothing. The markup sweep reads the directory — just run it                                           |
+| A template part in `parts/` | Nothing. Same sweep                                                                                   |
 
 Anything that genuinely needs WordPress — a meta query, the `render_block` filter, a real
 `WP_Query` — goes in `tests/integration/`, which runs against a real WordPress under wp-env.
@@ -123,6 +123,12 @@ Three rules are worth knowing before you write anything:
     migrating it through the block's `deprecated` array and then reports `isValid: true` — the
     exact bug this theme once shipped in `section-index.php` passes that check. Use
     `isValidBlockContent()` instead.
+
+CI runs the two fast suites on **every commit** (`.github/workflows/ci.yml`), and adds the
+WordPress integration suite on **pull requests and main** (`.github/workflows/ci-full.yml`).
+The fast workflow also rebuilds and fails if the committed `build/` output is stale. Linting
+and formatting run there too, but as an advisory job — they report findings and never fail
+the build.
 
 [`tests/README.md`](tests/README.md) covers what each suite is for and the non-obvious parts of
 the setup. [`docs/testing-plan.md`](docs/testing-plan.md) tracks what is still to be built.

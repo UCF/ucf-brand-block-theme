@@ -1,0 +1,84 @@
+# The heavy tiers — pull requests and main only.
+#
+# Everything here needs Docker and takes minutes rather than seconds, which is why it does
+# not run on every commit. The fast suites in ci.yml already cover each push; this adds the
+# tiers that can only run against a real WordPress.
+#
+# Deliberately NOT a superset. It does not re-run the unit, block or markup suites, because
+# ci.yml has already run them on the same commit — a `pull_request` event and the `push`
+# event for its branch fire together, so duplicating them here would mean running everything
+# twice on every PR update for no extra signal.
+#
+# Triggers, matching how work actually lands:
+#
+#   pull_request     opened, and every push to the branch afterwards (the default types
+#                    include `synchronize`), so a PR is fully tested before review and stays
+#                    tested as it changes.
+#   push to main     the merge itself, plus anything committed straight to main.
+#
+# One gap worth knowing: `push` does not fire in this repository for a branch pushed to a
+# fork, so a fork's pre-PR commits get no fast run. Opening the PR triggers this workflow and
+# the branch's own ci.yml run, so nothing reaches main untested — it just arrives later than
+# it would for a branch pushed here directly.
+
+name: CI (full)
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    integration:
+        name: WordPress integration
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+
+            # vendor/ is mounted into the wp-env container and phpunit runs from it, so the
+            # host install has to happen first. The container supplies the PHP that executes.
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Cache Composer packages
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cache/composer/files
+                  key: composer-8.2-${{ hashFiles('composer.lock') }}
+                  restore-keys: composer-8.2-
+
+            - name: Install PHP dependencies
+              run: composer install --prefer-dist --no-interaction --no-progress
+
+            - name: Install dependencies
+              run: npm ci
+
+            # tools/integration-tests.js boots wp-env, runs PHPUnit, and always stops the
+            # environment again — including on failure, with PHPUnit's exit code preserved.
+            - name: Integration tests
+              run: npm run test:integration
+
+    # The accessibility suite belongs here when it lands (phase 2): Playwright + axe-core
+    # against wp-env, per route, per pattern and per block style variant. It is the other
+    # tier that needs a booted WordPress, and the reason this workflow is scoped to pull
+    # requests and main rather than every commit.
+    #
+    # See docs/testing-plan.md.

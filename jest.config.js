@@ -24,7 +24,9 @@ module.exports = {
 		'\\.[cm]?[jt]sx?$': [
 			require.resolve( 'babel-jest' ),
 			{
-				presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+				presets: [
+					require.resolve( '@wordpress/babel-preset-default' ),
+				],
 			},
 		],
 	},
@@ -64,11 +66,7 @@ module.exports = {
 	],
 
 	testMatch: [ '<rootDir>/tests/js/**/*.test.js' ],
-	testPathIgnorePatterns: [
-		'/node_modules/',
-		'/vendor/',
-		'/build/',
-	],
+	testPathIgnorePatterns: [ '/node_modules/', '/vendor/', '/build/' ],
 	// The a11y suite is Playwright's, not Jest's; it lives in tests/a11y/.
 	modulePathIgnorePatterns: [ '<rootDir>/tests/a11y/' ],
 };
