@@ -76,9 +76,103 @@ jobs:
             - name: Integration tests
               run: npm run test:integration
 
-    # The accessibility suite belongs here when it lands (phase 2): Playwright + axe-core
-    # against wp-env, per route, per pattern and per block style variant. It is the other
-    # tier that needs a booted WordPress, and the reason this workflow is scoped to pull
-    # requests and main rather than every commit.
+    # axe-core against a real WordPress: every template, every registered pattern, every
+    # registered block style, at three viewports. The other tier that needs a booted
+    # WordPress, and the second reason this workflow is scoped to pull requests and main.
     #
-    # See docs/testing-plan.md.
+    # Blocking, deliberately. The findings are the point — they go to the design team as a
+    # list of colours to change — and a check nobody has to act on is a check nobody reads.
+    accessibility:
+        name: Accessibility (axe)
+        runs-on: ubuntu-latest
+
+        # `pull-requests: write` is for the summary comment below and nothing else. Job-level
+        # permissions replace the workflow's block outright rather than adding to it, so
+        # `contents: read` has to be restated here.
+        permissions:
+            contents: read
+            pull-requests: write
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            # The suite reads rendered colour, so it needs the compiled stylesheet. build/ is
+            # committed, but building here means a PR that edited src/ is audited against what
+            # it actually changed rather than against the last committed CSS.
+            - name: Build
+              run: npm run build
+
+            - name: Install Chromium
+              run: npx playwright install --with-deps chromium
+
+            # tools/a11y-tests.js boots wp-env, seeds the fixture content, runs Playwright, and
+            # always stops the environment again — on failure and on interrupt, with
+            # Playwright's exit code preserved.
+            - name: Accessibility suite
+              run: npm run test:a11y
+
+            # `always()` on everything below: the report is most useful precisely when the step
+            # above failed, and without it a red suite would post nothing.
+            - name: Render the report
+              if: ${{ always() }}
+              run: |
+                  node tools/a11y-report.js playwright-report/results.json > a11y-comment.md
+                  cat a11y-comment.md >> "$GITHUB_STEP_SUMMARY"
+
+            # Skipped for pull requests from forks: `pull_request` hands those a read-only
+            # token, so this would fail on permissions rather than on anything real. The job
+            # summary and the artifact still carry the full findings there.
+            - name: Comment on the pull request
+              if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require( 'fs' );
+                      const marker = '<!-- ucf-brand-a11y-report -->';
+                      const body = marker + '\n' + fs.readFileSync( 'a11y-comment.md', 'utf8' );
+
+                      // One comment per pull request, edited in place. Appending a new one on
+                      // every push buries the branch's own history under its CI output.
+                      const { data: comments } = await github.rest.issues.listComments( {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.issue.number,
+                        per_page: 100,
+                      } );
+
+                      const existing = comments.find( ( c ) => c.body.includes( marker ) );
+
+                      if ( existing ) {
+                        await github.rest.issues.updateComment( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: existing.id,
+                          body,
+                        } );
+                      } else {
+                        await github.rest.issues.createComment( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.issue.number,
+                          body,
+                        } );
+                      }
+
+            # The comment lists findings; this is where the failing screenshots, the DOM
+            # snapshots and the full node lists live when a finding needs chasing.
+            - name: Upload the Playwright report
+              if: ${{ always() }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-report
+                  path: playwright-report/
+                  retention-days: 14
