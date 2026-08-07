@@ -260,10 +260,19 @@
 				return;
 			}
 
-			var toPageEnd =
-				document.documentElement.scrollHeight -
-				window.scrollY -
-				window.innerHeight;
+			var pageOverflow =
+				document.documentElement.scrollHeight - window.innerHeight;
+
+			// The page needs more scroll room than the drawer is borrowing, or the "last
+			// stretch" would begin at (or above) the top of the page: the drawer would then
+			// load already scrolled, with the masthead and search out of view and no way to
+			// scroll the page back far enough to restore them. A short page — a search result
+			// with few hits, say — leaves the drawer alone and scrolls on its own.
+			if ( pageOverflow <= overflow ) {
+				return;
+			}
+
+			var toPageEnd = pageOverflow - window.scrollY;
 
 			if ( toPageEnd > overflow ) {
 				return;
@@ -279,7 +288,9 @@
 		var queued = false;
 
 		function onScroll() {
-			if ( queued ) {
+			// sync() checks this too, but bailing here keeps the off-canvas breakpoint from
+			// queueing a frame per scroll event only to discard it.
+			if ( ! docked.matches || queued ) {
 				return;
 			}
 
