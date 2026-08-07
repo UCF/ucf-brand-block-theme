@@ -4,17 +4,19 @@
  * The suite needs Docker containers that `wp-env` boots. Left running they hold ports 8888
  * and 8889 plus four containers, which is how you end up unable to start a *different*
  * project's wp-env with nothing but "address already in use" to go on. So this starts the
- * environment, runs the tests, and stops it again — including when the tests fail, and when
- * the run is interrupted.
+ * environment, runs the tests, and stops it again.
  *
- * Three properties this exists to guarantee, none of which a chained npm script gives you
+ * Four properties this exists to guarantee, none of which a chained npm script gives you
  * reliably across shells:
  *
  * 1. PHPUnit's exit code is what the process exits with, so CI and `&&` chains see a real
  *    pass or fail rather than the exit code of `wp-env stop`.
  * 2. The environment is stopped even when the tests fail — the common case, and exactly when
  *    a `&&` chain would skip the cleanup.
- * 3. Ctrl-C stops it too, rather than orphaning four containers.
+ * 3. It is stopped on Ctrl-C, and on an uncaught exception, rather than orphaning four
+ *    containers. See the note on the `exit` handler below for why both routes are needed.
+ * 4. A teardown that itself fails says so, loudly, instead of leaving you to discover it
+ *    the next time some other project will not start.
  *
  * Run with `npm run test:integration`.
  *
@@ -52,37 +54,61 @@ function wpEnv( args ) {
 	return result.status === null ? 1 : result.status;
 }
 
-/**
- * Stop the environment. Never throws — cleanup must not mask the test result.
- *
- * @return {void}
- */
-function stopEnvironment() {
-	try {
-		wpEnv( [ 'stop' ] );
-	} catch ( error ) {
-		console.error( `Failed to stop wp-env: ${ error.message }` );
-	}
-}
-
 let stopped = false;
 
 /**
- * Stop once, however we got here.
+ * Stop the environment, once, however we got here.
+ *
+ * No try/catch: `spawnSync` does not throw for the cases that actually happen — a command
+ * exiting non-zero comes back as `status`, and a missing binary as `error` — and `wpEnv()`
+ * already turns both into a return code. A catch here would be unreachable, and would have
+ * made the failure below look handled when it was not.
+ *
+ * A failed teardown is reported loudly rather than swallowed. It is the one outcome this
+ * whole script exists to prevent, and the person running it needs to know the containers
+ * outlived the run.
  *
  * @return {void}
  */
 function cleanUp() {
-	if ( ! stopped ) {
-		stopped = true;
-		stopEnvironment();
+	if ( stopped ) {
+		return;
+	}
+
+	stopped = true;
+
+	if ( 0 !== wpEnv( [ 'stop' ] ) ) {
+		console.error(
+			'\nwp-env failed to stop. Containers may still be running and holding ports\n' +
+				'8888/8889. Run `npm run env:stop` before starting another wp-env project.\n'
+		);
 	}
 }
 
-// Ctrl-C and `kill` should still tear the containers down.
+/*
+ * Teardown is registered on `exit`, which is what makes "always" literally true rather than
+ * merely intended.
+ *
+ * `exit` fires on normal completion, on an explicit `process.exit()`, and after an uncaught
+ * exception — the last of which is the case an earlier version of this file missed, because
+ * only `exit` runs then, not the signal handlers. Node 15+ also treats an unhandled rejection
+ * as fatal, so that route ends up here too (there is no async code in this script, but the
+ * guarantee should not depend on that staying true).
+ *
+ * Signals do not raise `exit` on their own, so their handlers call `process.exit()` and let
+ * the one teardown path below do the work.
+ *
+ * `spawnSync` is synchronous, which is the reason an `exit` handler can do this at all —
+ * anything asynchronous would be abandoned mid-flight.
+ *
+ * Registered before `wp-env start` on purpose: a start that fails partway can still leave
+ * containers behind, and `cleanUp()` is idempotent, so running it after a no-op start costs
+ * only a few seconds.
+ */
+process.on( 'exit', cleanUp );
+
 [ 'SIGINT', 'SIGTERM' ].forEach( ( signal ) => {
 	process.on( signal, () => {
-		cleanUp();
 		process.exit( 1 );
 	} );
 } );
@@ -98,7 +124,6 @@ if ( 0 !== started ) {
 			'    Stop that one, or set "port"/"testsPort" in .wp-env.override.json\n' +
 			'    (gitignored, so it stays local to your machine).\n'
 	);
-	cleanUp();
 	process.exit( started );
 }
 
@@ -111,7 +136,5 @@ const tests = wpEnv( [
 	'phpunit-integration.xml.dist',
 ] );
 
-cleanUp();
-
-// Exit with the tests' status, not the teardown's.
+// Exit with the tests' status, not the teardown's. The `exit` handler stops the environment.
 process.exit( tests );

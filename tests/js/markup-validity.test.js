@@ -168,13 +168,18 @@ function staleBlocksIn( source ) {
  *
  * A typo in a block comment, or a block removed while something still references it.
  *
+ * Each entry names the offending block, not just the file. Reporting the filename alone
+ * meant a source with three unrecognized blocks produced the same string three times — a
+ * longer failure that told you nothing more than a shorter one would have. `core/missing`
+ * keeps the original markup on the block, so say which one.
+ *
  * @param {{file: string, content: string}} source Rendered source.
  * @return {string[]} Failure lines.
  */
 function unrecognizedBlocksIn( source ) {
 	return flatten( parse( source.content ) )
 		.filter( ( block ) => block.name === 'core/missing' )
-		.map( () => source.file );
+		.map( ( block ) => `${ source.file } → ${ describe_( block ) }` );
 }
 
 const SILENCED = [
