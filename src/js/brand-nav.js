@@ -8,7 +8,9 @@
  * through the viewport.
  *
  * The drawer's sticky behavior is pure CSS (see src/scss/_drawer.scss). Nothing here
- * positions it.
+ * positions it — the one exception is syncDrawerToPageEnd() below, which drives the
+ * drawer's own scrollTop (never its position) so the end of the nav lands in view as the
+ * page ends. That comment explains why it cannot be CSS.
  */
 ( function () {
 	'use strict';
@@ -219,6 +221,93 @@
 				activate( link.getAttribute( 'href' ).slice( 1 ) );
 			}
 		} );
+	}
+
+	/**
+	 * Scroll the drawer to its end as the page reaches its end.
+	 *
+	 * The drawer is a viewport-height scroll container pinned below the header, and its
+	 * footer (the contact block and version line) sits in flow at the end of the nav. When
+	 * the nav is long enough to overflow, that footer is below the drawer's own fold, so a
+	 * reader who never scrolls the drawer itself never sees it — and at the bottom of the
+	 * page it reads as clipped by the site footer, since that is exactly where the drawer's
+	 * box ends.
+	 *
+	 * CSS cannot express this: a box taller than the viewport can be anchored by its top or
+	 * its bottom, never both, so there is no declaration that keeps the rail pinned under the
+	 * header *and* reveals its tail at the end of the page. (`position: sticky; bottom: 0`
+	 * was tried; per spec `top` wins when the box does not fit, so it resolves back to a top
+	 * pin.) So spend the page's last stretch of scroll on the drawer's remaining scroll:
+	 * map the final `overflow` pixels of page scroll onto the drawer's 0→overflow range, and
+	 * the drawer lands on its footer exactly as the page lands on the site footer.
+	 *
+	 * Above that stretch the drawer is left alone, so scrolling it by hand still works
+	 * everywhere else on the page.
+	 */
+	function syncDrawerToPageEnd() {
+		// Only on the docked rail. Below the breakpoint the drawer is a fixed off-canvas
+		// panel with its own scroll and no relationship to page position at all.
+		var docked = window.matchMedia( '(min-width: 961px)' );
+
+		function sync() {
+			if ( ! docked.matches ) {
+				return;
+			}
+
+			var overflow = sidebar.scrollHeight - sidebar.clientHeight;
+
+			if ( overflow <= 0 ) {
+				return;
+			}
+
+			var pageOverflow =
+				document.documentElement.scrollHeight - window.innerHeight;
+
+			// The page needs more scroll room than the drawer is borrowing, or the "last
+			// stretch" would begin at (or above) the top of the page: the drawer would then
+			// load already scrolled, with the masthead and search out of view and no way to
+			// scroll the page back far enough to restore them. A short page — a search result
+			// with few hits, say — leaves the drawer alone and scrolls on its own.
+			if ( pageOverflow <= overflow ) {
+				return;
+			}
+
+			var toPageEnd = pageOverflow - window.scrollY;
+
+			if ( toPageEnd > overflow ) {
+				return;
+			}
+
+			// Clamped because rubber-band scrolling reports a negative distance.
+			sidebar.scrollTop = Math.min(
+				overflow,
+				Math.max( 0, overflow - toPageEnd )
+			);
+		}
+
+		var queued = false;
+
+		function onScroll() {
+			// sync() checks this too, but bailing here keeps the off-canvas breakpoint from
+			// queueing a frame per scroll event only to discard it.
+			if ( ! docked.matches || queued ) {
+				return;
+			}
+
+			queued = true;
+			window.requestAnimationFrame( function () {
+				queued = false;
+				sync();
+			} );
+		}
+
+		window.addEventListener( 'scroll', onScroll, { passive: true } );
+		window.addEventListener( 'resize', onScroll, { passive: true } );
+
+		// The sub-nav is injected into the drawer after this runs, which changes the
+		// overflow the mapping is built on. Re-run once the layout settles.
+		window.addEventListener( 'load', sync );
+		sync();
 	}
 
 	/**
@@ -448,6 +537,10 @@
 				}
 			}
 		}
+	}
+
+	if ( sidebar ) {
+		syncDrawerToPageEnd();
 	}
 
 	initMobileDrawer();
