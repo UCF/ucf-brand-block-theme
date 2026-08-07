@@ -52,6 +52,12 @@
 	padding: 0;
 }
 
+// The drawer is its own scroll container, exactly the height of the viewport strip below the
+// header, pinned there. A bottom-anchored variant (`sticky bottom: 0` on a content-height
+// rail) was tried and reverted: with the rail almost exactly viewport-height it resolves to
+// the same top pin anyway, and it gives up the guarantee that the black column fills the
+// strip. Revealing the footer at the end of the page is handled in brand-nav.js instead —
+// see syncDrawerToPageEnd() there.
 .brand-sidebar {
 	background: map.get($color, "black");
 	border-right: 1px solid map.get($color, "line-dark");
@@ -126,9 +132,10 @@
 }
 
 // The sidebar's content comes from a template part invoked without a `tagName`, so WP wraps
-// it in `<div class="wp-block-template-part">`. Left alone that wrapper is the sidebar's only
-// flex child, which collapses `margin-top: auto` on the footer (a grandchild). `display:
-// contents` drops the wrapper from the box tree so the part's blocks become the flex children.
+// it in `<div class="wp-block-template-part">`. `display: contents` drops that wrapper from
+// the box tree so the part's own blocks are the sidebar's flex children — anything the
+// sidebar's flex column is asked to do to them (alignment, sizing) reaches them directly
+// instead of being absorbed by a wrapper they'd be nested inside.
 .brand-sidebar > .wp-block-template-part {
 	display: contents;
 }
@@ -145,13 +152,17 @@
 
 	box-sizing: border-box;
 	min-width: 0;
-	padding-block: map.get($space, "50") map.get($space, "60");
+	// No bottom inset. The column used to carry one, which stacked on top of whatever
+	// vertical rhythm the last block already had — section bands and the hero supply their
+	// own `padding-block` — so the gap above the site footer read as a stray strip of page
+	// background rather than as spacing belonging to anything.
+	padding-block: map.get($space, "50") 0;
 	padding-inline: var(--brand-gutter);
 }
 
 // A hero leads the column flush with the header: its image has to reach the top edge, and it
-// carries its own vertical rhythm through the hero block's padding controls. Only the top
-// inset goes — the column keeps its bottom one. Pages without a hero are untouched.
+// carries its own vertical rhythm through the hero block's padding controls. Pages without a
+// hero are untouched.
 .brand-content:has(> .brand-hero:first-child) {
 	padding-block-start: 0;
 }
@@ -224,19 +235,15 @@
 	text-transform: uppercase;
 }
 
-// ── Sidebar footer, pinned to the bottom of the drawer viewport ──────────────
+// ── Sidebar footer, in flow after the nav ────────────────────────────────────
 //
-// `margin-top: auto` seats it at the bottom when the nav is short; `sticky bottom: 0`
-// keeps it pinned there once the nav list is tall enough to scroll. The black fill lets
-// nav items scroll cleanly behind it, and the footer carries the drawer's bottom inset
+// It sits directly below the last nav item and scrolls away with it, rather than being
+// pinned to the bottom of the drawer viewport — the version line is reference material,
+// not chrome that needs to stay on screen. It still carries the drawer's bottom inset
 // (the scroll area's own bottom padding is dropped so this sits flush).
 
 .brand-sidebar__footer {
-	background: map.get($color, "black");
-	bottom: 0;
-	margin-top: auto;
 	padding: map.get($space, "40") 1.3rem map.get($space, "50");
-	position: sticky;
 }
 
 // Site title (core/site-title) + build version on one meta line. The title carries the
