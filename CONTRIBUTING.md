@@ -10,6 +10,7 @@ This document outlines the best ways to submit new ideas or inform us of bugs. P
 -   [Bug reports](#bug-reports)
 -   [Feature requests](#feature-requests)
 -   [Pull requests](#pull-requests)
+-   [Tests](#tests)
 -   [Code standards and style guides](#code-standards-and-style-guides)
 
 ---
@@ -64,11 +65,25 @@ This theme lives at `wp-content/themes/ucf-brand-block-theme` in a WordPress ins
 
 Other useful scripts:
 
+-   `npm test` — run the two fast suites (~3 seconds, no Docker).
+-   `npm run test:php` — the PHP unit suite only.
+-   `npm run test:js` — the block and markup suites only.
+-   `npm run test:integration` — the WordPress integration suite. Needs Docker; boots the
+    environment, runs the tests, and stops it again.
+-   `npm run test:integration:only` — the same tests against an already-running environment,
+    for a fast loop while iterating (`npm run env:start` / `npm run env:stop` around it).
+-   `npm run test:all` — everything, integration included.
 -   `npm run start` — rebuild block and editor scripts on change.
 -   `npm run watch` — rebuild the stylesheet on change.
--   `npm run lint:js` — lint everything under `src/blocks/` and `src/js/`.
+-   `npm run lint:js` — lint everything under `src/blocks/`, `src/js/` and `tests/js/`.
 -   `npm run lint:version` — check that `style.css` and `package.json` agree on the version.
 -   `npm run format` — format JS, JSON, and YAML to the WordPress standard.
+
+`composer.json` pins `config.platform.php` to **8.1**, the version `style.css` declares as the
+minimum. Without it, Composer resolves against whatever PHP the developer happens to be
+running and can lock a package that needs something newer — which installs fine locally and
+then fails for everyone else with "your lock file does not contain a compatible set of
+packages". Run `composer update` on the pinned platform, not on your own.
 
 The theme's version lives in **two** places — the `Version:` header in `style.css`, which is
 what WordPress reads, and `version` in `package.json`. Bump both together; `npm run
@@ -78,8 +93,51 @@ lint:version` fails if they drift.
 
 1. Create a new branch off of `main` for your work.
 2. Make your changes, following the [code standards](#code-standards-and-style-guides) below.
-3. Run `npm run build` and commit the regenerated assets.
-4. Open a pull request against `main` with a clear description, following the pull request template.
+3. Add tests — see [Tests](#tests) below for what your change needs.
+4. Run `npm run build` and commit the regenerated assets.
+5. Run `npm test` and make sure both suites pass.
+6. Open a pull request against `main` with a clear description, following the pull request template.
+
+## Tests
+
+New code ships with its test. Two of the four cases are automatic, so this is less work than
+it sounds:
+
+| You added                   | You write                                                                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
+| A block in `src/blocks/`    | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do                          |
+| A pattern in `patterns/`    | Nothing. The markup sweep reads the directory — just run it                                           |
+| A template part in `parts/` | Nothing. Same sweep                                                                                   |
+
+Anything that genuinely needs WordPress — a meta query, the `render_block` filter, a real
+`WP_Query` — goes in `tests/integration/`, which runs against a real WordPress under wp-env.
+Do not mock those into the fast suite; a test that mocks the thing it is testing tests the
+mock. Note that `npm test` deliberately never touches Docker, so the integration tier is a
+separate command.
+
+Three rules are worth knowing before you write anything:
+
+-   **Prove a new test can fail.** Break the code it covers, watch it go red, then restore it.
+    Two tests in this repo have passed against nothing at all — one because blocks silently
+    failed to register, one because an XSS payload sat outside the range being escaped. Both
+    looked green.
+-   **Use annotations, not attributes.** PHPUnit is pinned to `^9.6` because WordPress's test
+    suite calls an API that PHPUnit removed in 10. Write `@dataProvider` and `@covers`, not
+    `#[DataProvider]`.
+-   **Don't check markup with a block's `isValid`.** `parse()` recovers mismatched markup by
+    migrating it through the block's `deprecated` array and then reports `isValid: true` — the
+    exact bug this theme once shipped in `section-index.php` passes that check. Use
+    `isValidBlockContent()` instead.
+
+CI runs the two fast suites on **every commit** (`.github/workflows/ci.yml`), and adds the
+WordPress integration suite on **pull requests and main** (`.github/workflows/ci-full.yml`).
+The fast workflow also rebuilds and fails if the committed `build/` output is stale. Linting
+and formatting run there too, but as an advisory job — they report findings and never fail
+the build.
+
+[`tests/README.md`](tests/README.md) covers what each suite is for and the non-obvious parts of
+the setup. [`docs/testing-plan.md`](docs/testing-plan.md) tracks what is still to be built.
 
 ## Code standards and style guides
 

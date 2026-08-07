@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The integration suite: real WordPress, real database, real hooks.
+
+	Separate from phpunit.xml.dist because the bootstrap is different, not merely the file
+	list — this one boots WordPress. Keeping them apart is what lets `npm test` stay
+	sub-second and container-free while this runs on demand and in CI.
+
+	Run it through wp-env, which supplies WP_TESTS_DIR and the database:
+
+		npm run test:integration
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+	bootstrap="tests/integration/bootstrap.php"
+	colors="true"
+	beStrictAboutTestsThatDoNotTestAnything="true"
+	cacheResultFile=".phpunit.cache/integration.result">
+
+	<testsuites>
+		<testsuite name="integration">
+			<directory>tests/integration</directory>
+		</testsuite>
+	</testsuites>
+
+	<coverage>
+		<include>
+			<directory suffix=".php">includes</directory>
+		</include>
+	</coverage>
+</phpunit>

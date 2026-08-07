@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ucf-brand/color-swatches produces stable save() markup 1`] = `
+"<!-- wp:ucf-brand/color-swatches -->
+<div class="wp-block-ucf-brand-color-swatches brand-swatches"><!-- wp:ucf-brand/color-swatch {"hex":"#EDB80D","rgb":"237 · 184 · 13","cmyk":"0 22 95 0","pantone":"7409 C","usage":"Primary accent","ratio":"1.9:1","ratioStatus":"fail"} -->
+<div class="wp-block-ucf-brand-color-swatch brand-swatch"><span class="brand-swatch__chip has-gold-background-color has-background"></span><div class="brand-swatch__body"><p class="brand-swatch__name">Bold Gold</p><p class="brand-swatch__value">HEX #EDB80D<br/>RGB 237 · 184 · 13<br/>CMYK 0 22 95 0<br/>PANTONE 7409 C<br/>Primary accent</p><span class="brand-swatch__ratio is-fail">1.9:1</span></div></div>
+<!-- /wp:ucf-brand/color-swatch --></div>
+<!-- /wp:ucf-brand/color-swatches -->"
+`;
+
+exports[`ucf-brand/page-hero produces stable save() markup 1`] = `
+"<!-- wp:ucf-brand/page-hero -->
+<div class="wp-block-ucf-brand-page-hero brand-hero"><!-- wp:paragraph -->
+<p>Hero deck.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:ucf-brand/page-hero -->"
+`;
+
+exports[`ucf-brand/tabs produces stable save() markup 1`] = `
+"<!-- wp:ucf-brand/tabs -->
+<div class="wp-block-ucf-brand-tabs ucf-tabs"><!-- wp:ucf-brand/tab -->
+<div class="wp-block-ucf-brand-tab ucf-tabs__set"><!-- wp:ucf-brand/tab-label -->
+<div class="wp-block-ucf-brand-tab-label ucf-tabs__label"><span class="ucf-tabs__badge">Do</span><h3 class="ucf-tabs__heading">Use the primary mark</h3></div>
+<!-- /wp:ucf-brand/tab-label -->
+
+<!-- wp:ucf-brand/tab-panel -->
+<div class="wp-block-ucf-brand-tab-panel ucf-tabs__panel"><!-- wp:paragraph -->
+<p>Panel copy.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:ucf-brand/tab-panel --></div>
+<!-- /wp:ucf-brand/tab --></div>
+<!-- /wp:ucf-brand/tabs -->"
+`;

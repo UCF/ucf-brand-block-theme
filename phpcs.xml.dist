@@ -43,4 +43,52 @@
 			</property>
 		</properties>
 	</rule>
+
+	<!--
+	The unit suite is PSR-4 autoloaded and follows PHPUnit's conventions, which are
+	flatly incompatible with WordPress's file naming: PSR-4 requires the file to be
+	named for the class (SectionNavTest.php), while WordPress wants
+	class-sectionnavtest.php. Renaming would break autoloading, so the naming sniffs are
+	scoped off for the test directory only — everything shipped still obeys them.
+	-->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>/tests/php/</exclude-pattern>
+		<exclude-pattern>/tests/integration/</exclude-pattern>
+	</rule>
+
+	<!--
+	A PHPUnit method name is the assertion in words — test_the_front_page_is_excluded()
+	needs no second sentence restating it. Descriptions are still written wherever a test
+	pins behavior for a reason that is not obvious from its name.
+	-->
+	<rule ref="Generic.Commenting.DocComment.MissingShort">
+		<exclude-pattern>/tests/php/</exclude-pattern>
+		<exclude-pattern>/tests/integration/</exclude-pattern>
+	</rule>
+
+	<!--
+	The suite's stand-ins for WP_Post and WP_Block must carry core's exact class names —
+	that is the entire point, since the code under test type-checks against them — so the
+	theme-prefix rule cannot apply. Same for ABSPATH in the bootstrap, which is core's
+	constant and is what every include guards on.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound">
+		<exclude-pattern>/tests/php/stubs/</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound">
+		<exclude-pattern>/tests/php/bootstrap\.php</exclude-pattern>
+	</rule>
+
+	<!--
+	The stubs stand in for core functions and must carry core's exact names and
+	signatures — a prefixed `ucf_brand_esc_html()` would stand in for nothing, and
+	dropping the unused `$domain` parameter would stop the signature matching the
+	function it replaces.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound">
+		<exclude-pattern>/tests/php/stubs/</exclude-pattern>
+	</rule>
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+		<exclude-pattern>/tests/php/stubs/</exclude-pattern>
+	</rule>
 </ruleset>
