@@ -1,15 +1,20 @@
 # Tests
 
-Two suites today, both run by `npm test`:
+Three suites. `npm test` runs the two fast ones:
 
 | Suite | Command | Needs | Runtime |
 | --- | --- | --- | --- |
 | PHP units | `npm run test:php` | PHP + Composer | ~0.1s |
 | Block round-trips + markup sweep | `npm run test:js` | Node, and PHP for the sweep | ~3s |
+| PHP integration | `npm run test:integration` | Docker (wp-env) | ~2min cold, ~1s warm |
 
-Both are fast and dependency-light on purpose. A suite that takes a minute and needs Docker
-is a suite nobody runs before committing, so anything requiring a live WordPress is kept out
-of these and pushed to the integration tier instead.
+`npm test` runs the first two and **never touches Docker** — that is deliberate, and worth
+protecting. A suite that needs a container is a suite nobody runs before committing, which is
+the same as not having it. `npm run test:all` adds the integration tier.
+
+The split is not by speed but by honesty: if a function needs real WordPress, it goes in the
+integration tier rather than being mocked into the fast one, because mocking the thing under
+test tests the mock.
 
 ## PHP units — `tests/php/`
 
@@ -18,8 +23,9 @@ database, no Docker**. What is covered is the theme's pure logic: heading slugs,
 numbering, search term parsing, highlighting, snippet windowing, ranking, and the two markup
 builders (`site-mark`, `section-nav`).
 
-That boundary is deliberate. WordPress functions the covered code calls are stubbed in
-`TestCase::stubWordPress()`, and the stubs reproduce core's real behavior where it matters —
+That boundary is deliberate. WordPress functions the covered code calls are defined in
+`tests/php/stubs/wp-escaping.php` — shared with the pattern renderer so the two cannot drift —
+and they reproduce core's real behavior where it matters:
 `esc_html()` does not double-encode, because highlighting escapes each run between matches
 separately and a double-encoding stub would make those assertions pass against behavior
 WordPress does not have.
@@ -115,9 +121,74 @@ fails. An ordinary function leaves nothing to find.
 - `setupFiles` must re-list the preset's own globals file, because naming it replaces the
   preset's copy rather than adding to it.
 
+## PHP integration — `tests/integration/`
+
+Real WordPress, real database, real hooks, via [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env).
+
+```bash
+npm run test:integration   # boots the containers, runs the tests, stops them again
+```
+
+**It always leaves the environment stopped**, including when the tests fail and when the run
+is interrupted. Containers left running hold ports 8888 and 8889, which is how the next
+project's `wp-env start` fails with nothing but "address already in use" to explain itself.
+
+That is `tools/integration-tests.js` rather than a chained npm script, because three
+properties have to hold together and a `&&` chain gives none of them reliably: PHPUnit's exit
+code is what the process exits with (not the teardown's), the teardown runs even when the
+tests fail — which is exactly when `&&` would skip it — and Ctrl-C tears the containers down
+instead of orphaning four of them. All three are verified, the failure path included.
+
+The cold start is around two minutes. While iterating, skip it:
+
+```bash
+npm run env:start              # once
+npm run test:integration:only  # ~1s per run, against the running environment
+npm run env:stop               # when you are done
+```
+
+Covers what the fast suite deliberately cannot:
+
+- **`ucf_brand_add_heading_anchor()`** through the real `render_block` pass — including the
+  `static` slug registry resetting between posts. Without that reset, the second page rendered
+  in a request gets every anchor suffixed and every inbound link to it breaks.
+- **`ucf_brand_get_ordered_sections()`** against real posts: that the `meta_key`/`meta_query`
+  pair actually excludes drafts, child pages, posts, and unnumbered pages, and that ordering
+  is numeric rather than lexical (10 must not sort before 2).
+- **Search**: that `pre_get_posts` narrows the *main* query and leaves secondary queries
+  alone, and that the subsections block renders real deep links inside a real search loop.
+
+One test is there specifically to catch the failure `docs/architecture.md` warns about: it
+renders a page, asks search to derive that page's anchors, and asserts every derived anchor is
+present in the rendered HTML. Two implementations of one slug disagreeing is what broke shared
+deep links before.
+
+### PHPUnit is pinned to 9.6, and that is not an oversight
+
+WordPress's test suite calls `PHPUnit\Util\Test::parseTestMethodAnnotations()`, which PHPUnit
+removed in 10. So WP 7.0.3's suite caps at 9.x, and **the whole project is pinned to `^9.6`**
+so there is one toolchain rather than two. That is what WP core itself uses.
+
+The practical consequence: use annotations (`@dataProvider`, `@covers`), not PHP attributes
+(`#[DataProvider]`). 9.6 runs cleanly on PHP 8.5, so the pin costs nothing locally.
+
+### If wp-env will not start
+
+Two things account for nearly every case, and the runner prints both:
+
+- **Docker is not running.**
+- **Ports 8888/8889 are taken**, almost always by another wp-env project that was left up.
+  Stop that one, or override the ports for your machine only:
+
+  ```json
+  // .wp-env.override.json — gitignored, never commit it
+  { "port": 8899, "testsPort": 8898 }
+  ```
+
+`.wp-env.json` itself stays on the defaults so the committed config is the standard one.
+
 ## Not yet built
 
-- Integration tier for the WordPress-dependent PHP (see above).
 - Accessibility suite (Phase 2): Playwright + axe-core, per route, per pattern and per block
   style variant.
 

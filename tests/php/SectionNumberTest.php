@@ -13,16 +13,12 @@
 namespace UCF\Brand\Tests;
 
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\Attributes\CoversFunction;
-use PHPUnit\Framework\Attributes\DataProvider;
 use WP_Block;
 
 /**
  * @covers ::ucf_brand_format_number
  * @covers ::ucf_brand_binding_section_number
  */
-#[CoversFunction( 'ucf_brand_format_number' )]
-#[CoversFunction( 'ucf_brand_binding_section_number' )]
 final class SectionNumberTest extends TestCase {
 
 	/**
@@ -37,8 +33,8 @@ final class SectionNumberTest extends TestCase {
 	 * @param mixed  $input    Raw meta value.
 	 * @param string $expected Formatted label.
 	 * @return void
+	 * @dataProvider numberCases
 	 */
-	#[DataProvider( 'numberCases' )]
 	public function test_format_number( $input, $expected ) {
 		$this->assertSame( $expected, ucf_brand_format_number( $input ) );
 	}

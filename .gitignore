@@ -33,6 +33,11 @@ coverage/
 playwright-report/
 test-results/
 
+# wp-env writes its per-developer overrides here. `.wp-env.json` IS committed — it pins the
+# WordPress version and the ports the integration suite uses — but an override file is local
+# to one machine and must not be.
+.wp-env.override.json
+
 # Editor / IDE
 .vscode/
 .idea/

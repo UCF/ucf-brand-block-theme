@@ -65,9 +65,14 @@ This theme lives at `wp-content/themes/ucf-brand-block-theme` in a WordPress ins
 
 Other useful scripts:
 
--   `npm test` — run both test suites (~3 seconds).
+-   `npm test` — run the two fast suites (~3 seconds, no Docker).
 -   `npm run test:php` — the PHP unit suite only.
 -   `npm run test:js` — the block and markup suites only.
+-   `npm run test:integration` — the WordPress integration suite. Needs Docker; boots the
+    environment, runs the tests, and stops it again.
+-   `npm run test:integration:only` — the same tests against an already-running environment,
+    for a fast loop while iterating (`npm run env:start` / `npm run env:stop` around it).
+-   `npm run test:all` — everything, integration included.
 -   `npm run start` — rebuild block and editor scripts on change.
 -   `npm run watch` — rebuild the stylesheet on change.
 -   `npm run lint:js` — lint everything under `src/blocks/`, `src/js/` and `tests/js/`.
@@ -94,17 +99,26 @@ it sounds:
 
 | You added | You write |
 | --- | --- |
-| A function in `includes/` | A case in `tests/php/` — nothing enforces this for you |
+| A function in `includes/` | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
 | A block in `src/blocks/` | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do |
 | A pattern in `patterns/` | Nothing. The markup sweep reads the directory — just run it |
 | A template part in `parts/` | Nothing. Same sweep |
 
-Two rules are worth knowing before you write anything:
+Anything that genuinely needs WordPress — a meta query, the `render_block` filter, a real
+`WP_Query` — goes in `tests/integration/`, which runs against a real WordPress under wp-env.
+Do not mock those into the fast suite; a test that mocks the thing it is testing tests the
+mock. Note that `npm test` deliberately never touches Docker, so the integration tier is a
+separate command.
+
+Three rules are worth knowing before you write anything:
 
 -   **Prove a new test can fail.** Break the code it covers, watch it go red, then restore it.
     Two tests in this repo have passed against nothing at all — one because blocks silently
     failed to register, one because an XSS payload sat outside the range being escaped. Both
     looked green.
+-   **Use annotations, not attributes.** PHPUnit is pinned to `^9.6` because WordPress's test
+    suite calls an API that PHPUnit removed in 10. Write `@dataProvider` and `@covers`, not
+    `#[DataProvider]`.
 -   **Don't check markup with a block's `isValid`.** `parse()` recovers mismatched markup by
     migrating it through the block's `deprecated` array and then reports `isValid: true` — the
     exact bug this theme once shipped in `section-index.php` passes that check. Use

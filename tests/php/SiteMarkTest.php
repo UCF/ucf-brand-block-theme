@@ -15,14 +15,11 @@ namespace UCF\Brand\Tests;
 
 use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\Attributes\CoversFunction;
 
 /**
  * @covers ::ucf_brand_site_mark_src
  * @covers ::ucf_brand_render_site_mark
  */
-#[CoversFunction( 'ucf_brand_site_mark_src' )]
-#[CoversFunction( 'ucf_brand_render_site_mark' )]
 final class SiteMarkTest extends TestCase {
 
 	/**

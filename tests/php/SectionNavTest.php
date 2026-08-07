@@ -16,15 +16,12 @@
 namespace UCF\Brand\Tests;
 
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use WP_Post;
 
 /**
  * @covers ::ucf_brand_get_ordered_sections
  * @covers ::ucf_brand_render_section_nav
  */
-#[CoversFunction( 'ucf_brand_get_ordered_sections' )]
-#[CoversFunction( 'ucf_brand_render_section_nav' )]
 final class SectionNavTest extends TestCase {
 
 	/**

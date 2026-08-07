@@ -13,13 +13,11 @@
 
 namespace UCF\Brand\Tests;
 
-use PHPUnit\Framework\Attributes\CoversFunction;
 use WP_Post;
 
 /**
  * @covers ::ucf_brand_find_matching_sections
  */
-#[CoversFunction( 'ucf_brand_find_matching_sections' )]
 final class SearchRankingTest extends TestCase {
 
 	/**

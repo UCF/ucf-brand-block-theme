@@ -5,9 +5,8 @@
 	colors="true"
 	beStrictAboutTestsThatDoNotTestAnything="true"
 	failOnWarning="true"
-	failOnNotice="true"
-	failOnDeprecation="true"
-	cacheDirectory=".phpunit.cache">
+	failOnRisky="true"
+	cacheResultFile=".phpunit.cache/unit.result">
 
 	<testsuites>
 		<testsuite name="unit">
@@ -15,9 +14,9 @@
 		</testsuite>
 	</testsuites>
 
-	<source>
+	<coverage>
 		<include>
 			<directory suffix=".php">includes</directory>
 		</include>
-	</source>
+	</coverage>
 </phpunit>

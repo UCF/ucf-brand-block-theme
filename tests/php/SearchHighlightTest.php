@@ -14,14 +14,10 @@
 
 namespace UCF\Brand\Tests;
 
-use PHPUnit\Framework\Attributes\CoversFunction;
-
 /**
  * @covers ::ucf_brand_highlight_terms
  * @covers ::ucf_brand_section_snippet
  */
-#[CoversFunction( 'ucf_brand_highlight_terms' )]
-#[CoversFunction( 'ucf_brand_section_snippet' )]
 final class SearchHighlightTest extends TestCase {
 
 	/**

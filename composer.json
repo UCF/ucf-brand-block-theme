@@ -16,11 +16,14 @@
 	"require-dev": {
 		"wp-coding-standards/wpcs": "^3.1",
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-		"phpunit/phpunit": "^11",
-		"brain/monkey": "^2.6"
+		"phpunit/phpunit": "^9.6",
+		"brain/monkey": "^2.6",
+		"wp-phpunit/wp-phpunit": "^7.0",
+		"yoast/phpunit-polyfills": "^4.0"
 	},
 	"autoload-dev": {
 		"psr-4": {
+			"UCF\\Brand\\Tests\\Integration\\": "tests/integration/",
 			"UCF\\Brand\\Tests\\": "tests/php/"
 		}
 	},
@@ -28,7 +31,8 @@
 		"lint": "phpcs",
 		"lint:fix": "phpcbf",
 		"test": "phpunit",
-		"test:unit": "phpunit --testsuite unit"
+		"test:unit": "phpunit --testsuite unit",
+		"test:integration": "phpunit -c phpunit-integration.xml.dist"
 	},
 	"config": {
 		"allow-plugins": {

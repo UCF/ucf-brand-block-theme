@@ -25,7 +25,8 @@ Search has its own document: [`docs/search.md`](docs/search.md).
 
 ## Tests
 
-`npm test` runs both suites and takes about three seconds. Read
+`npm test` runs the two fast suites in about three seconds and needs no Docker.
+`npm run test:integration` adds the WordPress tier; `npm run test:all` is everything. Read
 [`tests/README.md`](tests/README.md) before adding to them — it covers what each suite is for
 and the non-obvious parts of the setup.
 
@@ -34,16 +35,23 @@ of the four cases are already automatic:
 
 | You added | You write |
 | --- | --- |
-| A function in `includes/` | A case in `tests/php/` — nothing enforces this for you |
+| A function in `includes/` | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
 | A block in `src/blocks/` | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do |
 | A pattern in `patterns/` | Nothing. The sweep reads the directory — just run it |
 | A template part in `parts/` | Nothing. Same sweep |
 
 -   **A new function in `includes/` needs a unit test.** Put it with the tests for the file
     that owns the topic. If the function genuinely needs WordPress — a meta query,
-    `WP_HTML_Tag_Processor`, the `render_block` filter — it belongs in the integration tier
-    (not built yet; see [`docs/testing-plan.md`](docs/testing-plan.md)). Do **not** mock those
-    into the fast suite. A test that mocks the thing it is testing tests the mock.
+    `WP_HTML_Tag_Processor`, the `render_block` filter — it goes in `tests/integration/`
+    instead, which runs against real WordPress under wp-env (`npm run test:integration`). Do
+    **not** mock those into the fast suite. A test that mocks the thing it is testing tests
+    the mock.
+-   **`npm test` must never require Docker.** It runs the two fast suites only; the
+    integration tier is `npm run test:integration`, and `npm run test:all` is both. Keep that
+    boundary — a suite that needs a container is one nobody runs before committing.
+-   **PHPUnit is pinned to `^9.6`, deliberately.** WordPress's test suite calls a PHPUnit API
+    removed in 10, so the project uses one toolchain at the version WP core supports. Write
+    `@dataProvider` / `@covers` annotations, not `#[DataProvider]` attributes.
 -   **A new block in `src/blocks/` needs registering in the test helper.** Add it to
     `BLOCK_DIRS` and give it a `BLOCK_FIXTURES` entry. You will not forget: the "registers
     every block that ships in `src/blocks/`" test compares the list against the directory and

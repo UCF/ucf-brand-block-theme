@@ -18,15 +18,10 @@
 
 namespace UCF\Brand\Tests;
 
-use PHPUnit\Framework\Attributes\CoversFunction;
-use PHPUnit\Framework\Attributes\DataProvider;
-
 /**
  * @covers ::ucf_brand_heading_slug
  * @covers ::ucf_brand_unique_heading_slug
  */
-#[CoversFunction( 'ucf_brand_heading_slug' )]
-#[CoversFunction( 'ucf_brand_unique_heading_slug' )]
 final class HeadingSlugTest extends TestCase {
 
 	/**
@@ -41,8 +36,8 @@ final class HeadingSlugTest extends TestCase {
 	 * @param string $input    Raw heading text.
 	 * @param string $expected Slug.
 	 * @return void
+	 * @dataProvider slugCases
 	 */
-	#[DataProvider( 'slugCases' )]
 	public function test_heading_slug( $input, $expected ) {
 		$this->assertSame( $expected, ucf_brand_heading_slug( $input ) );
 	}

@@ -23,77 +23,54 @@ Fold the finished parts into `tests/README.md` and delete this file once phase 2
 Branch `test`, **uncommitted**, on top of `1f87cf7` (the merged header-bar PR).
 
 ```bash
-npm test          # both suites
-npm run test:php  # PHPUnit         → OK (95 tests, 155 assertions)   ~0.1s
-npm run test:js   # Jest            → 20 passed, 20 total             ~3s
+npm test                   # PHPUnit 95 + Jest 20, ~3s, no Docker
+npm run env:start          # Docker, once
+npm run test:integration   # PHPUnit + real WordPress, 26 tests
+npm run test:all           # everything
 ```
 
-Both are green, `phpcs` is clean across all 31 PHP files, and `npm run lint:js tests/js`
-is clean. `npm run build` output is **byte-identical** with the test tooling installed —
-re-verify that if you touch the Babel or Jest config.
+All three suites are green, `phpcs` is clean across the whole theme, `tests/js` adds no
+eslint debt, and `npm run build` output is byte-identical with the test tooling installed.
 
-New files:
+**[`tests/README.md`](../tests/README.md) is the reference for what each suite covers and how
+it is wired.** It is deliberately not restated here — two copies of that is exactly the drift
+this theme keeps getting bitten by. This file holds only what a reference doc should not: the
+plan, the reasoning behind choices already made, and the traps already paid for.
 
-```
-phpunit.xml.dist
-jest.config.js
-tests/README.md
-tests/php/{bootstrap,TestCase}.php
-tests/php/stubs/class-wp-{post,block}.php
-tests/php/{HeadingSlug,PostSections,SectionNumber,SearchTerms,SearchHighlight,SearchRanking,SiteMark,SectionNav}Test.php
-tests/js/{blocks.test.js,setup-globals.js}
-tests/js/helpers/register-blocks.js
-tests/js/__snapshots__/blocks.test.js.snap
-```
-
-Modified: `.gitignore`, `composer.json`, `package.json`, `phpcs.xml.dist` (+ both lockfiles).
-
-**What is covered.** Heading slugs and section extraction, section numbering and the hero
-binding, search term parsing / matching / highlighting / snippets / ranking, the `site-mark`
-and `section-nav` renderers, and round-trip validity plus committed snapshots for all seven
-custom blocks.
-
-**What is not.** Anything needing a real WordPress: `ucf_brand_add_heading_anchor()` (wants
-`WP_HTML_Tag_Processor` and `render_block`), `ucf_brand_limit_main_search_to_pages()` (wants
-`WP_Query`), and `ucf_brand_render_search_subsections()` end to end. Also nothing in
-`src/js/` outside the blocks — `brand-nav.js`, `badge-format.js` and `src/js/editor/*` have
-no coverage yet.
+Still uncovered: everything in `src/js/` outside the blocks — `brand-nav.js`,
+`badge-format.js` and `src/js/editor/*`.
 
 ## Decisions already made
 
 Recorded so they are not re-argued. Each was chosen for a reason that still holds.
 
-**PHP units run without WordPress.** PHPUnit + Brain Monkey, no database, no Docker, ~0.1s.
-A suite that needs a container is a suite nobody runs before committing. The WordPress
-functions the covered code calls are stubbed in `TestCase::stubWordPress()`, and the stubs
-reproduce core's real behavior where it matters — notably `esc_html()` does **not**
-double-encode, matching `_wp_specialchars()`'s `$double_encode = false` default.
+**Three tiers, split by honesty rather than speed.** If a function needs real WordPress it
+goes to the integration tier instead of being mocked into the fast one, because mocking the
+thing under test tests the mock. The fast tiers stay Docker-free so they actually get run.
 
-**The boundary is "does it need real WordPress".** If a function needs a meta query, the
-HTML API, or the hook pipeline, it goes to the integration tier rather than getting mocked
-into the fast suite. Mocking those would test the mock.
+**PHPUnit is pinned to `^9.6` project-wide.** Not a preference — WordPress's test suite calls
+an API PHPUnit removed in 10. See the note under item 2 below for how that surfaced.
 
-**Blocks are tested through `serialize()` → `parse()` → `isValid`.** That is the comparison
-the editor itself makes, and `docs/architecture.md` is explicit that a front-end render is
-not a sufficient check because invalid blocks still render.
+**Blocks get both a round-trip and a snapshot, and both are needed.** They catch different
+things: renaming a class inside `save()` is self-consistent, so the round-trip still passes
+while every already-saved page is silently invalidated. The snapshot catches that. Verified by
+mutation, not assumed.
 
-**Snapshots sit alongside the round-trips, and both are needed.** They catch different
-things. Renaming a class inside `save()` is self-consistent, so the round-trip still passes
-— but it silently invalidates every page already saved with the old markup. The snapshot
-catches that; the round-trip does not. This was verified by mutation, not assumed.
+**Markup is checked with `isValidBlockContent()`, never `isValid`.** See item 1 below.
 
 **Babel is scoped to Jest, not added as a root `babel.config.js`.** A root config would also
-be read by webpack, changing shipped output for the sake of the tests. It is passed inline
-in `jest.config.js` instead.
+be read by webpack, changing shipped output for the sake of the tests.
 
 **`@wordpress/*` are devDependencies only.** The build externalizes those imports to the
 `wp.*` globals WordPress already ships, so none of it reaches `build/`.
 
-**phpcs exclusions are scoped, not blanket.** Three narrow ones in `phpcs.xml.dist`, each
-with its reason inline: PSR-4 file naming in `tests/php/` (incompatible with WordPress's
-`class-*.php` convention and required by the autoloader), the `WP_Post`/`WP_Block` stub class
-names (they must match core's exactly — that is the point), and `strip_tags()` in
-`TestCase.php` (the stub reproduces core's implementation, which calls it).
+**WordPress stubs live in one file, shared.** `tests/php/stubs/wp-escaping.php` is used by both
+the unit suite and the pattern renderer. Two copies would mean the markup sweep validates
+markup escaped differently from what the site emits.
+
+**phpcs exclusions are scoped and each carries its reason inline** — PSR-4 file naming in the
+test directories, the `WP_Post`/`WP_Block` stub class names, `strip_tags()` in the stub that
+reproduces core's implementation. None of them are blanket.
 
 ## Gotchas already paid for
 
@@ -166,18 +143,31 @@ Also worth knowing: `@wordpress/jest-console` must be defeated with **plain func
 `jest.spyOn`**, or Gutenberg's validation logging buries the real failure. See
 `tests/README.md`.
 
-### 2. PHP integration tier
+### ~~2. PHP integration tier~~ — done
 
-For the functions deliberately excluded from the fast suite. Use `@wordpress/env` (already
-the news theme's approach) plus `wp-phpunit`.
+`tests/integration/` on wp-env + wp-phpunit: 26 tests across heading anchors, ordered
+sections, and search. Mutation-verified against three separate defects. `npm test` still
+never touches Docker; `npm run test:integration` is the tier and `npm run test:all` is both.
 
-Targets: `ucf_brand_add_heading_anchor()` through the real `render_block` filter, including
-the author-set-id-wins path and the per-post registry reset; `ucf_brand_get_ordered_sections()`
-against real posts and meta; `ucf_brand_limit_main_search_to_pages()` against a real
-`WP_Query`; `ucf_brand_render_search_subsections()` end to end on a search request.
+Two things came out of building it that were not in the plan:
 
-Keep it a **separate** PHPUnit suite (`--testsuite integration`) so `npm run test:php` stays
-sub-second and Docker stays optional for the fast loop.
+**PHPUnit had to be downgraded from 11 to 9.6, project-wide.** WordPress's test suite calls
+`PHPUnit\Util\Test::parseTestMethodAnnotations()`, which PHPUnit removed in 10 — so WP 7.0.3
+caps at 9.x. Composer resolved `phpunit ^11` with `wp-phpunit` happily; the incompatibility
+only surfaced at runtime, as 18 identical errors. Picking 11 for the unit suite was a default
+chosen before the integration tier's constraint was known. One toolchain at the version WP
+core supports is the right answer; 9.6 runs cleanly on PHP 8.5, so it costs nothing. The
+attributes (`#[DataProvider]`, `#[CoversFunction]`) were converted to annotations.
+
+**The environment must not be left running.** `npm run test:integration` goes through
+`tools/integration-tests.js`, which boots, runs, and always stops — on failure and on Ctrl-C
+too, with PHPUnit's exit code preserved rather than the teardown's. A chained npm script gives
+none of those reliably. Containers left up hold 8888/8889 and the next project's `wp-env
+start` then fails with only "address already in use" to go on, which is exactly how an hour
+disappears. Both the success and failure paths are verified.
+
+`.wp-env.json` stays on the default ports; per-machine clashes go in `.wp-env.override.json`,
+which is gitignored.
 
 ### 3. CI workflow
 

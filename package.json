@@ -21,7 +21,13 @@
 		"test": "npm run test:php && npm run test:js",
 		"test:php": "composer test",
 		"test:js": "wp-scripts test-unit-js --config jest.config.js",
-		"test:js:watch": "wp-scripts test-unit-js --config jest.config.js --watch"
+		"test:js:watch": "wp-scripts test-unit-js --config jest.config.js --watch",
+		"test:integration": "node tools/integration-tests.js",
+		"env:start": "wp-env start",
+		"env:stop": "wp-env stop",
+		"env:clean": "wp-env clean all",
+		"test:all": "npm run test && npm run test:integration",
+		"test:integration:only": "wp-env run tests-wordpress --env-cwd=wp-content/themes/ucf-brand-block-theme vendor/bin/phpunit -c phpunit-integration.xml.dist"
 	},
 	"devDependencies": {
 		"@wordpress/block-editor": "^16.1.0",
@@ -29,6 +35,7 @@
 		"@wordpress/blocks": "^15.25.0",
 		"@wordpress/components": "^38.0.0",
 		"@wordpress/data": "^10.52.0",
+		"@wordpress/env": "^10.39.0",
 		"@wordpress/prettier-config": "^4.51.0",
 		"@wordpress/scripts": "^30.0.0",
 		"sass": "^1.100.0"

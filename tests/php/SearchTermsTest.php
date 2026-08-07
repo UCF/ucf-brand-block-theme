@@ -15,16 +15,12 @@
 namespace UCF\Brand\Tests;
 
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\Attributes\CoversFunction;
 
 /**
  * @covers ::ucf_brand_search_terms
  * @covers ::ucf_brand_term_pattern
  * @covers ::ucf_brand_count_term
  */
-#[CoversFunction( 'ucf_brand_search_terms' )]
-#[CoversFunction( 'ucf_brand_term_pattern' )]
-#[CoversFunction( 'ucf_brand_count_term' )]
 final class SearchTermsTest extends TestCase {
 
 	/**

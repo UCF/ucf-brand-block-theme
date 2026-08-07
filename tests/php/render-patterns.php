@@ -23,9 +23,9 @@
  */
 
 // Shared with the unit suite, so a pattern is escaped here exactly the way those tests
-// assert it is. (This comment is also load-bearing for phpcs: Squiz.Commenting.FileComment
+// assert it is. This comment is also load-bearing for phpcs: Squiz.Commenting.FileComment
 // mistakes a docblock followed immediately by `require_once` for documentation of the
-// require, and then reports the file as having no doc comment at all.)
+// require itself, and then reports the file as having no doc comment at all.
 require_once __DIR__ . '/stubs/wp-escaping.php';
 
 /**
