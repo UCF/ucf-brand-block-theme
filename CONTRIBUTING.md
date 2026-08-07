@@ -10,6 +10,7 @@ This document outlines the best ways to submit new ideas or inform us of bugs. P
 -   [Bug reports](#bug-reports)
 -   [Feature requests](#feature-requests)
 -   [Pull requests](#pull-requests)
+-   [Tests](#tests)
 -   [Code standards and style guides](#code-standards-and-style-guides)
 
 ---
@@ -64,9 +65,12 @@ This theme lives at `wp-content/themes/ucf-brand-block-theme` in a WordPress ins
 
 Other useful scripts:
 
+-   `npm test` — run both test suites (~3 seconds).
+-   `npm run test:php` — the PHP unit suite only.
+-   `npm run test:js` — the block and markup suites only.
 -   `npm run start` — rebuild block and editor scripts on change.
 -   `npm run watch` — rebuild the stylesheet on change.
--   `npm run lint:js` — lint everything under `src/blocks/` and `src/js/`.
+-   `npm run lint:js` — lint everything under `src/blocks/`, `src/js/` and `tests/js/`.
 -   `npm run lint:version` — check that `style.css` and `package.json` agree on the version.
 -   `npm run format` — format JS, JSON, and YAML to the WordPress standard.
 
@@ -78,8 +82,36 @@ lint:version` fails if they drift.
 
 1. Create a new branch off of `main` for your work.
 2. Make your changes, following the [code standards](#code-standards-and-style-guides) below.
-3. Run `npm run build` and commit the regenerated assets.
-4. Open a pull request against `main` with a clear description, following the pull request template.
+3. Add tests — see [Tests](#tests) below for what your change needs.
+4. Run `npm run build` and commit the regenerated assets.
+5. Run `npm test` and make sure both suites pass.
+6. Open a pull request against `main` with a clear description, following the pull request template.
+
+## Tests
+
+New code ships with its test. Two of the four cases are automatic, so this is less work than
+it sounds:
+
+| You added | You write |
+| --- | --- |
+| A function in `includes/` | A case in `tests/php/` — nothing enforces this for you |
+| A block in `src/blocks/` | An entry in `tests/js/helpers/register-blocks.js`; a test fails until you do |
+| A pattern in `patterns/` | Nothing. The markup sweep reads the directory — just run it |
+| A template part in `parts/` | Nothing. Same sweep |
+
+Two rules are worth knowing before you write anything:
+
+-   **Prove a new test can fail.** Break the code it covers, watch it go red, then restore it.
+    Two tests in this repo have passed against nothing at all — one because blocks silently
+    failed to register, one because an XSS payload sat outside the range being escaped. Both
+    looked green.
+-   **Don't check markup with a block's `isValid`.** `parse()` recovers mismatched markup by
+    migrating it through the block's `deprecated` array and then reports `isValid: true` — the
+    exact bug this theme once shipped in `section-index.php` passes that check. Use
+    `isValidBlockContent()` instead.
+
+[`tests/README.md`](tests/README.md) covers what each suite is for and the non-obvious parts of
+the setup. [`docs/testing-plan.md`](docs/testing-plan.md) tracks what is still to be built.
 
 ## Code standards and style guides
 
