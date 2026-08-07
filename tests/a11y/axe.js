@@ -111,11 +111,22 @@ async function auditPage( page, testInfo, target ) {
 
 	const response = await page.goto( target.path, { waitUntil: 'load' } );
 
+	/*
+	 * `page.goto()` resolves to null when the navigation produced no response of its own — a
+	 * same-document hash change, mainly. No target in the manifest can do that, so this is not
+	 * a case the suite reaches today. It is guarded anyway because the unguarded version fails
+	 * as "Cannot read properties of null", which reads like a bug in the helper rather than a
+	 * page that did not navigate.
+	 */
+	const status = response?.status() ?? null;
+
 	expect(
-		response.status(),
+		status,
 		`${ target.name }: expected HTTP ${ expectedStatus } at ${ target.path } but got ` +
-			`${ response.status() }. Auditing the wrong page passes for the wrong reason — ` +
-			're-seed before reading anything else in this run.'
+			`${
+				null === status ? 'no response at all' : status
+			}. Auditing the wrong page ` +
+			'passes for the wrong reason — re-seed before reading anything else in this run.'
 	).toBe( expectedStatus );
 
 	/*

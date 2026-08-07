@@ -22,8 +22,11 @@ const path = require( 'path' );
 
 const root = path.join( __dirname, '..' );
 
+/** The theme's directory name, which is also its slug for `wp theme activate`. */
+const THEME_SLUG = 'ucf-brand-block-theme';
+
 /** Where the theme is mounted inside the containers. */
-const THEME_PATH = 'wp-content/themes/ucf-brand-block-theme';
+const THEME_PATH = `wp-content/themes/${ THEME_SLUG }`;
 
 /**
  * Run a local binary through npx, inheriting stdio so its output reaches the terminal.
@@ -110,6 +113,31 @@ if ( 0 !== wpEnv( [ 'start' ] ) ) {
 			'  - Ports 8888/8889 are taken, usually by another wp-env project.\n' +
 			'    Stop that one, or set "port"/"testsPort" in .wp-env.override.json\n' +
 			'    (gitignored, so it stays local to your machine).\n'
+	);
+	process.exit( 1 );
+}
+
+/*
+ * Activating the theme is its own WP-CLI invocation, and it has to be.
+ *
+ * `switch_theme()` writes an option; it does not retrofit the running request. WordPress has
+ * already booted by the time `eval-file` gets control — `functions.php` loaded for whatever
+ * theme was active, `init` fired, pattern and block-style registration done. Calling
+ * `switch_theme()` from inside the seed therefore leaves this process looking at empty
+ * registries while making the theme active for the *next* one.
+ *
+ * That is worse than it sounds. The seed fails on a clean environment and passes on every run
+ * after it, so it is green on any machine that has run it once and red on every CI runner.
+ * This shipped exactly that way; see tests/README.md.
+ *
+ * A separate `wp theme activate` means the process below starts with the theme already loaded.
+ * `tests/integration/bootstrap.php` solves the same problem the other way, by switching at
+ * `muplugins_loaded` — before the theme loads — which is why that tier never had this bug.
+ */
+if ( 0 !== wpEnv( [ 'run', 'cli', 'wp', 'theme', 'activate', THEME_SLUG ] ) ) {
+	console.error(
+		`\nCould not activate ${ THEME_SLUG }. The suite audits whatever theme is active, so\n` +
+			'it was not run.\n'
 	);
 	process.exit( 1 );
 }

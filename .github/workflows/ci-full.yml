@@ -176,3 +176,7 @@ jobs:
                   name: playwright-report
                   path: playwright-report/
                   retention-days: 14
+                  # A run that failed before Playwright started has no report to upload, and a
+                  # "no files found" warning on top of the real failure is just noise pointing
+                  # at the wrong thing.
+                  if-no-files-found: ignore

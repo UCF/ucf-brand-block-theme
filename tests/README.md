@@ -258,6 +258,22 @@ cannot compute — text over a background image, mainly — and those are record
 This policy is carried over verbatim from the news theme, and for the same reason: pa11y
 conflates the two and produces a false positive on every hero.
 
+### The theme must be activated in its own command
+
+`switch_theme()` cannot do this from inside `wp eval-file`. WordPress has already booted by
+then — `functions.php` loaded for whatever theme was active, `init` fired, patterns and block
+styles registered — so the switch writes an option and changes nothing else in that process.
+
+The failure mode is the interesting part, because it is invisible locally. The switch *does*
+take effect for the **next** process, so the seed fails on a clean environment and passes on
+every run after it: green on any machine that has run it once, red on every CI runner. It
+shipped exactly that way, and no amount of local re-running would have shown it.
+
+`tools/a11y-tests.js` runs `wp theme activate` as a separate invocation, and `seed.php` now
+asserts rather than switches — failing loudly beats a fix that hides itself on the second
+attempt. `tests/integration/bootstrap.php` solves the same problem from the other side, at
+`muplugins_loaded`, which is why that tier never had it.
+
 ### wp-env will not write `.htaccess`, and the symptom is misleading
 
 `flush_rules( true )` guards its write behind `got_mod_rewrite()`, which asks the *current*

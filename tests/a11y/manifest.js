@@ -30,14 +30,33 @@ function loadManifest() {
 
 	const manifest = JSON.parse( fs.readFileSync( MANIFEST, 'utf8' ) );
 
-	// Each family is asserted non-empty on its own. A seed that failed partway through — say
-	// the pattern loop threw after the routes were written — would otherwise show up as a
-	// smaller green run rather than as a failure.
-	[ 'routes', 'blocks', 'patterns', 'variants' ].forEach( ( family ) => {
-		if (
-			! Array.isArray( manifest[ family ] ) ||
-			! manifest[ family ].length
-		) {
+	/*
+	 * Every family must be present, so a seed that died partway through — say the pattern loop
+	 * threw after the routes were written — fails here instead of showing up as a smaller
+	 * green run.
+	 *
+	 * Only three of them must also be non-empty. `blocks` covers custom blocks that no pattern
+	 * or template already renders, so it legitimately empties out the moment the last one gets
+	 * used somewhere: today it holds `tabs` alone, and a pattern using tabs would correctly
+	 * reduce it to nothing. Requiring a row there would turn better coverage into a failure.
+	 * Nothing is lost by allowing it — `ucf_brand_a11y_assert_blocks_covered()` in the seeder
+	 * is what actually guarantees no block goes unaudited, and it runs regardless.
+	 */
+	const families = {
+		routes: true,
+		blocks: false,
+		patterns: true,
+		variants: true,
+	};
+
+	Object.entries( families ).forEach( ( [ family, required ] ) => {
+		if ( ! Array.isArray( manifest[ family ] ) ) {
+			throw new Error(
+				`The seed manifest has no "${ family }" list at all. Re-run the seed and check its output.`
+			);
+		}
+
+		if ( required && ! manifest[ family ].length ) {
 			throw new Error(
 				`The seed manifest has no "${ family }" entries. Re-run the seed and check its output.`
 			);

@@ -27,7 +27,7 @@
 		"env:start": "wp-env start",
 		"env:stop": "wp-env stop",
 		"env:clean": "wp-env clean all",
-		"env:seed": "wp-env run cli wp eval-file wp-content/themes/ucf-brand-block-theme/tests/a11y/seed.php",
+		"env:seed": "wp-env run cli wp theme activate ucf-brand-block-theme && wp-env run cli wp eval-file wp-content/themes/ucf-brand-block-theme/tests/a11y/seed.php",
 		"test:all": "npm run test && npm run test:integration && npm run test:a11y",
 		"test:integration:only": "wp-env run tests-wordpress --env-cwd=wp-content/themes/ucf-brand-block-theme vendor/bin/phpunit -c phpunit-integration.xml.dist",
 		"test:a11y:only": "playwright test"

@@ -56,9 +56,8 @@ ucf_brand_a11y_seed();
  * @return void
  */
 function ucf_brand_a11y_seed() {
+	ucf_brand_a11y_assert_theme_active();
 	ucf_brand_a11y_reset();
-
-	switch_theme( 'ucf-brand-block-theme' );
 
 	// Pretty permalinks: the manifest hands Playwright paths like `/colors/`, and with the
 	// default `?p=` structure every one of them would 404 into a green-looking 404 test.
@@ -94,6 +93,39 @@ function ucf_brand_a11y_seed() {
 			count( $manifest['variants'] )
 		)
 	);
+}
+
+/**
+ * Refuse to run against any theme but this one.
+ *
+ * This checks rather than fixes, and that distinction is the whole point. An earlier version
+ * called `switch_theme()` here, which does not do what it looks like it does: WordPress has
+ * already booted by the time `eval-file` runs, so `functions.php` loaded for whatever theme
+ * was active and `init` has been and gone. The switch writes the option and nothing else —
+ * this process still sees empty pattern and block-style registries, while the *next* process
+ * gets the theme.
+ *
+ * So the seed failed on a clean environment and passed on every run after it: green on any
+ * machine that had run it once, red on every CI runner, which is how it shipped. Failing
+ * loudly is strictly better than a fix that hides itself on the second attempt.
+ *
+ * `tools/a11y-tests.js` activates the theme in a separate WP-CLI invocation, which is the
+ * arrangement that actually works. `tests/integration/bootstrap.php` solves the same problem
+ * from the other side, switching at `muplugins_loaded` — before the theme loads.
+ *
+ * @return void
+ */
+function ucf_brand_a11y_assert_theme_active() {
+	$active = get_stylesheet();
+
+	if ( 'ucf-brand-block-theme' !== $active ) {
+		WP_CLI::error(
+			"The active theme is '{$active}', so this would seed and audit that theme instead.\n"
+			. 'Activate it first, in its own command — switching from inside this script is too '
+			. "late to matter:\n"
+			. '  wp-env run cli wp theme activate ucf-brand-block-theme'
+		);
+	}
 }
 
 /**

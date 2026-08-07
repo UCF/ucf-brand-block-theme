@@ -254,7 +254,22 @@ function render( report ) {
 
 	let listed = 0;
 
-	for ( const [ rule, group_ ] of byRule ) {
+	/*
+	 * Sorted, not left in insertion order.
+	 *
+	 * This comment is edited in place on every push, so its diff is read as "what changed
+	 * about accessibility". Any ordering that can shuffle between runs turns an unchanged set
+	 * of findings into a comment that looks like it changed. Playwright's JSON reporter does
+	 * appear to emit in file and declaration order rather than completion order — two full
+	 * runs of this suite produced byte-identical output despite `fullyParallel` — but that is
+	 * an observation about the reporter's internals, not a guarantee it makes, and the cost of
+	 * not depending on it is one `sort()`.
+	 */
+	const rules = [ ...byRule.entries() ].sort( ( a, b ) =>
+		a[ 0 ].localeCompare( b[ 0 ] )
+	);
+
+	for ( const [ rule, group_ ] of rules ) {
 		lines.push( '' );
 		lines.push( `### \`${ rule }\` — ${ group_[ 0 ].help }` );
 		lines.push( '' );
@@ -264,7 +279,14 @@ function render( report ) {
 		lines.push( '| --- | --- | --- | --- | --- |' );
 
 		group_
-			.sort( ( a, b ) => b.pages.size - a.pages.size )
+			// Reach first, then the element as a tiebreak. The tiebreak is not decoration:
+			// every finding on this theme today sits at the same page count, so without it the
+			// entire table is ordered by nothing but insertion.
+			.sort(
+				( a, b ) =>
+					b.pages.size - a.pages.size ||
+					a.node.target.localeCompare( b.node.target )
+			)
 			.slice( 0, MAX_NODES )
 			.forEach( ( finding ) => {
 				lines.push( row( finding ) );
@@ -305,7 +327,14 @@ function render( report ) {
 		);
 		lines.push( '' );
 
+		// Sorted for the same reason the tables are, and because an unsorted `slice()` would
+		// also change *which* items get shown when the list is truncated.
 		[ ...incomplete.values() ]
+			.sort(
+				( a, b ) =>
+					a.id.localeCompare( b.id ) ||
+					a.node.target.localeCompare( b.node.target )
+			)
 			.slice( 0, MAX_NODES )
 			.forEach( ( finding ) => {
 				lines.push(
@@ -327,10 +356,31 @@ function render( report ) {
 const reportPath = process.argv[ 2 ];
 
 if ( ! reportPath || ! fs.existsSync( reportPath ) ) {
-	// Not an error: a run that died before writing a report has already failed the build, and
-	// this should not add a second confusing failure on top of the real one.
+	/*
+	 * Exiting 0 here is deliberate: the run has already failed the build, and a second failure
+	 * from the reporter would only obscure the first.
+	 *
+	 * The message says what it means, because the vague version of it was genuinely confusing
+	 * once. The suite failed in the *seed* — before Playwright ran at all — and the comment
+	 * read "the suite did not produce a report", which sounds like the reporter broke rather
+	 * than like nothing was ever audited. Naming the two things that get you here points at
+	 * the log line that matters.
+	 */
+	const run =
+		process.env.GITHUB_SERVER_URL &&
+		process.env.GITHUB_REPOSITORY &&
+		process.env.GITHUB_RUN_ID
+			? `${ process.env.GITHUB_SERVER_URL }/${ process.env.GITHUB_REPOSITORY }/actions/runs/${ process.env.GITHUB_RUN_ID }`
+			: null;
+
 	process.stdout.write(
-		'## Accessibility audit\n\nThe suite did not produce a report. See the job log.\n'
+		'## Accessibility audit\n\n' +
+			'**The audit did not run**, so nothing here says anything about accessibility ' +
+			'either way.\n\n' +
+			'Playwright produced no results file. That means the job failed before any page ' +
+			'was audited — almost always the environment failing to boot, or ' +
+			'`tests/a11y/seed.php` refusing to seed. Both print the reason.\n\n' +
+			( run ? `See the job log: ${ run }\n` : 'See the job log.\n' )
 	);
 	process.exit( 0 );
 }
