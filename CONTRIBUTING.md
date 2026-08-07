@@ -79,6 +79,12 @@ Other useful scripts:
 -   `npm run lint:version` — check that `style.css` and `package.json` agree on the version.
 -   `npm run format` — format JS, JSON, and YAML to the WordPress standard.
 
+`composer.json` pins `config.platform.php` to **8.1**, the version `style.css` declares as the
+minimum. Without it, Composer resolves against whatever PHP the developer happens to be
+running and can lock a package that needs something newer — which installs fine locally and
+then fails for everyone else with "your lock file does not contain a compatible set of
+packages". Run `composer update` on the pinned platform, not on your own.
+
 The theme's version lives in **two** places — the `Version:` header in `style.css`, which is
 what WordPress reads, and `version` in `package.json`. Bump both together; `npm run
 lint:version` fails if they drift.
