@@ -26,3 +26,9 @@ require_once UCF_BRAND_THEME_DIR . '/vendor/autoload.php';
 // Data-only stand-ins for the two core classes the covered functions type-check against.
 require_once __DIR__ . '/stubs/class-wp-post.php';
 require_once __DIR__ . '/stubs/class-wp-block.php';
+
+// The escaping and translation functions, as real definitions rather than per-test Brain
+// Monkey aliases. They are shared with tests/php/render-patterns.php, which runs as a plain
+// CLI script with no PHPUnit around it — one implementation, so the markup the validity
+// sweep parses is escaped exactly the way the unit suite asserts it is.
+require_once __DIR__ . '/stubs/wp-escaping.php';

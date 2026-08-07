@@ -25,7 +25,7 @@ Branch `test`, **uncommitted**, on top of `1f87cf7` (the merged header-bar PR).
 ```bash
 npm test          # both suites
 npm run test:php  # PHPUnit         → OK (95 tests, 155 assertions)   ~0.1s
-npm run test:js   # Jest            → 11 passed, 11 total             ~2s
+npm run test:js   # Jest            → 20 passed, 20 total             ~3s
 ```
 
 Both are green, `phpcs` is clean across all 31 PHP files, and `npm run lint:js tests/js`
@@ -141,30 +141,30 @@ item 1 below.
 
 ## Remaining work, in order
 
-### 1. Markup validity sweep over `parts/` and `patterns/`
+### ~~1. Markup validity sweep over `parts/` and `patterns/`~~ — done
 
-Highest remaining value. `docs/architecture.md` records that pattern PHP must serialize
-*exactly* what `save()` would produce, and that `section-index.php` has already shipped a
-violation. Nothing currently guards it.
+`tests/php/render-patterns.php` renders the seven patterns; `tests/js/markup-validity.test.js`
+sweeps those plus the four template parts. Nine tests. Mutation-verified against both a
+pattern and a template part.
 
-Both template parts were hand-verified during the header work and were valid at that time —
-this makes it permanent and extends it to all seven patterns.
+One finding from building it is worth carrying forward, because it invalidates the plan as
+originally written above:
 
-Obstacle: the PHP interpolation above. Plan:
+**`isValid` is a near-useless assertion, and the plan called for exactly that.** `parse()`
+does not merely validate — on a mismatch it searches the block type's `deprecated` array for
+an older `save()` that matches, migrates the block, and reports `isValid: true`. Reproducing
+the exact `section-index.php` bug (a `textColor` attribute with no matching class) leaves
+every block valid; core recovers it and logs "Updated Block: core/paragraph". **A sweep built
+to the original plan would have shipped that bug a second time.**
 
-1. `tests/php/render-patterns.php` — a small CLI script that output-buffers each file in
-   `patterns/**/*.php` with the i18n functions stubbed to return their first argument, and
-   emits `[{ file, content }]` as JSON.
-2. `tests/js/markup-validity.test.js` — shells out to it with `execFileSync`, reads
-   `parts/*.html` directly (no PHP there), registers core + theme blocks, `parse()`s each,
-   and asserts no block is `isValid: false` and none is `core/missing`.
+The suite uses `isValidBlockContent( name, attributes, originalContent )` instead, which
+compares against today's `save()` with no deprecation fallback. `core/html` is exempt —
+verbatim raw markup, no normalization contract, and real WordPress parses the theme's two
+`core/html` chrome blocks as valid.
 
-That makes the JS suite depend on a PHP binary. Acceptable for a WordPress theme, and CI has
-both, but note it in `tests/README.md`.
-
-Sanity check while writing it: assert the sweep actually found blocks (`expect(count)
-.toBeGreaterThan(0)`), or an empty parse will pass silently — same trap as the block
-registration above.
+Also worth knowing: `@wordpress/jest-console` must be defeated with **plain functions, not
+`jest.spyOn`**, or Gutenberg's validation logging buries the real failure. See
+`tests/README.md`.
 
 ### 2. PHP integration tier
 

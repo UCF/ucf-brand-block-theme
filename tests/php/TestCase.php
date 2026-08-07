@@ -31,7 +31,6 @@ abstract class TestCase extends PHPUnitTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
-		$this->stubWordPress();
 	}
 
 	/**
@@ -64,62 +63,14 @@ abstract class TestCase extends PHPUnitTestCase {
 		}
 	}
 
-	/**
-	 * Stub the WordPress functions the covered code calls.
+	/*
+	 * The escaping and translation functions used to be aliased here per test. They now
+	 * live in tests/php/stubs/wp-escaping.php as real definitions, loaded once by the
+	 * bootstrap, because tests/php/render-patterns.php needs the identical
+	 * implementations and runs as a plain CLI script with no Brain Monkey around it.
 	 *
-	 * These mirror core's real behavior rather than returning the input untouched,
-	 * because the behavior is load-bearing in the code under test:
-	 *
-	 * - `esc_html()` must NOT double-encode. Core's `_wp_specialchars()` defaults
-	 *   `$double_encode` to false, so `&amp;` stays `&amp;`. Highlighting escapes each
-	 *   run between matches separately, and a stub that double-encoded would make those
-	 *   assertions pass against behavior WordPress does not have.
-	 * - `wp_strip_all_tags()` strips script/style bodies before `strip_tags()` and trims.
-	 *   Heading slugs and section text both run through it.
-	 *
-	 * @return void
+	 * Only functions whose return value a test needs to *vary* — get_post_meta(),
+	 * get_posts(), get_queried_object_id() and friends — are still stubbed per test, with
+	 * Brain Monkey, in the test that cares.
 	 */
-	protected function stubWordPress() {
-		Monkey\Functions\when( 'esc_html' )->alias(
-			static function ( $text ) {
-				return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8', false );
-			}
-		);
-
-		Monkey\Functions\when( 'esc_attr' )->alias(
-			static function ( $text ) {
-				return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8', false );
-			}
-		);
-
-		// Core's esc_url does a great deal more (protocol allowlisting, entity fixing).
-		// Only the ampersand rewrite is observable in the markup these tests assert on.
-		Monkey\Functions\when( 'esc_url' )->alias(
-			static function ( $url ) {
-				return str_replace( '&', '&#038;', (string) $url );
-			}
-		);
-
-		Monkey\Functions\when( 'wp_strip_all_tags' )->alias(
-			static function ( $text, $remove_breaks = false ) {
-				if ( ! is_scalar( $text ) ) {
-					return '';
-				}
-
-				$text = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', (string) $text );
-				$text = strip_tags( $text );
-
-				if ( $remove_breaks ) {
-					$text = preg_replace( '/[\r\n\t ]+/', ' ', $text );
-				}
-
-				return trim( $text );
-			}
-		);
-
-		// Translation is identity here; the suite asserts on English output.
-		Monkey\Functions\when( '__' )->returnArg( 1 );
-		Monkey\Functions\when( 'esc_attr__' )->returnArg( 1 );
-		Monkey\Functions\when( 'esc_html__' )->returnArg( 1 );
-	}
 }

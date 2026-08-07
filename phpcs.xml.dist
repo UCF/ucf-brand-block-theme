@@ -78,11 +78,15 @@
 	</rule>
 
 	<!--
-	The stub of wp_strip_all_tags() reproduces core's implementation, and core calls
-	strip_tags(). Substituting the "more comprehensive" alternative the sniff suggests
-	would make the stub stop matching the function it stands in for.
+	The stubs stand in for core functions and must carry core's exact names and
+	signatures — a prefixed `ucf_brand_esc_html()` would stand in for nothing, and
+	dropping the unused `$domain` parameter would stop the signature matching the
+	function it replaces.
 	-->
-	<rule ref="WordPress.WP.AlternativeFunctions.strip_tags_strip_tags">
-		<exclude-pattern>/tests/php/TestCase\.php</exclude-pattern>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound">
+		<exclude-pattern>/tests/php/stubs/</exclude-pattern>
+	</rule>
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+		<exclude-pattern>/tests/php/stubs/</exclude-pattern>
 	</rule>
 </ruleset>

@@ -5,7 +5,7 @@ Two suites today, both run by `npm test`:
 | Suite | Command | Needs | Runtime |
 | --- | --- | --- | --- |
 | PHP units | `npm run test:php` | PHP + Composer | ~0.1s |
-| Block round-trips | `npm run test:js` | Node | ~2s |
+| Block round-trips + markup sweep | `npm run test:js` | Node, and PHP for the sweep | ~3s |
 
 Both are fast and dependency-light on purpose. A suite that takes a minute and needs Docker
 is a suite nobody runs before committing, so anything requiring a live WordPress is kept out
@@ -65,6 +65,40 @@ The "registers every block that ships in `src/blocks/`" test exists to catch tha
 registry, and to catch a new block being added without coverage. It has already earned its
 place once.
 
+## Markup validity sweep — `tests/js/markup-validity.test.js`
+
+Every block in every template part and pattern must be markup the current `save()` would
+produce. `docs/architecture.md` records that `section-index.php` shipped a violation of this
+once — a paragraph carrying a `textColor` attribute with no matching class, which looked fine
+on white and stayed grey-on-black inside a Dark group.
+
+Template parts are read straight off disk. Patterns cannot be: they interpolate PHP *inside*
+their block markup, so `tests/php/render-patterns.php` renders each one the way core does and
+hands back the result. **That is why this suite needs a PHP binary**, unlike `blocks.test.js`.
+
+### `isValid` is not the assertion — and that matters
+
+`parse()` does not merely validate. When markup fails to match, it walks the block type's
+`deprecated` array for an older `save()` that *does* match, and on a hit it migrates the block
+and reports `isValid: true`. Core blocks carry many deprecations — `core/heading` has six.
+
+This was measured, not assumed. **Reproducing the exact `section-index.php` bug leaves every
+block `isValid: true`**; core silently recovers it and logs "Updated Block: core/paragraph".
+A sweep asserting on `isValid` would have shipped that bug a second time.
+
+So the assertion is `isValidBlockContent( name, attributes, originalContent )`, which compares
+against today's `save()` with no deprecation fallback. `core/html` is exempt — it carries
+verbatim raw markup and has no normalization contract to hold it to; real WordPress 7.0.2
+parses both of the theme's `core/html` chrome blocks as valid.
+
+### Console silencing
+
+Gutenberg logs a full validation diff for every invalid or migrated block, and
+`@wordpress/jest-console` turns that into its own failure — hundreds of lines that bury which
+file actually broke. The suite replaces the console methods with **plain functions, not
+`jest.spyOn`**: jest-console asserts against `.mock.calls`, so a spy still records and still
+fails. An ordinary function leaves nothing to find.
+
 ### Jest configuration
 
 `jest.config.js` carries four non-obvious settings, each commented in place:
@@ -84,8 +118,8 @@ place once.
 ## Not yet built
 
 - Integration tier for the WordPress-dependent PHP (see above).
-- Markup validity sweep over `parts/*.html` and `patterns/**/*.php`. Patterns interpolate PHP
-  *inside* their block markup, so this needs a PHP render step before the markup can be
-  parsed — `section-index.php` has shipped this class of bug before.
 - Accessibility suite (Phase 2): Playwright + axe-core, per route, per pattern and per block
   style variant.
+
+See [`docs/testing-plan.md`](../docs/testing-plan.md) for the order of work and the decisions
+behind it.
