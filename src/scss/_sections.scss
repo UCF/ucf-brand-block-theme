@@ -132,25 +132,62 @@
 
 // ── Color swatches (Identity → Color) ────────────────────────────────────────
 
+// One contiguous band rather than a grid of cards: no gap, no border, no card backing, and
+// each swatch's own color runs the full height of its cell with the label sitting on it.
+//
+// `flex` and not `grid`: the band has to stay contiguous at any number of swatches, and
+// `auto-fit` reserves empty tracks once a row is short — a five-swatch band left a sixth
+// column of page background butted onto the end of it. Flex sizes to what is there.
+// `flex: 1 1 <basis>` keeps every cell equal until they would go narrower than the basis,
+// at which point the row wraps rather than crushing the labels.
 .brand-swatches {
-	display: grid;
-	gap: 1px;
-	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+	display: flex;
+	flex-wrap: wrap;
 }
 
+// The chip is promoted from a band across the top of a card to the cell's whole background,
+// so the body can sit on the color. Markup is untouched — the chip is still a sibling of the
+// body, still carrying core's `has-{slug}-background-color` class, so a swatch keeps
+// tracking its token exactly as before.
 .brand-swatch {
-	background: map.get($color, "paper-alt");
-	border: 1px solid map.get($color, "line");
+	align-items: flex-end;
+	display: flex;
+	flex: 1 1 150px;
+	min-height: 210px;
+	min-width: 0;
+	position: relative;
+}
+
+// On a phone the band becomes one column of full-width rows, each exactly as tall as its own
+// label. Both halves of that are needed and neither implies the other.
+//
+// `flex-basis: 100%` because the 150px basis otherwise fits two cells in a ~335px viewport,
+// which leaves the mono value lines wrapping mid-number in half-width cells.
+//
+// `min-height: 0` because the 210px floor is what gives a swatch its proportions on a wide
+// band, where cells are narrow and the color needs room to read as a color. Stacked, that
+// floor is just empty color: nineteen of them turn a reference table into several screens of
+// scrolling to get past.
+//
+// Nothing here touches the parent — `.brand-swatches` keeps the flex default of
+// `align-items: stretch`, which is what still matches cell heights per row above this width.
+@media (max-width: $breakpoint-header) {
+	.brand-swatch {
+		flex-basis: 100%;
+		min-height: 0;
+	}
 }
 
 .brand-swatch__chip {
 	display: block;
-	height: 118px;
-	width: 100%;
+	inset: 0;
+	position: absolute;
 }
 
 .brand-swatch__body {
 	padding: map.get($space, "30");
+	position: relative;
+	width: 100%;
 }
 
 .brand-swatch__name {
@@ -162,12 +199,118 @@
 }
 
 .brand-swatch__value {
-	color: map.get($color, "text-secondary");
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "meta");
 	letter-spacing: 0.03em;
 	line-height: 1.8;
 	margin: 0;
+}
+
+// Moving the label onto the color is what makes this necessary. On a card the label always
+// sat on `paper-alt` and one text color was right for every swatch; on the color, UCF Black
+// would print black on black and Link Blue at 3.59:1.
+//
+// Which of the two applies is the author's call, set per swatch by the Label color control —
+// see `labelInk` in src/blocks/color-swatch/index.js. Black is the unset default, so a swatch
+// saved before this control existed keeps the markup it already had and needs no migration.
+//
+// Two values only, and both absolute: #000000 or #FFFFFF, with nothing knocked back by an
+// opacity. A muted second line would take the value text off those two and drop its contrast
+// by an amount that depends on the swatch underneath. The hierarchy between the name and the
+// value line is carried by family, size and weight instead.
+.brand-swatch__body {
+	color: map.get($color, "black");
+}
+
+.brand-swatch.is-label-light .brand-swatch__body {
+	color: map.get($color, "white");
+}
+
+.brand-swatch__name,
+.brand-swatch__value {
+	color: inherit;
+}
+
+// ── Swatch hex copy ──────────────────────────────────────────────────────────
+//
+// The heading-anchor gesture, on the HEX line: hovering fades in a clipboard icon and a
+// click copies the value, confirmed by a brief "Copied" bubble. Built at runtime by
+// `src/blocks/color-swatch/view.js` — the saved markup is a bare text node, so nothing here
+// paints until that script runs, which is the point. The affordance and the behavior arrive
+// together or not at all.
+//
+// Deliberately the same shape as `.brand-heading__anchor` above rather than a variant of it:
+// a shared class would have to be neutral about the two contexts, and this one lives on an
+// arbitrary swatch color while that one lives on the page background. Keep them in step by
+// eye; they are twenty lines apart.
+.brand-swatch__hex {
+	cursor: pointer;
+}
+
+.brand-swatch__copy {
+	align-items: center;
+	appearance: none;
+	background: none;
+	border: 0;
+	color: inherit;
+	cursor: pointer;
+	display: inline-flex;
+	margin-left: 0.4rem;
+	opacity: 0;
+	padding: 0;
+	position: relative;
+	transition: opacity 0.15s;
+	vertical-align: middle;
+
+	svg {
+		height: 0.9em;
+		width: 0.9em;
+	}
+}
+
+// Focus is not a hover state but needs the same reveal, or the icon is a control a keyboard
+// can reach and not see. `:focus-within` on the line covers it because the button is inside.
+.brand-swatch__hex:hover .brand-swatch__copy,
+.brand-swatch__hex:focus-within .brand-swatch__copy,
+.brand-swatch__hex.is-copied .brand-swatch__copy {
+	opacity: 0.7;
+}
+
+// currentColor, not a token: the button sits on the swatch's own color, and the label ink is
+// already the one value known to read against it.
+.brand-swatch__copy:focus-visible {
+	opacity: 1;
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.brand-swatch__copy::after {
+	background: map.get($color, "black");
+	bottom: calc(100% + 0.4rem);
+	color: map.get($color, "white");
+	content: "Copied";
+	font-family: map.get($font, "mono");
+	font-size: 0.62rem;
+	left: 50%;
+	letter-spacing: 0.05em;
+	opacity: 0;
+	padding: 0.2rem 0.45rem;
+	pointer-events: none;
+	position: absolute;
+	transform: translateX(-50%);
+	transition: opacity 0.15s;
+	white-space: nowrap;
+}
+
+// A black bubble on UCF Black is a bubble nobody can see. The swatch already knows which of
+// the two inks reads against it, so the bubble takes the opposite pair on the same signal.
+.brand-swatch.is-label-light .brand-swatch__copy::after {
+	background: map.get($color, "white");
+	color: map.get($color, "black");
+}
+
+.brand-swatch__hex.is-copied .brand-swatch__copy::after {
+	opacity: 1;
 }
 
 .brand-swatch__ratio {

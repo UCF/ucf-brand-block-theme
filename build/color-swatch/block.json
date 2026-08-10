@@ -58,11 +58,16 @@
     "ratioStatus": {
       "type": "string",
       "default": "pass"
+    },
+    "labelInk": {
+      "type": "string",
+      "default": ""
     }
   },
   "supports": {
     "html": false,
     "reusable": false
   },
-  "editorScript": "file:./index.js"
+  "editorScript": "file:./index.js",
+  "viewScript": "file:./view.js"
 }

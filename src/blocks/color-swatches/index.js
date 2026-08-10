@@ -16,15 +16,12 @@ import metadata from './block.json';
 
 const ALLOWED = [ 'ucf-brand/color-swatch' ];
 
-// A starting grid, not a fixed set — the appender below lets an author add a
-// single custom swatch (or remove any of these) at will.
+// One swatch to start, not a row: the band is a single contiguous run of color, so a
+// three-swatch default reads as the finished thing an author is meant to keep rather than
+// the first of however many they came to build. The appender below adds the rest, and
+// `patterns/groups/color-swatches.php` is where the full published palette lives.
 const TEMPLATE = [
 	[ 'ucf-brand/color-swatch', { colorSlug: 'gold', name: 'Bold Gold' } ],
-	[ 'ucf-brand/color-swatch', { colorSlug: 'black', name: 'UCF Black' } ],
-	[
-		'ucf-brand/color-swatch',
-		{ colorSlug: 'horizon-blue', name: 'Horizon Blue' },
-	],
 ];
 
 registerBlockType( metadata.name, {
