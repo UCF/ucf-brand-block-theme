@@ -116,6 +116,7 @@
 		},
 		"custom": {
 			"textOnDark": "#EAEAEA",
+			"accordionHeading": "#444444",
 			"sidebarWidth": "288px",
 			"headerHeight": "56px",
 			"wrap": "1160px",

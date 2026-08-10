@@ -81,6 +81,22 @@ li {
 	color: var(--brand-body, inherit);
 }
 
+// Headings are black on a light field rather than the `text-body` they used to inherit
+// from `styles.color.text`. Deliberately a role and not `styles.elements.heading.color` in
+// theme.json: WordPress emits that as `:root :where(h1, …, h6) { color: … }`, a rule that
+// matches the heading itself, and a matching rule always beats a color inherited from an
+// ancestor no matter the specificity. Every heading inside a Dark section — the footer, the
+// header, the halftone heroes — would have gone black on black. The role resolves from the
+// nearest composition instead, so a heading follows whatever field it lands on.
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: var(--brand-heading, #{compositions.role-default("heading")});
+}
+
 // `brand-` components are excluded: the drawer links, the skip link and the heading anchor
 // carry their own color at (0,1,0), which the `:hover` half of this rule would otherwise
 // outrank. Both halves keep the exclusion so the two states cannot drift apart.

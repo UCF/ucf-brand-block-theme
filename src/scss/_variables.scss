@@ -61,6 +61,12 @@ $space: (
 // in the editor's color picker, so it lives in settings.custom.
 $text-on-dark: var(--wp--custom--text-on-dark);
 
+// The accordion's closed heading label. Comes from the comp and matches no palette grey —
+// it sits between `text-secondary` (#565656) and `text-body` (#1A1A1A). Scoped to the one
+// component that asked for it rather than added to the palette, so it stays out of the
+// editor's color picker until something else needs it. Same reasoning as $text-on-dark.
+$accordion-heading: var(--wp--custom--accordion-heading);
+
 $sidebar-width: var(--wp--custom--sidebar-width);
 $header-height: var(--wp--custom--header-height);
 $wrap: var(--wp--custom--wrap);
