@@ -195,7 +195,6 @@ registerBlockType( metadata.name, {
 			ratio,
 			ratioStatus,
 			labelInk,
-			filled,
 		} = attributes;
 		const blockProps = useBlockProps( {
 			className: swatchClass( labelInk ),
@@ -232,7 +231,6 @@ registerBlockType( metadata.name, {
 			setAttributes( {
 				colorSlug: match ? match.slug : '',
 				customColor: match ? '' : value,
-				filled: true,
 				...derivedFromColor( value ),
 			} );
 		};
@@ -241,18 +239,22 @@ registerBlockType( metadata.name, {
 		 * Fill the derived values on a freshly inserted swatch, once the palette is
 		 * available and before anything has been entered by hand.
 		 *
-		 * `filled` is what makes clearing a value line stick. Without it the guard is
-		 * "hex is empty", and this effect runs again on every mount — so an author who
-		 * cleared HEX to publish a swatch without one would find it back the next time
-		 * the page was opened, with nothing to blame but the editor. The flag records
-		 * that the fields have been decided, whether by this effect, by a color change
-		 * or by hand, and is never read on the front end.
+		 * The guard is `undefined === hex`, not `! hex`, and `hex` is declared in
+		 * block.json with no default so that it can be. Three states, one attribute:
+		 * absent is "never filled", a string is the published value, and `''` is an
+		 * author who deleted it on purpose. A `! hex` guard cannot tell the last two
+		 * apart, so it re-runs on every mount — clear HEX to publish a swatch without
+		 * one, reopen the page, and it is back, with nothing to blame but the editor.
+		 *
+		 * Absent rather than a separate `filled` flag because an attribute with no
+		 * default is not serialized at all: "never filled" stays out of post content
+		 * instead of parking editor-only state in every page forever.
 		 */
 		useEffect( () => {
-			if ( filled || hex || ! currentColor ) {
+			if ( undefined !== hex || ! currentColor ) {
 				return;
 			}
-			setAttributes( { ...derivedFromColor( currentColor ), filled: true } );
+			setAttributes( derivedFromColor( currentColor ) );
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [ currentColor ] );
 
@@ -333,6 +335,11 @@ registerBlockType( metadata.name, {
 						   whose name is the whole point. `valueLines()` already drops
 						   an empty field, so clearing one is how that is expressed,
 						   and read-only fields left no way to do it.
+
+						   `hex || ''` because `hex` is undefined until the first
+						   fill — see the effect above — and a TextControl handed
+						   undefined flips from uncontrolled to controlled the
+						   moment a value lands.
 						 */ }
 						<TextControl
 							__nextHasNoMarginBottom
@@ -341,10 +348,8 @@ registerBlockType( metadata.name, {
 								'Filled from the swatch color. Edit or clear it to leave the line off.',
 								'ucf-brand-block-theme'
 							) }
-							value={ hex }
-							onChange={ ( v ) =>
-								setAttributes( { hex: v, filled: true } )
-							}
+							value={ hex || '' }
+							onChange={ ( v ) => setAttributes( { hex: v } ) }
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
@@ -354,9 +359,7 @@ registerBlockType( metadata.name, {
 								'ucf-brand-block-theme'
 							) }
 							value={ rgb }
-							onChange={ ( v ) =>
-								setAttributes( { rgb: v, filled: true } )
-							}
+							onChange={ ( v ) => setAttributes( { rgb: v } ) }
 						/>
 						<TextControl
 							__nextHasNoMarginBottom

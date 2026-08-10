@@ -32,8 +32,7 @@
       "default": ""
     },
     "hex": {
-      "type": "string",
-      "default": ""
+      "type": "string"
     },
     "rgb": {
       "type": "string",
@@ -62,10 +61,6 @@
     "labelInk": {
       "type": "string",
       "default": ""
-    },
-    "filled": {
-      "type": "boolean",
-      "default": false
     }
   },
   "supports": {

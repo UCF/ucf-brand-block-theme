@@ -18,15 +18,14 @@
 			"selector": ".brand-swatch__name",
 			"default": ""
 		},
-		"hex": { "type": "string", "default": "" },
+		"hex": { "type": "string" },
 		"rgb": { "type": "string", "default": "" },
 		"cmyk": { "type": "string", "default": "" },
 		"pantone": { "type": "string", "default": "" },
 		"usage": { "type": "string", "default": "" },
 		"ratio": { "type": "string", "default": "" },
 		"ratioStatus": { "type": "string", "default": "pass" },
-		"labelInk": { "type": "string", "default": "" },
-		"filled": { "type": "boolean", "default": false }
+		"labelInk": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"html": false,
