@@ -122,6 +122,26 @@ function derivedFromColor( color ) {
 }
 
 /**
+ * The swatch wrapper's class, shared by edit and save so their markup stays byte-identical.
+ *
+ * The band layout puts the label on the color, so one label color cannot serve every swatch —
+ * black on UCF Black is invisible, and on Link Blue it measures 3.59:1. Which one applies is
+ * the author's call rather than something derived, so it is an attribute.
+ *
+ * An unset `labelInk` adds no class at all, and that is deliberate: it makes the markup of a
+ * swatch saved before this control existed identical to what it saves now, so nothing needs a
+ * `deprecated` entry and no swatch already sitting in a page is invalidated. Black is the
+ * default in the stylesheet, which is the right answer for most of the palette — but it is a
+ * default, not a measurement, so a dark swatch left untouched will need this set by hand.
+ *
+ * @param {string} labelInk `light`, or '' for the default.
+ * @return {string} Class name for the wrapper.
+ */
+function swatchClass( labelInk ) {
+	return labelInk ? `brand-swatch is-label-${ labelInk }` : 'brand-swatch';
+}
+
+/**
  * Props for the color chip, shared by edit and save so their markup stays
  * byte-identical.
  *
@@ -174,8 +194,11 @@ registerBlockType( metadata.name, {
 			usage,
 			ratio,
 			ratioStatus,
+			labelInk,
 		} = attributes;
-		const blockProps = useBlockProps( { className: 'brand-swatch' } );
+		const blockProps = useBlockProps( {
+			className: swatchClass( labelInk ),
+		} );
 
 		// The theme palette, as the editor sees it — the same 19 brand tokens.
 		const palette = useSelect(
@@ -212,10 +235,23 @@ registerBlockType( metadata.name, {
 			} );
 		};
 
-		// Fill the derived values on a freshly inserted swatch, once the palette
-		// is available and before anything has been entered by hand.
+		/**
+		 * Fill the derived values on a freshly inserted swatch, once the palette is
+		 * available and before anything has been entered by hand.
+		 *
+		 * The guard is `undefined === hex`, not `! hex`, and `hex` is declared in
+		 * block.json with no default so that it can be. Three states, one attribute:
+		 * absent is "never filled", a string is the published value, and `''` is an
+		 * author who deleted it on purpose. A `! hex` guard cannot tell the last two
+		 * apart, so it re-runs on every mount — clear HEX to publish a swatch without
+		 * one, reopen the page, and it is back, with nothing to blame but the editor.
+		 *
+		 * Absent rather than a separate `filled` flag because an attribute with no
+		 * default is not serialized at all: "never filled" stays out of post content
+		 * instead of parking editor-only state in every page forever.
+		 */
 		useEffect( () => {
-			if ( hex || ! currentColor ) {
+			if ( undefined !== hex || ! currentColor ) {
 				return;
 			}
 			setAttributes( derivedFromColor( currentColor ) );
@@ -250,6 +286,38 @@ registerBlockType( metadata.name, {
 								__experimentalIsRenderedInSidebar
 							/>
 						</BaseControl>
+
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __(
+								'Label color',
+								'ucf-brand-block-theme'
+							) }
+							help={ __(
+								'The name and values print on top of the swatch. Switch to white on a dark color — black is the default and will not be legible there.',
+								'ucf-brand-block-theme'
+							) }
+							value={ labelInk }
+							options={ [
+								{
+									label: __(
+										'Black',
+										'ucf-brand-block-theme'
+									),
+									value: '',
+								},
+								{
+									label: __(
+										'White',
+										'ucf-brand-block-theme'
+									),
+									value: 'light',
+								},
+							] }
+							onChange={ ( v ) =>
+								setAttributes( { labelInk: v } )
+							}
+						/>
 					</PanelBody>
 
 					<PanelBody
@@ -258,25 +326,40 @@ registerBlockType( metadata.name, {
 							'ucf-brand-block-theme'
 						) }
 					>
+						{ /*
+						   Editable, not read-only. These are filled from the swatch
+						   color and refilled whenever it changes, but a computed
+						   default is not the same as a locked one: a swatch may need
+						   to publish fewer lines than the formula produces — a
+						   digital-only color with no print values, or a surface
+						   whose name is the whole point. `valueLines()` already drops
+						   an empty field, so clearing one is how that is expressed,
+						   and read-only fields left no way to do it.
+
+						   `hex || ''` because `hex` is undefined until the first
+						   fill — see the effect above — and a TextControl handed
+						   undefined flips from uncontrolled to controlled the
+						   moment a value lands.
+						 */ }
 						<TextControl
 							__nextHasNoMarginBottom
-							readOnly
 							label={ __( 'HEX', 'ucf-brand-block-theme' ) }
 							help={ __(
-								'Computed from the swatch color.',
+								'Filled from the swatch color. Edit or clear it to leave the line off.',
 								'ucf-brand-block-theme'
 							) }
-							value={ hex }
+							value={ hex || '' }
+							onChange={ ( v ) => setAttributes( { hex: v } ) }
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
-							readOnly
 							label={ __( 'RGB', 'ucf-brand-block-theme' ) }
 							help={ __(
-								'Computed from the HEX value.',
+								'Filled from the HEX value. Edit or clear it to leave the line off.',
 								'ucf-brand-block-theme'
 							) }
 							value={ rgb }
+							onChange={ ( v ) => setAttributes( { rgb: v } ) }
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
@@ -383,8 +466,11 @@ registerBlockType( metadata.name, {
 	},
 
 	save( { attributes } ) {
-		const { colorSlug, customColor, name, ratio, ratioStatus } = attributes;
-		const blockProps = useBlockProps.save( { className: 'brand-swatch' } );
+		const { colorSlug, customColor, name, ratio, ratioStatus, labelInk } =
+			attributes;
+		const blockProps = useBlockProps.save( {
+			className: swatchClass( labelInk ),
+		} );
 
 		return (
 			<div { ...blockProps }>

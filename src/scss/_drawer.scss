@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "chevron" as *;
+@use "compositions";
 @use "variables" as *;
 
 // ── The shell ────────────────────────────────────────────────────────────────
@@ -58,7 +59,20 @@
 // the same top pin anyway, and it gives up the guarantee that the black column fills the
 // strip. Revealing the footer at the end of the page is handled in brand-nav.js instead —
 // see syncDrawerToPageEnd() there.
+//
+// The treatment is declared, not just the background. The rail's own chrome paints itself
+// with direct tokens below — it is fixed and must not invert — but the sidebar *footer* is
+// core blocks (site-title, paragraphs) carrying `is-style-meta`, and those read `--brand-*`
+// roles by definition. Without this include they resolved `role-default()`, which is the
+// light row: `#565656` meta and `#1F6A9A` links, painted on black at 2.86:1 and 3.58:1.
+// Shipped that way, and axe caught it on 39 pages. The values the dark row already points
+// at — `text-meta-dark` and `blue-tint` — clear AA at 6.08:1 and 10.90:1.
+//
+// Note what this is NOT: the light-row tokens are correct on a light field and are used
+// across the theme. The bug was the drawer selecting the wrong row, never the values.
 .brand-sidebar {
+	@include compositions.treatment("dark");
+
 	background: map.get($color, "black");
 	border-right: 1px solid map.get($color, "line-dark");
 	color: map.get($color, "white");
@@ -196,8 +210,12 @@
 // install says it is, and the tagline had nowhere else to appear once the header became
 // the university lockup.
 //
-// Colors are direct tokens rather than `--brand-*` roles. The drawer is fixed chrome: it
-// is always the black rail and must not invert, which is the test in docs/architecture.md.
+// The masthead's colors are direct tokens rather than `--brand-*` roles — it is fixed
+// chrome and must not invert. That reasoning covers this block and the nav, not the whole
+// rail: the sidebar footer is core blocks that read roles, which is why `.brand-sidebar`
+// declares the dark treatment above. Read this paragraph as scoped to the masthead.
+// "Always the black rail, must not invert" is the direct-token test in
+// docs/architecture.md — it is about a component's own chrome, not about its contents.
 
 .brand-sidebar__brand {
 	display: block;

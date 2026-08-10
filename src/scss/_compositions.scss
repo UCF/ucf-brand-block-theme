@@ -53,6 +53,7 @@ $treatments: (
 		"body": "text-body",
 		"body-muted": "text-secondary",
 		"eyebrow": "link-blue",
+		"heading": "black",
 		"lead": "text-body",
 		"line": "line",
 		"link": "link-blue",
@@ -67,6 +68,7 @@ $treatments: (
 		"body": "white",
 		"body-muted": "text-secondary-dark",
 		"eyebrow": "gold",
+		"heading": "white",
 		"lead": "white",
 		"line": "line-dark",
 		"link": "blue-tint",
@@ -85,6 +87,7 @@ $treatments: (
 		"body": "black",
 		"body-muted": "text-body",
 		"eyebrow": "black",
+		"heading": "black",
 		"lead": "text-body",
 		"line": "gold-deep",
 		"link": "black",
@@ -132,6 +135,7 @@ $compositions: (
 	--brand-body: #{map.get($color, map.get($spec, "body"))};
 	--brand-body-muted: #{map.get($color, map.get($spec, "body-muted"))};
 	--brand-eyebrow: #{map.get($color, map.get($spec, "eyebrow"))};
+	--brand-heading: #{map.get($color, map.get($spec, "heading"))};
 	--brand-lead: #{map.get($color, map.get($spec, "lead"))};
 	--brand-line: #{map.get($color, map.get($spec, "line"))};
 	--brand-link: #{map.get($color, map.get($spec, "link"))};

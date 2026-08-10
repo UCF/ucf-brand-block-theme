@@ -49,8 +49,13 @@
 	// The clickable header, in the theme's display/uppercase/letterspaced label idiom.
 	// Closed rows sit at a lighter grey-black; the open row goes full ink below so the
 	// active section reads darkest.
+	//
+	// The closed grey is the comp's own value, not a palette token — see $accordion-heading
+	// in _variables.scss for why it is scoped here. The chevron below deliberately stays at
+	// `text-secondary`: it used to match this label exactly, and now sits a step lighter,
+	// which is the "closed rows keep it quiet" intent rather than drift.
 	.wp-block-accordion-heading__toggle {
-		color: map.get($color, "text-secondary");
+		color: $accordion-heading;
 		font-family: map.get($font, "display");
 		font-size: var(--wp--preset--font-size--heading-4);
 		font-weight: 700;
