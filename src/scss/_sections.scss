@@ -178,6 +178,21 @@
 	}
 }
 
+// Six to a row on desktop, not five. The 150px basis is a minimum, so the count per row is
+// whatever the content column divides into — at `contentSize` (850px) that is five, and the
+// comp asks for six. A basis of `100% / 6` fixes the count instead of leaving it to arithmetic
+// on a width that is set two files away in theme.json: the row holds exactly six, and any
+// change to the content column re-divides rather than dropping a swatch onto a second row.
+//
+// Still `flex: 1 1`, so a band of fewer than six grows to fill the width and stays contiguous.
+// Gated at the drawer breakpoint because six cells only have room once the sidebar layout is
+// in play; between here and the phone rule the 150px basis handles the tablet range.
+@media (min-width: $breakpoint-drawer) {
+	.brand-swatch {
+		flex-basis: calc(100% / 6);
+	}
+}
+
 .brand-swatch__chip {
 	display: block;
 	inset: 0;

@@ -62,6 +62,10 @@
     "labelInk": {
       "type": "string",
       "default": ""
+    },
+    "filled": {
+      "type": "boolean",
+      "default": false
     }
   },
   "supports": {

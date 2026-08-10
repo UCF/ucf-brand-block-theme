@@ -195,6 +195,7 @@ registerBlockType( metadata.name, {
 			ratio,
 			ratioStatus,
 			labelInk,
+			filled,
 		} = attributes;
 		const blockProps = useBlockProps( {
 			className: swatchClass( labelInk ),
@@ -231,17 +232,27 @@ registerBlockType( metadata.name, {
 			setAttributes( {
 				colorSlug: match ? match.slug : '',
 				customColor: match ? '' : value,
+				filled: true,
 				...derivedFromColor( value ),
 			} );
 		};
 
-		// Fill the derived values on a freshly inserted swatch, once the palette
-		// is available and before anything has been entered by hand.
+		/**
+		 * Fill the derived values on a freshly inserted swatch, once the palette is
+		 * available and before anything has been entered by hand.
+		 *
+		 * `filled` is what makes clearing a value line stick. Without it the guard is
+		 * "hex is empty", and this effect runs again on every mount — so an author who
+		 * cleared HEX to publish a swatch without one would find it back the next time
+		 * the page was opened, with nothing to blame but the editor. The flag records
+		 * that the fields have been decided, whether by this effect, by a color change
+		 * or by hand, and is never read on the front end.
+		 */
 		useEffect( () => {
-			if ( hex || ! currentColor ) {
+			if ( filled || hex || ! currentColor ) {
 				return;
 			}
-			setAttributes( derivedFromColor( currentColor ) );
+			setAttributes( { ...derivedFromColor( currentColor ), filled: true } );
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [ currentColor ] );
 
@@ -313,25 +324,39 @@ registerBlockType( metadata.name, {
 							'ucf-brand-block-theme'
 						) }
 					>
+						{ /*
+						   Editable, not read-only. These are filled from the swatch
+						   color and refilled whenever it changes, but a computed
+						   default is not the same as a locked one: a swatch may need
+						   to publish fewer lines than the formula produces — a
+						   digital-only color with no print values, or a surface
+						   whose name is the whole point. `valueLines()` already drops
+						   an empty field, so clearing one is how that is expressed,
+						   and read-only fields left no way to do it.
+						 */ }
 						<TextControl
 							__nextHasNoMarginBottom
-							readOnly
 							label={ __( 'HEX', 'ucf-brand-block-theme' ) }
 							help={ __(
-								'Computed from the swatch color.',
+								'Filled from the swatch color. Edit or clear it to leave the line off.',
 								'ucf-brand-block-theme'
 							) }
 							value={ hex }
+							onChange={ ( v ) =>
+								setAttributes( { hex: v, filled: true } )
+							}
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
-							readOnly
 							label={ __( 'RGB', 'ucf-brand-block-theme' ) }
 							help={ __(
-								'Computed from the HEX value.',
+								'Filled from the HEX value. Edit or clear it to leave the line off.',
 								'ucf-brand-block-theme'
 							) }
 							value={ rgb }
+							onChange={ ( v ) =>
+								setAttributes( { rgb: v, filled: true } )
+							}
 						/>
 						<TextControl
 							__nextHasNoMarginBottom

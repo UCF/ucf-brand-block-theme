@@ -25,7 +25,8 @@
 		"usage": { "type": "string", "default": "" },
 		"ratio": { "type": "string", "default": "" },
 		"ratioStatus": { "type": "string", "default": "pass" },
-		"labelInk": { "type": "string", "default": "" }
+		"labelInk": { "type": "string", "default": "" },
+		"filled": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"html": false,
