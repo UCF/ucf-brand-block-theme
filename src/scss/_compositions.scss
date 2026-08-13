@@ -2,9 +2,14 @@
 // that paints them.
 //
 // A composition is a background plus everything that has to be true of what sits on it:
-// body text, the `.lead` / `.eyebrow` / `.meta` helpers, links, and an accent. Nothing
-// here invents a value; every entry names a token that already exists in theme.json and
-// is aliased in _variables.scss. This module owns the *relationships* only.
+// body text, the `.lead` / `.meta` helpers, links, and an accent. Nothing here invents a
+// value; every entry names a token that already exists in theme.json and is aliased in
+// _variables.scss. This module owns the *relationships* only.
+//
+// `.eyebrow` is deliberately not among the roles. It became a badge that paints its own
+// black field, so no per-composition value describes it — on the gold field its old role
+// (`black`) would have put black text on the black badge. A mark carrying its own
+// background answers for its own contrast; see _typography.scss.
 //
 // Two tables, deliberately not flattened into one. `$treatments` describes what happens
 // to marks on a kind of field; `$compositions` names the fields and points at a treatment.
@@ -52,7 +57,6 @@ $treatments: (
 		"accent": "gold",
 		"body": "text-body",
 		"body-muted": "text-secondary",
-		"eyebrow": "link-blue",
 		"heading": "black",
 		"lead": "text-body",
 		"line": "line",
@@ -67,7 +71,6 @@ $treatments: (
 		"accent": "gold-deep",
 		"body": "white",
 		"body-muted": "text-secondary-dark",
-		"eyebrow": "gold",
 		"heading": "white",
 		"lead": "white",
 		"line": "line-dark",
@@ -86,7 +89,6 @@ $treatments: (
 		"accent": "gold-deep",
 		"body": "black",
 		"body-muted": "text-body",
-		"eyebrow": "black",
 		"heading": "black",
 		"lead": "text-body",
 		"line": "gold-deep",
@@ -134,7 +136,6 @@ $compositions: (
 	--brand-accent: #{map.get($color, map.get($spec, "accent"))};
 	--brand-body: #{map.get($color, map.get($spec, "body"))};
 	--brand-body-muted: #{map.get($color, map.get($spec, "body-muted"))};
-	--brand-eyebrow: #{map.get($color, map.get($spec, "eyebrow"))};
 	--brand-heading: #{map.get($color, map.get($spec, "heading"))};
 	--brand-lead: #{map.get($color, map.get($spec, "lead"))};
 	--brand-line: #{map.get($color, map.get($spec, "line"))};

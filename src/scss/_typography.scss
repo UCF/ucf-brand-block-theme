@@ -8,7 +8,8 @@
 // This file assigns roles — `.lead` takes the lead color role — but never decides what a
 // role is worth. Both the live value (`--brand-lead`) and the no-composition fallback
 // (`compositions.role-default()`) come from _compositions.scss, so no color token is
-// named here.
+// named here. `.eyebrow` is the one exception, and says why at its own rule: a mark that
+// paints its own background is not describable as a role on someone else's field.
 
 .lead,
 .is-style-lead {
@@ -20,28 +21,33 @@
 	text-transform: none;
 }
 
-// Mono, letterspaced, rule-prefixed label. Reserved for eyebrows, meta and numbers —
-// never body copy.
+// Mono, letterspaced, gold-on-black badge. Reserved for eyebrows, meta and numbers —
+// never body copy. The same badge idiom as the H2 subsection number in _sections.scss,
+// at eyebrow size and eyebrow letter-spacing.
+//
+// This is the one helper in this file that names tokens instead of reading a `--brand-*`
+// role, and it has to: the badge paints its own field, so the composition's `eyebrow`
+// role no longer describes anything true. Left as `var(--brand-eyebrow)` it would put
+// black text on the black badge inside a gold composition. A mark that carries its own
+// background answers for its own contrast — see _compositions.scss on why roles exist.
+//
+// `inline-flex`, not `flex`: the badge has to hug its text. As a block-level flex box the
+// black field stretched the full content column.
 .eyebrow,
 .is-style-eyebrow {
 	align-items: center;
-	color: var(--brand-eyebrow, #{compositions.role-default("eyebrow")});
-	display: flex;
+	background: map.get($color, "black");
+	color: map.get($color, "gold");
+	display: inline-flex;
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "eyebrow");
 	font-weight: 700;
-	gap: 0.7rem;
 	letter-spacing: 0.22em;
 	margin-bottom: map.get($space, "30");
+	// `letter-spacing` also trails the last glyph, so the right pad is short by exactly
+	// that much to keep the text optically centred in the badge.
+	padding: 0.75em calc(0.9em - 0.22em) 0.75em 0.9em;
 	text-transform: uppercase;
-
-	&::before {
-		background: currentcolor;
-		content: "";
-		display: inline-block;
-		height: 2px;
-		width: 26px;
-	}
 }
 
 // De-emphasized body copy. Same family and size as `p` — only the color role differs, so
