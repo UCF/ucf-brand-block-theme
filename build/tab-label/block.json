@@ -8,7 +8,7 @@
   "parent": [
     "ucf-brand/tab"
   ],
-  "description": "The clickable label for a tab: a gold badge over a condensed H3 heading.",
+  "description": "The clickable label for a tab: a gold badge over a condensed H3 heading, with an optional line of supporting copy under it.",
   "textdomain": "ucf-brand-block-theme",
   "keywords": [
     "tab",
@@ -27,6 +27,12 @@
       "type": "string",
       "source": "html",
       "selector": ".ucf-tabs__heading",
+      "default": ""
+    },
+    "description": {
+      "type": "string",
+      "source": "html",
+      "selector": ".ucf-tabs__description",
       "default": ""
     }
   },

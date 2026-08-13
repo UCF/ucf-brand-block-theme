@@ -46,16 +46,37 @@
 .ucf-tabs__heading {
 	color: map.get($color, "black");
 	font-family: map.get($font, "display");
-	font-size: map.get($size, "heading-3");
+	// Heading 4's size on an H3 element: the tab label sits below the section's H2 in the
+	// outline but reads as a control, not as a heading of its own weight.
+	font-size: map.get($size, "heading-4");
 	font-weight: 700;
 	line-height: 1.05;
 	margin: 0;
 	text-transform: uppercase;
 }
 
+// Supporting copy under the tab's heading. Grey rather than body black, so the heading
+// stays the thing you read first — the label is a control, and the copy is the hint that
+// tells you what is behind it.
+.ucf-tabs__description {
+	color: map.get($color, "text-secondary");
+	font-family: map.get($font, "body");
+	font-size: map.get($size, "ui");
+	line-height: 1.5;
+	margin: 0;
+}
+
 .ucf-tabs__panel {
 	margin-bottom: map.get($space, "40");
 	margin-top: map.get($space, "20");
+}
+
+// Core ships `:where(.wp-block-columns){margin-bottom:1.75em}`, which inside a panel adds
+// a block of dead space under the tab's content — the panel's own padding is what sets
+// that inset here. `:where()` has zero specificity, so a single class overrides it without
+// `!important`.
+.ucf-tabs__panel .wp-block-columns {
+	margin-bottom: 0;
 }
 
 // ── Tab strip (enhanced, tablet and up) ──────────────────────────────────────
@@ -69,18 +90,31 @@
 	}
 
 	.ucf-tabs.is-enhanced {
-		border: 1px solid map.get($color, "black");
-		border-top: 3px solid map.get($color, "gold");
+		// The white field belongs to the tab strip, not to the block: it is the card the
+		// tabs and panels are drawn on, so it exists only where that card does. The base
+		// (mobile, and no-JS at any width) layout is a plain stack of sections and stays
+		// transparent, taking the color of whatever band it was dropped into.
+		background: map.get($color, "white");
+		// The box outline is drawn by the panel below, not here. On this element its side
+		// borders ran the full height of the block, which put a 1px grey line immediately
+		// beside each tab's 3px top rule — at the first and last tab the two met at the
+		// corner and read as the side border bleeding into the top one. The strip's own
+		// edges are the tabs' backgrounds; only the panel needs an outline.
 		display: grid;
-		gap: 2px;
+		gap: 1px;
 		grid-template-columns: repeat(var(--tab-count, 1), minmax(0, 1fr));
 	}
 
 	// The tab strip itself. It spans the whole container and lays its own tabs out on
 	// `--tab-count` equal columns, so the labels never share a grid with the panels.
 	.is-enhanced .ucf-tabs__tablist {
+		// No gap, and no background showing through one: the dividers are borders on the
+		// tabs themselves (below). A gap is a hole in the strip, so it cut through each
+		// tab's 3px top rule as well, breaking that rule into segments and meeting it at
+		// the corner — the side divider reading as if it bled into the top border. A border
+		// mitres into the one above it instead, so the top rule stays a continuous line.
 		display: grid;
-		gap: 2px;
+		gap: 0;
 		grid-column: 1 / -1;
 		grid-row: 1;
 		// The strip spans the whole container (grid-column 1 / -1) and divides itself into
@@ -89,13 +123,38 @@
 		grid-template-columns: repeat(var(--tab-count, 1), minmax(0, 1fr));
 	}
 
+	// Each tab carries its own 3px top rule: grey while idle, gold on the selected one.
+	// That rule is the strip's only marker of which tab is open, so it belongs to the tab
+	// rather than to the strip — a single gold rule across the top marked the block, not
+	// the selection.
 	.is-enhanced .ucf-tabs__label {
 		background: map.get($color, "black");
+		border-top: 3px solid map.get($color, "line");
 		cursor: pointer;
 		margin: 0;
+		// Every tab but the first carries the divider on its leading edge, so there is one
+		// hairline between each pair and none at the ends of the strip. `line-dark` is the
+		// hairline the drawer divides its nav items with (_drawer.scss) — one seam color
+		// for every black surface in the theme.
+		&:not(:first-child) {
+			border-left: 1px solid map.get($color, "line-dark");
+		}
 		min-height: 4rem;
-		padding: map.get($space, "40") map.get($space, "40")
-			map.get($space, "50");
+		padding: map.get($space, "30");
+	}
+
+	// The same hover field the drawer's nav links use (`card-dark`, see _drawer.scss) — one
+	// hover treatment for every black surface in the theme rather than a per-component grey.
+	//
+	// Hover only applies to a tab you can actually move to, so the selected tab — which is
+	// white — is excluded; without that, hovering the current tab would lift it to grey and
+	// read as if the selection had moved. Pointer-only: `:hover` sticks after a tap on
+	// touch, and this is the state that says "not selected, but you could select it".
+	@media (hover: hover) {
+		.is-enhanced
+			.ucf-tabs__label:not([aria-selected="true"]):hover {
+			background: map.get($color, "card-dark");
+		}
 	}
 
 	.is-enhanced .ucf-tabs__label:focus-visible {
@@ -104,14 +163,33 @@
 	}
 
 	// Idle: gold heading on black. The badge stays gold-on-black in every state.
+	//
+	// The badge and heading sit at the top of the tab; `margin-top: auto` moved onto the
+	// description below, which pushes it to the bottom. That way the free space is the gap
+	// between the two, so descriptions line up across tabs however many lines their
+	// headings run to. It was on the heading before, which bottom-aligned the whole stack.
 	.is-enhanced .ucf-tabs__heading {
 		color: map.get($color, "gold");
+		// 24px, in rem so it still tracks the root size. Larger than the `heading-4` preset
+		// the stacked layout uses: in the strip the heading is the tab's whole identity and
+		// has a fixed-width column to fill, so it steps up rather than staying at the size
+		// it takes when it is one heading in a scrolling stack. No preset lands on 24px —
+		// `heading-4` is 1.28rem and `heading-3` is fluid to 1.9rem.
+		font-size: 1.5rem;
+	}
+
+	// White on the black tab. The `dark` treatment's grey (#B3B3B3) is the usual swap here,
+	// but it read as washed out at this size — the same call _compositions.scss records for
+	// body copy on the dark field, which is white for exactly that reason.
+	.is-enhanced .ucf-tabs__description {
+		color: map.get($color, "white");
 		margin-top: auto;
 	}
 
 	// Selected: white tab, black heading.
 	.is-enhanced .ucf-tabs__label[aria-selected="true"] {
 		background: map.get($color, "white");
+		border-top-color: map.get($color, "gold");
 	}
 
 	.is-enhanced
@@ -120,15 +198,31 @@
 		color: map.get($color, "black");
 	}
 
+	// Back to the light-field grey once the tab is white.
+	.is-enhanced
+		.ucf-tabs__label[aria-selected="true"]
+		.ucf-tabs__description {
+		color: map.get($color, "text-secondary");
+	}
+
 	// Every panel occupies the same row-2 cell, so they overlap and the grid track
 	// sizes to the tallest one. The strip's height is therefore fixed by the tallest
 	// panel and does not shift when you switch tabs — shorter panels just leave
 	// whitespace below.
 	.is-enhanced .ucf-tabs__panel {
+		// The card's outline, on the only row that needs one. `border-top: 0` because the
+		// tab strip already closes that edge — a rule there would cut the selected tab off
+		// from the panel it opens onto.
+		//
+		// The hairline token, not `--brand-line`: the strip paints its own white field, so
+		// it always wants the light-field line. Reading the role would hand it `line-dark`
+		// inside a dark section — the wrong hairline for the white card it is drawn on.
+		border: 1px solid map.get($color, "line");
+		border-top: 0;
 		grid-column: 1 / -1;
 		grid-row: 2;
 		margin: 0;
-		padding: 0 2rem;
+		padding: map.get($space, "40");
 	}
 
 	// Hide inactive panels with `visibility`, not `display: none`: they must keep

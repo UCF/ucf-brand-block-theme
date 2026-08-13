@@ -102,6 +102,8 @@ export const BLOCK_FIXTURES = [
 						attributes: {
 							badge: 'Do',
 							heading: 'Use the primary mark',
+							description:
+								'The full lockup, on a field with room to breathe.',
 						},
 						innerBlocks: [],
 					},
