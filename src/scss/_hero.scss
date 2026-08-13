@@ -32,11 +32,14 @@
 	display: flex;
 	flex-direction: column;
 
-	// The copy stack has more air than the 1rem default block gap: at hero scale the eyebrow,
-	// title and copy need to read as three separate marks, not a paragraph. `gap` rather than
-	// a `* + *` margin because the featured image is the first child and is out of flow —
-	// flex gap skips it, an adjacent-sibling margin would not.
-	gap: map.get($space, "40");
+	// `gap` rather than a `* + *` margin because the featured image is the first child and is
+	// out of flow — flex gap skips it, an adjacent-sibling margin would not.
+	//
+	// One rhythm for the whole stack: at hero scale the type sizes already separate the
+	// eyebrow, title and copy, so the extra air `$space.40` gave them read as drift rather
+	// than as three marks. The eyebrow's own `margin-bottom` is zeroed below so this gap is
+	// the only thing setting the distance anywhere in the stack.
+	gap: map.get($space, "30");
 	justify-content: flex-end;
 	min-height: 40vh;
 
@@ -86,6 +89,22 @@
 // open a gap in the stack. Same treatment as `.brand-page-number:empty` in _typography.scss.
 .brand-hero p:empty {
 	display: none;
+}
+
+// Two elements in the stack carry block margins of their own — the eyebrow's from
+// _typography.scss, the separator's from core — and in a flex container those land on top of
+// the gap rather than collapsing into it. The result was three different distances in a stack
+// that declares one: the eyebrow pushed off the title it labels, and the accent rule floating
+// in twice the air of everything around it. The gap owns the rhythm here; nothing else does.
+.brand-hero .is-style-eyebrow,
+.brand-hero .wp-block-separator {
+	margin-block: 0;
+}
+
+// The closing note is the exception the rhythm is worth breaking for: it answers the deck
+// rather than continuing it, so it gets the one larger step in the band.
+.brand-hero > p:last-child {
+	margin-top: map.get($space, "20");
 }
 
 // ── Accent rule ──────────────────────────────────────────────────────────────
