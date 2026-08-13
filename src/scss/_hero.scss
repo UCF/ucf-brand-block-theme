@@ -35,11 +35,11 @@
 	// `gap` rather than a `* + *` margin because the featured image is the first child and is
 	// out of flow — flex gap skips it, an adjacent-sibling margin would not.
 	//
-	// One rhythm for the whole stack: at hero scale the type sizes already separate the
-	// eyebrow, title and copy, so the extra air `$space.40` gave them read as drift rather
-	// than as three marks. The eyebrow's own `margin-bottom` is zeroed below so this gap is
-	// the only thing setting the distance anywhere in the stack.
-	gap: map.get($space, "30");
+	// The base step of the stack, and deliberately small: it is the eyebrow-to-title
+	// distance, which is the tightest pair in the band — a label sitting on the thing it
+	// labels. Everything below the title asks for more air through its own margin, so this
+	// is a floor rather than the one rhythm.
+	gap: map.get($space, "20");
 	justify-content: flex-end;
 	min-height: 40vh;
 
@@ -101,10 +101,18 @@
 	margin-block: 0;
 }
 
+// Half-leading is the other half of that distance, and the reason zeroing the margin was
+// not enough on its own: the eyebrow's line box is taller than its caps, so the flex gap
+// measures from empty space rather than from the type. At 0.72rem the label is one line by
+// definition, so it gives the leading up and the gap becomes the whole gap.
+.brand-hero .is-style-eyebrow {
+	line-height: 1;
+}
+
 // The closing note is the exception the rhythm is worth breaking for: it answers the deck
 // rather than continuing it, so it gets the one larger step in the band.
 .brand-hero > p:last-child {
-	margin-top: map.get($space, "20");
+	margin-top: map.get($space, "30");
 }
 
 // ── Accent rule ──────────────────────────────────────────────────────────────
