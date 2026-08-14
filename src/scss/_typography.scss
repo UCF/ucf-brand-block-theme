@@ -74,6 +74,14 @@ li {
 	color: var(--brand-body, inherit);
 }
 
+// A hair of separation between list items. Core's layout rules do not reach here — a list
+// item is a child of the `ul`, not of a layout container — so an element margin is enough
+// and no class is needed to make it stick. The theme's own nav lists are unaffected: the
+// drawer's `.brand-nav__item` and friends set their own margin at (0,1,0).
+li {
+	margin-bottom: 2px;
+}
+
 // Headings are black on a light field rather than the `text-body` they used to inherit
 // from `styles.color.text`. Deliberately a role and not `styles.elements.heading.color` in
 // theme.json: WordPress emits that as `:root :where(h1, …, h6) { color: … }`, a rule that
