@@ -40,24 +40,24 @@
 	<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:72%">
 		<!-- wp:columns {"verticalAlignment":"top"} -->
 		<div class="wp-block-columns are-vertically-aligned-top">
-			<!-- wp:column {"verticalAlignment":"top","width":"14%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:14%">
+			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:10%">
 				<!-- wp:paragraph {"className":"is-style-meta","style":{"typography":{"fontWeight":"700"}}} -->
 				<p class="is-style-meta" style="font-weight:700">02.01</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"40%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:40%">
+			<!-- wp:column {"verticalAlignment":"top","width":"30%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:30%">
 				<!-- wp:heading {"level":4,"fontFamily":"display","fontSize":"heading-4","style":{"typography":{"textTransform":"uppercase","fontWeight":"700","lineHeight":"1.1"}}} -->
 				<h4 class="wp-block-heading has-display-font-family has-heading-4-font-size" style="font-weight:700;line-height:1.1;text-transform:uppercase"><?php esc_html_e( 'Brand Voice', 'ucf-brand-block-theme' ); ?></h4>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"46%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:46%">
+			<!-- wp:column {"verticalAlignment":"top","width":"60%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:60%">
 				<!-- wp:paragraph {"className":"is-style-muted","fontSize":"ui"} -->
 				<p class="is-style-muted has-ui-font-size"><?php esc_html_e( 'The characteristics of how we sound, complementing our brand personality', 'ucf-brand-block-theme' ); ?></p>
 				<!-- /wp:paragraph -->
@@ -72,24 +72,24 @@
 
 		<!-- wp:columns {"verticalAlignment":"top"} -->
 		<div class="wp-block-columns are-vertically-aligned-top">
-			<!-- wp:column {"verticalAlignment":"top","width":"14%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:14%">
+			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:10%">
 				<!-- wp:paragraph {"className":"is-style-meta","style":{"typography":{"fontWeight":"700"}}} -->
 				<p class="is-style-meta" style="font-weight:700">02.02</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"40%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:40%">
+			<!-- wp:column {"verticalAlignment":"top","width":"30%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:30%">
 				<!-- wp:heading {"level":4,"fontFamily":"display","fontSize":"heading-4","style":{"typography":{"textTransform":"uppercase","fontWeight":"700","lineHeight":"1.1"}}} -->
 				<h4 class="wp-block-heading has-display-font-family has-heading-4-font-size" style="font-weight:700;line-height:1.1;text-transform:uppercase"><?php esc_html_e( 'Brand Messages', 'ucf-brand-block-theme' ); ?></h4>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"46%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:46%">
+			<!-- wp:column {"verticalAlignment":"top","width":"60%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:60%">
 				<!-- wp:paragraph {"className":"is-style-muted","fontSize":"ui"} -->
 				<p class="is-style-muted has-ui-font-size"><?php esc_html_e( 'Some key phrases and themes that highlight our strengths and impact', 'ucf-brand-block-theme' ); ?></p>
 				<!-- /wp:paragraph -->
@@ -104,24 +104,24 @@
 
 		<!-- wp:columns {"verticalAlignment":"top"} -->
 		<div class="wp-block-columns are-vertically-aligned-top">
-			<!-- wp:column {"verticalAlignment":"top","width":"14%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:14%">
+			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:10%">
 				<!-- wp:paragraph {"className":"is-style-meta","style":{"typography":{"fontWeight":"700"}}} -->
 				<p class="is-style-meta" style="font-weight:700">02.03</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"40%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:40%">
+			<!-- wp:column {"verticalAlignment":"top","width":"30%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:30%">
 				<!-- wp:heading {"level":4,"fontFamily":"display","fontSize":"heading-4","style":{"typography":{"textTransform":"uppercase","fontWeight":"700","lineHeight":"1.1"}}} -->
 				<h4 class="wp-block-heading has-display-font-family has-heading-4-font-size" style="font-weight:700;line-height:1.1;text-transform:uppercase"><?php esc_html_e( 'General Standards and Style', 'ucf-brand-block-theme' ); ?></h4>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"46%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:46%">
+			<!-- wp:column {"verticalAlignment":"top","width":"60%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:60%">
 				<!-- wp:paragraph {"className":"is-style-muted","fontSize":"ui"} -->
 				<p class="is-style-muted has-ui-font-size"><?php esc_html_e( 'Details big and small for consistency across everything we write', 'ucf-brand-block-theme' ); ?></p>
 				<!-- /wp:paragraph -->
@@ -136,24 +136,24 @@
 
 		<!-- wp:columns {"verticalAlignment":"top"} -->
 		<div class="wp-block-columns are-vertically-aligned-top">
-			<!-- wp:column {"verticalAlignment":"top","width":"14%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:14%">
+			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:10%">
 				<!-- wp:paragraph {"className":"is-style-meta","style":{"typography":{"fontWeight":"700"}}} -->
 				<p class="is-style-meta" style="font-weight:700">02.04</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"40%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:40%">
+			<!-- wp:column {"verticalAlignment":"top","width":"30%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:30%">
 				<!-- wp:heading {"level":4,"fontFamily":"display","fontSize":"heading-4","style":{"typography":{"textTransform":"uppercase","fontWeight":"700","lineHeight":"1.1"}}} -->
 				<h4 class="wp-block-heading has-display-font-family has-heading-4-font-size" style="font-weight:700;line-height:1.1;text-transform:uppercase"><?php esc_html_e( 'Standards by Content Type', 'ucf-brand-block-theme' ); ?></h4>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:column -->
 
-			<!-- wp:column {"verticalAlignment":"top","width":"46%"} -->
-			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:46%">
+			<!-- wp:column {"verticalAlignment":"top","width":"60%"} -->
+			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:60%">
 				<!-- wp:paragraph {"className":"is-style-muted","fontSize":"ui"} -->
 				<p class="is-style-muted has-ui-font-size"><?php esc_html_e( 'Recommendations or standards for specific mediums or purposes', 'ucf-brand-block-theme' ); ?></p>
 				<!-- /wp:paragraph -->
