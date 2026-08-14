@@ -57,6 +57,10 @@
 	// outline but reads as a control, not as a heading of its own weight.
 	font-size: map.get($size, "heading-4");
 	font-weight: 700;
+	// A hairline of tracking to open up the condensed caps. In px rather than em so it stays
+	// 0.35px as the heading scales through the strip's clamp — a fixed optical correction,
+	// not a proportion of the type size.
+	letter-spacing: 0.35px;
 	line-height: 1.05;
 	margin: 0;
 	text-transform: uppercase;

@@ -59,7 +59,10 @@
 		font-family: map.get($font, "display");
 		font-size: var(--wp--preset--font-size--heading-4);
 		font-weight: 700;
-		letter-spacing: 0.12em;
+		// No letter-spacing: this is a heading, not one of the theme's letterspaced label
+		// idioms (eyebrow, meta, badge). At `heading-4` in the condensed display face the
+		// 0.12em it used to carry set it as a wide label and cost a full row of width on a
+		// long title. Tracking here belongs to labels; the accordion's rows are headings.
 		padding: var(--wp--preset--spacing--30);
 		text-transform: uppercase;
 	}
