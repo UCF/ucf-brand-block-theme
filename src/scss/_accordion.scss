@@ -59,7 +59,10 @@
 		font-family: map.get($font, "display");
 		font-size: var(--wp--preset--font-size--heading-4);
 		font-weight: 700;
-		letter-spacing: 0.12em;
+		// No letter-spacing: this is a heading, not one of the theme's letterspaced label
+		// idioms (eyebrow, meta, badge). At `heading-4` in the condensed display face the
+		// 0.12em it used to carry set it as a wide label and cost a full row of width on a
+		// long title. Tracking here belongs to labels; the accordion's rows are headings.
 		padding: var(--wp--preset--spacing--30);
 		text-transform: uppercase;
 	}
@@ -75,11 +78,41 @@
 		gap: 0.5em;
 	}
 
-	// Core underlines the title on hover; swap that for a brand gold shift.
+	// Core underlines the title on hover; swap that for the brand's own hover state.
 	.wp-block-accordion-heading__toggle:hover .wp-block-accordion-heading__toggle-title {
-		border-left-color: map.get($color, "gold");
-		// color: map.get($color, "gold-deep");
 		text-decoration: none;
+	}
+
+	// Hover is the step before open, and reads as one: the accent rule appears, but grey, and
+	// the label darkens from the closed grey without going all the way to the open row's ink.
+	// Three states, each a step along the same two axes:
+	//
+	//   closed   transparent rule   $accordion-heading  (#444444)
+	//   hover    text-secondary     text-body           (#1A1A1A)
+	//   open     gold rule          ink                 (#0A0A0A)
+	//
+	// Grey rather than a dimmer gold: gold is what marks the open row, and a second gold one
+	// shade off it asked the eye to tell two accents apart instead of telling accent from no
+	// accent. `text-secondary` is the grey the closed chevron already uses below — the
+	// accordion's own "present but quiet" value, so hover borrows a meaning that exists.
+	//
+	// Excluded on the open row, which already sits at the end of both ramps — hovering it
+	// would otherwise walk its rule and label *backwards* and read as a state change.
+	//
+	// The border lives on `.wp-block-accordion-heading`, which is why `:hover` goes there
+	// rather than on the toggle: the heading wraps the button, so it is hovered whenever the
+	// button is, and no `:has()` is needed to reach back up.
+	//
+	// Pointer-only: `:hover` sticks after a tap on touch, and a row stuck half-open-looking
+	// is worse than no hover at all. Same guard as the tab strip in _tabs.scss.
+	@media (hover: hover) {
+		.wp-block-accordion-item:not(.is-open) > .wp-block-accordion-heading:hover {
+			border-left-color: map.get($color, "text-secondary");
+
+			.wp-block-accordion-heading__toggle {
+				color: map.get($color, "text-body");
+			}
+		}
 	}
 
 	// Core's icon is a literal "+" glyph that it rotates 45° into an × when the row

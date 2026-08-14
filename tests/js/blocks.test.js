@@ -17,7 +17,12 @@
  * while silently invalidating every page already saved with the old output.
  */
 
-import { createBlock, parse, serialize } from '@wordpress/blocks';
+import {
+	createBlock,
+	isValidBlockContent,
+	parse,
+	serialize,
+} from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 import { BLOCK_FIXTURES, registerThemeBlocks } from './helpers/register-blocks';
@@ -98,6 +103,54 @@ describe( 'ucf-brand/tab-label', () => {
 		expect( html ).not.toContain( 'ucf-tabs__badge' );
 	} );
 
+	// `description` was added to this block after labels had already been saved without it.
+	// Those pages hold markup with no `.ucf-tabs__description` element, and they stay valid
+	// only because `save()` emits that element conditionally. If the guard is ever dropped —
+	// or the element gains a wrapper that renders when the attribute is empty — every tab
+	// label already in the database goes invalid, and the front end will not show it.
+	//
+	// `isValidBlockContent()`, not `parse()` → `isValid`: parse migrates markup through the
+	// block's deprecations and then reports valid, which is exactly how this class of bug has
+	// shipped from this repo before. See CLAUDE.md.
+	it( 'still validates markup saved before the description existed', () => {
+		const legacy =
+			'<div class="wp-block-ucf-brand-tab-label ucf-tabs__label">' +
+			'<span class="ucf-tabs__badge">Do</span>' +
+			'<h3 class="ucf-tabs__heading">Use the primary mark</h3>' +
+			'</div>';
+
+		const originalWarn = console.warn;
+		console.warn = () => {};
+		try {
+			expect(
+				isValidBlockContent(
+					'ucf-brand/tab-label',
+					{ badge: 'Do', heading: 'Use the primary mark' },
+					legacy
+				)
+			).toBe( true );
+		} finally {
+			console.warn = originalWarn;
+		}
+	} );
+
+	it( 'round-trips with the optional description omitted', () => {
+		const html = serialize(
+			createBlock( 'ucf-brand/tabs', {}, [
+				createBlock( 'ucf-brand/tab', {}, [
+					createBlock( 'ucf-brand/tab-label', {
+						badge: 'Do',
+						heading: 'No supporting copy here',
+					} ),
+					createBlock( 'ucf-brand/tab-panel', {}, [] ),
+				] ),
+			] )
+		);
+
+		expect( collectInvalid( parse( html ) ) ).toEqual( [] );
+		expect( html ).not.toContain( 'ucf-tabs__description' );
+	} );
+
 	it( 'reads its RichText attributes back out of the markup', () => {
 		const html = serialize(
 			createBlock( 'ucf-brand/tabs', {}, [
@@ -105,6 +158,7 @@ describe( 'ucf-brand/tab-label', () => {
 					createBlock( 'ucf-brand/tab-label', {
 						badge: 'Do',
 						heading: 'Use the primary mark',
+						description: 'On a field with room to breathe.',
 					} ),
 					createBlock( 'ucf-brand/tab-panel', {}, [] ),
 				] ),
@@ -118,6 +172,9 @@ describe( 'ucf-brand/tab-label', () => {
 		// apart, these come back empty while the block still looks valid.
 		expect( label.attributes.badge ).toBe( 'Do' );
 		expect( label.attributes.heading ).toBe( 'Use the primary mark' );
+		expect( label.attributes.description ).toBe(
+			'On a field with room to breathe.'
+		);
 	} );
 } );
 

@@ -20,28 +20,21 @@
 	text-transform: none;
 }
 
-// Mono, letterspaced, rule-prefixed label. Reserved for eyebrows, meta and numbers —
-// never body copy.
+// Mono, letterspaced, uppercase label. Reserved for eyebrows, meta and numbers — never
+// body copy. It paints no background of its own: on the hero and any dark composition it
+// is the gold-on-black in the brand comp, and the black comes from the field it sits on.
+//
+// The leading 2px rule this used to draw is gone. It read as a decoration competing with
+// the accent rule under the title, and the comp sets the label with nothing before it.
 .eyebrow,
 .is-style-eyebrow {
-	align-items: center;
 	color: var(--brand-eyebrow, #{compositions.role-default("eyebrow")});
-	display: flex;
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "eyebrow");
 	font-weight: 700;
-	gap: 0.7rem;
 	letter-spacing: 0.22em;
 	margin-bottom: map.get($space, "30");
 	text-transform: uppercase;
-
-	&::before {
-		background: currentcolor;
-		content: "";
-		display: inline-block;
-		height: 2px;
-		width: 26px;
-	}
 }
 
 // De-emphasized body copy. Same family and size as `p` — only the color role differs, so
@@ -81,6 +74,14 @@ li {
 	color: var(--brand-body, inherit);
 }
 
+// A hair of separation between list items. Core's layout rules do not reach here — a list
+// item is a child of the `ul`, not of a layout container — so an element margin is enough
+// and no class is needed to make it stick. The theme's own nav lists are unaffected: the
+// drawer's `.brand-nav__item` and friends set their own margin at (0,1,0).
+li {
+	margin-bottom: 2px;
+}
+
 // Headings are black on a light field rather than the `text-body` they used to inherit
 // from `styles.color.text`. Deliberately a role and not `styles.elements.heading.color` in
 // theme.json: WordPress emits that as `:root :where(h1, …, h6) { color: … }`, a rule that
@@ -97,10 +98,90 @@ h6 {
 	color: var(--brand-heading, #{compositions.role-default("heading")});
 }
 
+// ── Heading rhythm ───────────────────────────────────────────────────────────
+//
+// Heading margins live here rather than in `styles.elements.*.spacing.margin` in theme.json,
+// which is where they belong on paper and where they do nothing on a page. WordPress emits
+// its layout support as
+//
+//   :root :where(.is-layout-constrained) > * { margin-block-start: 1rem; margin-block-end: 0 }
+//
+// at (0,1,0) — the `:root` carries all of that, the `:where()` none — while theme.json writes
+// element styles as a bare `h2 { … }` at (0,0,1). Post content, groups and columns are all
+// layout containers, so on a real page every heading is a direct child of one and core's rule
+// wins on both axes: the bottom margin is replaced with `0`, the top with the block gap. The
+// margins read as set in theme.json and were inert everywhere anyone would see them.
+//
+// A class in the selector clears (0,1,0) with nothing to spare and no `!important`. Same
+// collision `.brand-section` answers with a doubled class in _sections.scss.
+//
+// `.is-root-container` is the editor canvas's stand-in for `.wp-block-post-content`, which is
+// not present there — see the note in _sections.scss. Keeping both selectors is what makes
+// the editor show the spacing the front end will.
+// `:not(:first-child)` / `:not(:last-child)` are not decoration. Core pairs its layout rule
+// with two exceptions at the same (0,1,0):
+//
+//   :root :where(.is-layout-constrained) > :first-child { margin-block-start: 0 }
+//   :root :where(.is-layout-constrained) > :last-child  { margin-block-end: 0 }
+//
+// which stop a container's own padding being doubled by its first and last child's margins.
+// Outranking the spacing rule outranks those too, so without the exclusions every
+// `.brand-section` — which opens with an H2 — took the band's `padding-block` *plus* a full
+// `$space.60` above its heading. Spacing between siblings is this rule's job; the distance to
+// a container's edge belongs to the container.
+// H2 is not in this loop: it takes Extra Large on both sides, below. Every other level keeps
+// Medium, which is the distance that reads as a heading attached to the copy under it.
+@each $level in h1, h3, h4, h5, h6 {
+	.wp-block-post-content #{$level}:not(:last-child),
+	.is-root-container #{$level}:not(:last-child) {
+		margin-block-end: map.get($space, "30");
+	}
+}
+
+// Large on mobile, Extra Large from tablet up. Three rem under a heading is a proportion of
+// a wide column; in a phone's measure the same gap is most of a screen, and the heading
+// stops reading as attached to the copy it introduces.
+.wp-block-post-content h2:not(:last-child),
+.is-root-container h2:not(:last-child) {
+	margin-block-end: map.get($space, "40");
+}
+
+@media (min-width: $breakpoint-tabs) {
+	.wp-block-post-content h2:not(:last-child),
+	.is-root-container h2:not(:last-child) {
+		margin-block-end: map.get($space, "50");
+	}
+}
+
+// H2 opens a subsection and carries the badge, so it takes Extra Large — the largest step
+// meant for type. `$space.60` is named Section: it is the bands' own `padding-block`, and
+// borrowing it here put a heading's margin on the same scale as a whole band's inset.
+.wp-block-post-content h2:not(:first-child),
+.is-root-container h2:not(:first-child) {
+	margin-block-start: map.get($space, "50");
+}
+
+.wp-block-post-content h3:not(:first-child),
+.is-root-container h3:not(:first-child) {
+	margin-block-start: map.get($space, "40");
+}
+
 // `brand-` components are excluded: the drawer links, the skip link and the heading anchor
 // carry their own color at (0,1,0), which the `:hover` half of this rule would otherwise
 // outrank. Both halves keep the exclusion so the two states cannot drift apart.
-a:where(:not(.wp-block-button__link, [class*="brand-"])),
-a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
+//
+// This rule is the fallback, not the thing that paints a link. `styles.elements.link` in
+// theme.json is emitted as `:root :where(a:where(:not(.wp-element-button)))` at (0,1,0),
+// which outranks this selector's (0,0,1) — so for as long as that named a token directly,
+// every link on the site was `link-blue` and the `--brand-link` role reached nothing. On a
+// dark field that was a 3.58:1 mid-blue on black. theme.json now reads the role itself, with
+// the token as its `var()` fallback, and this rule stays for links outside a composition.
+a:where(:not(.wp-block-button__link, [class*="brand-"])) {
 	color: var(--brand-link, #{compositions.role-default("link")});
+}
+
+// Hover moves toward the field's own high-contrast text — white on dark — rather than the
+// light field's darker blue, which on black read as the link switching off.
+a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
+	color: var(--brand-link-hover, #{compositions.role-default("link-hover")});
 }
