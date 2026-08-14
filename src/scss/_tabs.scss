@@ -120,7 +120,11 @@
 		// corner and read as the side border bleeding into the top one. The strip's own
 		// edges are the tabs' backgrounds; only the panel needs an outline.
 		display: grid;
-		gap: 1px;
+		// Zero, because this grid's only visible gap is the row one, between the tab strip
+		// and the panel — and a gap shows the container's background, which here is white.
+		// At 1px it was a white sliver cutting the selected tab off from the panel it opens
+		// onto: too faint to read as a divider, just enough to break the join.
+		gap: 0;
 		grid-template-columns: repeat(var(--tab-count, 1), minmax(0, 1fr));
 	}
 
