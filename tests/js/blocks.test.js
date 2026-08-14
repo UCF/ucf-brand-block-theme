@@ -119,13 +119,19 @@ describe( 'ucf-brand/tab-label', () => {
 			'<h3 class="ucf-tabs__heading">Use the primary mark</h3>' +
 			'</div>';
 
-		expect(
-			isValidBlockContent(
-				'ucf-brand/tab-label',
-				{ badge: 'Do', heading: 'Use the primary mark' },
-				legacy
-			)
-		).toBe( true );
+		const originalWarn = console.warn;
+		console.warn = () => {};
+		try {
+			expect(
+				isValidBlockContent(
+					'ucf-brand/tab-label',
+					{ badge: 'Do', heading: 'Use the primary mark' },
+					legacy
+				)
+			).toBe( true );
+		} finally {
+			console.warn = originalWarn;
+		}
 	} );
 
 	it( 'round-trips with the optional description omitted', () => {
