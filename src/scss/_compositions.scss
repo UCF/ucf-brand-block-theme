@@ -61,6 +61,7 @@ $treatments: (
 		"lead": "text-body",
 		"line": "line",
 		"link": "link-blue",
+		"link-hover": "link-blue-hover",
 		"meta": "text-secondary",
 		"on-accent": "black",
 	),
@@ -76,6 +77,11 @@ $treatments: (
 		"lead": "white",
 		"line": "line-dark",
 		"link": "blue-tint",
+		// Gold on hover, not the light field's `link-blue-hover` — a darker blue on a black
+		// field reads as the link switching off rather than answering. Gold is what every
+		// other interactive state on black already moves to (the drawer's active item, the
+		// open accordion row), and it clears 10.4:1 here.
+		"link-hover": "gold",
 		"meta": "text-meta-dark",
 		"on-accent": "black",
 	),
@@ -95,6 +101,7 @@ $treatments: (
 		"lead": "text-body",
 		"line": "gold-deep",
 		"link": "black",
+		"link-hover": "black",
 		"meta": "text-body",
 		"on-accent": "black",
 	),
@@ -143,6 +150,7 @@ $compositions: (
 	--brand-lead: #{map.get($color, map.get($spec, "lead"))};
 	--brand-line: #{map.get($color, map.get($spec, "line"))};
 	--brand-link: #{map.get($color, map.get($spec, "link"))};
+	--brand-link-hover: #{map.get($color, map.get($spec, "link-hover"))};
 	--brand-meta: #{map.get($color, map.get($spec, "meta"))};
 	--brand-on-accent: #{map.get($color, map.get($spec, "on-accent"))};
 }

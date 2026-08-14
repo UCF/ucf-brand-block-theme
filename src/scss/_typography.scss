@@ -161,7 +161,19 @@ h6 {
 // `brand-` components are excluded: the drawer links, the skip link and the heading anchor
 // carry their own color at (0,1,0), which the `:hover` half of this rule would otherwise
 // outrank. Both halves keep the exclusion so the two states cannot drift apart.
-a:where(:not(.wp-block-button__link, [class*="brand-"])),
-a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
+//
+// This rule is the fallback, not the thing that paints a link. `styles.elements.link` in
+// theme.json is emitted as `:root :where(a:where(:not(.wp-element-button)))` at (0,1,0),
+// which outranks this selector's (0,0,1) — so for as long as that named a token directly,
+// every link on the site was `link-blue` and the `--brand-link` role reached nothing. On a
+// dark field that was a 3.58:1 mid-blue on black. theme.json now reads the role itself, with
+// the token as its `var()` fallback, and this rule stays for links outside a composition.
+a:where(:not(.wp-block-button__link, [class*="brand-"])) {
 	color: var(--brand-link, #{compositions.role-default("link")});
+}
+
+// Hover moves toward the field's own high-contrast text — white on dark — rather than the
+// light field's darker blue, which on black read as the link switching off.
+a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
+	color: var(--brand-link-hover, #{compositions.role-default("link-hover")});
 }
