@@ -21,6 +21,13 @@
 // The editor never runs view.js, so authors always see the stacked (base) layout.
 
 .ucf-tabs__label {
+	// A tab column is as narrow as the tab count makes it, and the display face is set
+	// uppercase at heading size: "ACCELERATING" on its own is wider than a quarter of the
+	// strip at tablet widths. Without this it overflowed the column rather than breaking,
+	// and the next tab's background painted over the overhang — the heading read as
+	// truncated mid-word. Inherited, so the heading and the description are both covered.
+	overflow-wrap: break-word;
+
 	display: flex;
 	flex-direction: column;
 	gap: map.get($space, "30");
@@ -53,6 +60,18 @@
 	line-height: 1.05;
 	margin: 0;
 	text-transform: uppercase;
+}
+
+// The margin only, at three classes. The heading is an H3 inside post content, so the content
+// heading rhythm in _typography.scss matches it at (0,2,1) and the (0,1,0) rule above loses —
+// tab headings were picking up a content heading's bottom margin, where the label's own flex
+// `gap` is what should be spacing them.
+//
+// Scoped to `margin` on purpose: written as a third class on the rule above it, this would
+// also outrank `.is-enhanced .ucf-tabs__heading` (0,2,0) and repaint every idle tab's gold
+// heading black. A specificity bump is only ever safe for the declarations that need it.
+.ucf-tabs .ucf-tabs__heading.ucf-tabs__heading {
+	margin: 0;
 }
 
 // Supporting copy under the tab's heading. Grey rather than body black, so the heading
@@ -132,15 +151,27 @@
 		border-top: 3px solid map.get($color, "line");
 		cursor: pointer;
 		margin: 0;
+		min-height: 4rem;
+		padding: map.get($space, "30");
+
 		// Every tab but the first carries the divider on its leading edge, so there is one
-		// hairline between each pair and none at the ends of the strip. `line-dark` is the
-		// hairline the drawer divides its nav items with (_drawer.scss) — one seam color
-		// for every black surface in the theme.
+		// hairline between each pair. `line-dark` is the hairline the drawer divides its nav
+		// items with (_drawer.scss) — one seam color for every black surface in the theme.
 		&:not(:first-child) {
 			border-left: 1px solid map.get($color, "line-dark");
 		}
-		min-height: 4rem;
-		padding: map.get($space, "30");
+
+		// The strip's outer edges, which the panel's own border stops short of: with nothing
+		// here the first tab had no left edge and the last no right, so the card looked open
+		// at the top while the panel below it was boxed. `line`, not the seam color — this is
+		// the same outline the panel is drawn with, continued upward past the tabs.
+		&:first-child {
+			border-left: 1px solid map.get($color, "line");
+		}
+
+		&:last-child {
+			border-right: 1px solid map.get($color, "line");
+		}
 	}
 
 	// The same hover field the drawer's nav links use (`card-dark`, see _drawer.scss) — one
@@ -170,12 +201,13 @@
 	// headings run to. It was on the heading before, which bottom-aligned the whole stack.
 	.is-enhanced .ucf-tabs__heading {
 		color: map.get($color, "gold");
-		// 24px, in rem so it still tracks the root size. Larger than the `heading-4` preset
-		// the stacked layout uses: in the strip the heading is the tab's whole identity and
-		// has a fixed-width column to fill, so it steps up rather than staying at the size
-		// it takes when it is one heading in a scrolling stack. No preset lands on 24px —
-		// `heading-4` is 1.28rem and `heading-3` is fluid to 1.9rem.
-		font-size: 1.5rem;
+		// 24px at desktop, stepping down toward `heading-4` as the column narrows. Fixed at
+		// 1.5rem the heading was set at full size in a column a quarter of a tablet wide,
+		// which is where the breaking started — the wrap above keeps the words inside the
+		// tab, and this keeps them from needing to break in the first place. The `vw` term
+		// reaches 1.5rem at about a 1200px viewport, so desktop gets the 24px asked for.
+		// No preset lands on 24px: `heading-4` is 1.28rem and `heading-3` is fluid to 1.9rem.
+		font-size: clamp(#{map.get($size, "heading-4")}, 2vw, 1.5rem);
 	}
 
 	// White on the black tab. The `dark` treatment's grey (#B3B3B3) is the usual swap here,

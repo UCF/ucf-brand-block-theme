@@ -130,9 +130,19 @@ h6 {
 	}
 }
 
+// Large on mobile, Extra Large from tablet up. Three rem under a heading is a proportion of
+// a wide column; in a phone's measure the same gap is most of a screen, and the heading
+// stops reading as attached to the copy it introduces.
 .wp-block-post-content h2:not(:last-child),
 .is-root-container h2:not(:last-child) {
-	margin-block-end: map.get($space, "50");
+	margin-block-end: map.get($space, "40");
+}
+
+@media (min-width: $breakpoint-tabs) {
+	.wp-block-post-content h2:not(:last-child),
+	.is-root-container h2:not(:last-child) {
+		margin-block-end: map.get($space, "50");
+	}
 }
 
 // H2 opens a subsection and carries the badge, so it takes Extra Large — the largest step
