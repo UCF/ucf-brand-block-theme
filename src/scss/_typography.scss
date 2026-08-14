@@ -90,6 +90,64 @@ h6 {
 	color: var(--brand-heading, #{compositions.role-default("heading")});
 }
 
+// ── Heading rhythm ───────────────────────────────────────────────────────────
+//
+// Heading margins live here rather than in `styles.elements.*.spacing.margin` in theme.json,
+// which is where they belong on paper and where they do nothing on a page. WordPress emits
+// its layout support as
+//
+//   :root :where(.is-layout-constrained) > * { margin-block-start: 1rem; margin-block-end: 0 }
+//
+// at (0,1,0) — the `:root` carries all of that, the `:where()` none — while theme.json writes
+// element styles as a bare `h2 { … }` at (0,0,1). Post content, groups and columns are all
+// layout containers, so on a real page every heading is a direct child of one and core's rule
+// wins on both axes: the bottom margin is replaced with `0`, the top with the block gap. The
+// margins read as set in theme.json and were inert everywhere anyone would see them.
+//
+// A class in the selector clears (0,1,0) with nothing to spare and no `!important`. Same
+// collision `.brand-section` answers with a doubled class in _sections.scss.
+//
+// `.is-root-container` is the editor canvas's stand-in for `.wp-block-post-content`, which is
+// not present there — see the note in _sections.scss. Keeping both selectors is what makes
+// the editor show the spacing the front end will.
+// `:not(:first-child)` / `:not(:last-child)` are not decoration. Core pairs its layout rule
+// with two exceptions at the same (0,1,0):
+//
+//   :root :where(.is-layout-constrained) > :first-child { margin-block-start: 0 }
+//   :root :where(.is-layout-constrained) > :last-child  { margin-block-end: 0 }
+//
+// which stop a container's own padding being doubled by its first and last child's margins.
+// Outranking the spacing rule outranks those too, so without the exclusions every
+// `.brand-section` — which opens with an H2 — took the band's `padding-block` *plus* a full
+// `$space.60` above its heading. Spacing between siblings is this rule's job; the distance to
+// a container's edge belongs to the container.
+// H2 is not in this loop: it takes Extra Large on both sides, below. Every other level keeps
+// Medium, which is the distance that reads as a heading attached to the copy under it.
+@each $level in h1, h3, h4, h5, h6 {
+	.wp-block-post-content #{$level}:not(:last-child),
+	.is-root-container #{$level}:not(:last-child) {
+		margin-block-end: map.get($space, "30");
+	}
+}
+
+.wp-block-post-content h2:not(:last-child),
+.is-root-container h2:not(:last-child) {
+	margin-block-end: map.get($space, "50");
+}
+
+// H2 opens a subsection and carries the badge, so it takes Extra Large — the largest step
+// meant for type. `$space.60` is named Section: it is the bands' own `padding-block`, and
+// borrowing it here put a heading's margin on the same scale as a whole band's inset.
+.wp-block-post-content h2:not(:first-child),
+.is-root-container h2:not(:first-child) {
+	margin-block-start: map.get($space, "50");
+}
+
+.wp-block-post-content h3:not(:first-child),
+.is-root-container h3:not(:first-child) {
+	margin-block-start: map.get($space, "40");
+}
+
 // `brand-` components are excluded: the drawer links, the skip link and the heading anchor
 // carry their own color at (0,1,0), which the `:hover` half of this rule would otherwise
 // outrank. Both halves keep the exclusion so the two states cannot drift apart.
