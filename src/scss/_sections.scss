@@ -3,18 +3,16 @@
 
 // ── Subsection badges ────────────────────────────────────────────────────────
 //
-// Every H2 in the content is a subsection (it is also a drawer sub-nav entry). Each gets
-// an automatic gold-on-black badge that pairs the page's number with the H2's position —
-// "01.01", "01.02", … The page number arrives as the `--brand-section` custom property,
-// set inline per page in functions.php (ucf_brand_enqueue_assets). On a page with no Brand
-// order that property is unset, so `content` is invalid and the badge simply does not
-// render — no per-page opt-in needed. Sits beside the heading; stacks above it on mobile.
+// CONTEXT: every content H2 is a subsection and gets an automatic badge pairing the page's
+// number with the H2's position — "01.01", "01.02". The page number arrives as
+// `--brand-section`, set inline per page in functions.php.
 //
-// `.is-root-container` is the editor canvas's stand-in for `.wp-block-post-content`, which
-// is not present there. It is editor-only markup, and WP prefixes every `add_editor_style`
-// rule with `.editor-styles-wrapper`, so the extra selector is inert on the front end.
-// The initial `--brand-section` value comes from functions.php (`block_editor_settings_all`);
-// src/js/editor/section-variable.js updates it live when the Brand order field changes.
+// WHY: on a page with no Brand order the property is unset, so `content` is invalid and the
+// badge does not render. No per-page opt-in needed.
+// SYNC: `--brand-section` is set in functions.php and updated live in the editor by
+// src/js/editor/section-variable.js.
+// WHY: `.is-root-container` is the editor's stand-in for `.wp-block-post-content`. WP prefixes
+// every `add_editor_style` rule with `.editor-styles-wrapper`, so it is inert on the front end.
 .wp-block-post-content,
 .is-root-container {
 	counter-reset: brand-subsection;
@@ -53,10 +51,10 @@
 
 // ── Heading anchors ──────────────────────────────────────────────────────────
 //
-// brand-nav.js turns every content H2 into a jump link: clicking the heading (or its
-// anchor icon) updates the URL to the heading's #id and copies that link to the clipboard.
-// The icon fades in on hover/focus; a brief "Link copied" bubble confirms the copy. Scoped
-// to the drawer content, where brand-nav.js actually wires the clicks.
+// brand-nav.js turns every content H2 into a jump link — clicking the heading or its icon
+// copies the #id to the clipboard, confirmed by a brief bubble.
+//
+// WHY: scoped to the drawer content, which is where brand-nav.js actually wires the clicks.
 .brand-content h2 {
 	cursor: pointer;
 }
@@ -105,9 +103,9 @@
 	opacity: 1;
 }
 
-// Section treatments registered as core/group block styles in functions.php.
+// SYNC: section treatments registered as core/group block styles in functions.php.
 
-// Halftone dot field, used over black sections in the prototype.
+// SPEC: halftone dot field, used over black sections in the prototype.
 .is-style-halftone {
 	position: relative;
 
@@ -132,23 +130,20 @@
 
 // ── Color swatches (Identity → Color) ────────────────────────────────────────
 
-// One contiguous band rather than a grid of cards: no gap, no border, no card backing, and
-// each swatch's own color runs the full height of its cell with the label sitting on it.
+// SPEC: one contiguous band, not a grid of cards — no gap, no border, no card backing, each
+// color running the full height of its cell with the label on it.
 //
-// `flex` and not `grid`: the band has to stay contiguous at any number of swatches, and
-// `auto-fit` reserves empty tracks once a row is short — a five-swatch band left a sixth
-// column of page background butted onto the end of it. Flex sizes to what is there.
-// `flex: 1 1 <basis>` keeps every cell equal until they would go narrower than the basis,
-// at which point the row wraps rather than crushing the labels.
+// FIX: `flex`, not `grid`. `auto-fit` reserves empty tracks once a row is short, so a
+// five-swatch band left a sixth column of page background butted onto the end.
+// WHY: `flex: 1 1 <basis>` keeps cells equal until they would go under the basis, then wraps
+// rather than crushing the labels.
 .brand-swatches {
 	display: flex;
 	flex-wrap: wrap;
 }
 
-// The chip is promoted from a band across the top of a card to the cell's whole background,
-// so the body can sit on the color. Markup is untouched — the chip is still a sibling of the
-// body, still carrying core's `has-{slug}-background-color` class, so a swatch keeps
-// tracking its token exactly as before.
+// WHY: the chip is promoted from a band across a card to the cell's whole background, so the
+// body sits on the color. Markup is untouched, so a swatch keeps tracking its token.
 .brand-swatch {
 	align-items: flex-end;
 	display: flex;
@@ -158,19 +153,13 @@
 	position: relative;
 }
 
-// On a phone the band becomes one column of full-width rows, each exactly as tall as its own
-// label. Both halves of that are needed and neither implies the other.
+// WHY: on a phone the band becomes one column of rows, each as tall as its own label. Both
+// halves are needed and neither implies the other.
 //
-// `flex-basis: 100%` because the 150px basis otherwise fits two cells in a ~335px viewport,
-// which leaves the mono value lines wrapping mid-number in half-width cells.
-//
-// `min-height: 0` because the 210px floor is what gives a swatch its proportions on a wide
-// band, where cells are narrow and the color needs room to read as a color. Stacked, that
-// floor is just empty color: nineteen of them turn a reference table into several screens of
-// scrolling to get past.
-//
-// Nothing here touches the parent — `.brand-swatches` keeps the flex default of
-// `align-items: stretch`, which is what still matches cell heights per row above this width.
+// FIX: `flex-basis: 100%` — the 150px basis otherwise fits two cells in a ~335px viewport,
+// wrapping the mono value lines mid-number.
+// WHY: `min-height: 0` — the 210px floor gives a swatch its proportions on a wide band, but
+// stacked it is just empty color, turning a reference table into screens of scrolling.
 @media (max-width: $breakpoint-header) {
 	.brand-swatch {
 		flex-basis: 100%;
@@ -178,15 +167,12 @@
 	}
 }
 
-// Six to a row on desktop, not five. The 150px basis is a minimum, so the count per row is
-// whatever the content column divides into — at `contentSize` (850px) that is five, and the
-// comp asks for six. A basis of `100% / 6` fixes the count instead of leaving it to arithmetic
-// on a width that is set two files away in theme.json: the row holds exactly six, and any
-// change to the content column re-divides rather than dropping a swatch onto a second row.
+// SPEC: six to a row on desktop. The 150px basis divides `contentSize` into five, so a basis
+// of `100% / 6` fixes the count rather than leaving it to arithmetic on a width set in
+// theme.json — any change to the content column re-divides instead of dropping a swatch.
 //
-// Still `flex: 1 1`, so a band of fewer than six grows to fill the width and stays contiguous.
-// Gated at the drawer breakpoint because six cells only have room once the sidebar layout is
-// in play; between here and the phone rule the 150px basis handles the tablet range.
+// WHY: still `flex: 1 1`, so a band of fewer than six grows to fill the width. Gated at the
+// drawer breakpoint, since six cells only have room once the sidebar layout is in play.
 @media (min-width: $breakpoint-drawer) {
 	.brand-swatch {
 		flex-basis: calc(100% / 6);
@@ -221,18 +207,13 @@
 	margin: 0;
 }
 
-// Moving the label onto the color is what makes this necessary. On a card the label always
-// sat on `paper-alt` and one text color was right for every swatch; on the color, UCF Black
-// would print black on black and Link Blue at 3.59:1.
+// A11Y: moving the label onto the color makes this necessary — UCF Black would print black on
+// black and Link Blue lands at 3.59:1. Two values only, both absolute (#000000 or #FFFFFF),
+// with no opacity: a muted line would drop contrast by an amount the swatch decides.
 //
-// Which of the two applies is the author's call, set per swatch by the Label color control —
-// see `labelInk` in src/blocks/color-swatch/index.js. Black is the unset default, so a swatch
-// saved before this control existed keeps the markup it already had and needs no migration.
-//
-// Two values only, and both absolute: #000000 or #FFFFFF, with nothing knocked back by an
-// opacity. A muted second line would take the value text off those two and drop its contrast
-// by an amount that depends on the swatch underneath. The hierarchy between the name and the
-// value line is carried by family, size and weight instead.
+// WHY: which applies is the author's call, per swatch — see `labelInk` in
+// src/blocks/color-swatch/index.js. Black is the unset default, so already-saved swatches keep
+// the markup they have and need no migration.
 .brand-swatch__body {
 	color: map.get($color, "black");
 }
@@ -248,16 +229,12 @@
 
 // ── Swatch hex copy ──────────────────────────────────────────────────────────
 //
-// The heading-anchor gesture, on the HEX line: hovering fades in a clipboard icon and a
-// click copies the value, confirmed by a brief "Copied" bubble. Built at runtime by
-// `src/blocks/color-swatch/view.js` — the saved markup is a bare text node, so nothing here
-// paints until that script runs, which is the point. The affordance and the behavior arrive
-// together or not at all.
+// The heading-anchor gesture on the HEX line: hover fades in a clipboard icon, a click copies.
 //
-// Deliberately the same shape as `.brand-heading__anchor` above rather than a variant of it:
-// a shared class would have to be neutral about the two contexts, and this one lives on an
-// arbitrary swatch color while that one lives on the page background. Keep them in step by
-// eye; they are twenty lines apart.
+// WHY: built at runtime by src/blocks/color-swatch/view.js, and the saved markup is a bare
+// text node — so the affordance and the behavior arrive together or not at all.
+// SYNC: deliberately the same shape as `.brand-heading__anchor` above, not a variant. A shared
+// class would have to be neutral about a swatch color and the page background both.
 .brand-swatch__hex {
 	cursor: pointer;
 }
@@ -283,16 +260,16 @@
 	}
 }
 
-// Focus is not a hover state but needs the same reveal, or the icon is a control a keyboard
-// can reach and not see. `:focus-within` on the line covers it because the button is inside.
+// A11Y: focus needs the same reveal as hover, or the icon is a control a keyboard can reach
+// and not see. `:focus-within` on the line covers it, since the button is inside.
 .brand-swatch__hex:hover .brand-swatch__copy,
 .brand-swatch__hex:focus-within .brand-swatch__copy,
 .brand-swatch__hex.is-copied .brand-swatch__copy {
 	opacity: 0.7;
 }
 
-// currentColor, not a token: the button sits on the swatch's own color, and the label ink is
-// already the one value known to read against it.
+// A11Y: `currentColor`, not a token — the button sits on the swatch's own color, and the
+// label ink is already the one value known to read against it.
 .brand-swatch__copy:focus-visible {
 	opacity: 1;
 	outline: 2px solid currentColor;
@@ -317,8 +294,8 @@
 	white-space: nowrap;
 }
 
-// A black bubble on UCF Black is a bubble nobody can see. The swatch already knows which of
-// the two inks reads against it, so the bubble takes the opposite pair on the same signal.
+// A11Y: a black bubble on UCF Black is invisible. The swatch already knows which ink reads
+// against it, so the bubble takes the opposite pair on the same signal.
 .brand-swatch.is-label-light .brand-swatch__copy::after {
 	background: map.get($color, "white");
 	color: map.get($color, "black");
@@ -351,15 +328,14 @@
 
 // ── Type specimens (Identity → Typography) ───────────────────────────────────
 //
-// A specimen row is a plain core Group carrying this block style; its contents are an
-// eyebrow paragraph and a sample paragraph whose face and size are set through ordinary
-// block controls. No bespoke classes, so editors can build one from the inserter.
+// WHY: a plain core Group carrying this block style, its contents set through ordinary block
+// controls. No bespoke classes, so an editor can build one from the inserter.
 
 .is-style-specimen {
 	border-top: 1px solid map.get($color, "line");
 	padding-block: map.get($space, "40");
 
-	// The sample is the last thing in the row and should sit tight under its label.
+	// WHY: the sample is last in the row and should sit tight under its label.
 	> :last-child {
 		margin-bottom: 0;
 	}
@@ -398,21 +374,20 @@
 
 // ── Section band ─────────────────────────────────────────────────────────────
 //
-// A full-width content section: `.brand-section` is a core Group (tagName `section`, aligned
-// full) carrying the section's vertical rhythm. It has no background of its own — set one from
-// the block's color control (any palette slug) if the section should read as a band. It bleeds
-// to the content-column edges via the alignfull rule in _drawer.scss; `padding-inline` (the
-// inherited `--brand-gutter`) restores the reading inset so its content lines up with the rest
-// of the page, and the baked-in H2 keeps its automatic subsection badge. Built from
-// patterns/sections/section.php.
+// A core Group (tagName `section`, aligned full) carrying the section's vertical rhythm, built
+// from patterns/sections/section.php.
+//
+// WHY: no background of its own — an editor sets one from the block's color control if the
+// section should read as a band. It bleeds to the column edges via the alignfull rule in
+// _drawer.scss, and `padding-inline` restores the reading inset.
 .brand-section {
 	padding-block: map.get($space, "60");
 	padding-inline: var(--brand-gutter);
 }
 
-// Bands stack flush: their own `padding-block` supplies the vertical rhythm, so cancel the
-// flow block-gap (`:root :where(.is-layout-constrained) > *`, at (0,1,0)) that would otherwise
-// leave a strip of page background above each band. The doubled class outranks that rule.
+// UPSTREAM: bands stack flush on their own `padding-block`, so cancel core's flow block-gap
+// (`:root :where(.is-layout-constrained) > *`, (0,1,0)), which leaves a strip of page
+// background above each band. The doubled class outranks it.
 .brand-section.brand-section {
 	margin-block: 0;
 }

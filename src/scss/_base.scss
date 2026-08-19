@@ -2,8 +2,8 @@
 @use "compositions";
 @use "variables" as *;
 
-// `clip` rather than `hidden`: an `overflow: hidden` ancestor silently disables
-// `position: sticky` on every descendant, which would break the drawer.
+// FIX: `clip`, never `hidden` — an `overflow: hidden` ancestor silently disables
+// `position: sticky` on every descendant, and the drawer is sticky.
 html {
 	overflow-x: clip;
 	scroll-behavior: smooth;
@@ -15,21 +15,14 @@ body {
 	text-rendering: optimizeLegibility;
 }
 
-// Content centers on the reading measure. Core's constrained layout already centers the
-// children of `.wp-block-post-content` (and any nested constrained group) with `margin-inline:
-// auto`, which is exactly what this layout wants now: the reading column sits centered in the
-// track that `.brand-content` fills, and full-width sections bleed to the track edges (see the
-// `.alignfull` rule in _drawer.scss). So there is nothing to override here — core does it.
-
-// Reading Width: content fills the 850px area by default (the `contentSize` token); this
-// opt-in block style (registered in functions.php) narrows a block to the 756px reading
-// measure for long-form copy. It narrows from the *right* so the block keeps its normal
-// centered 850 box and the text stays flush-left with the rest of the content instead of
-// floating centered at 756. `box-sizing: border-box` + `max-width: 850` pin the box to 850,
-// then `padding-right` of the (content − reading) difference eats *into* that box — content
-// 756, box 850. (Plain `padding-right` alone would sit outside the content-box and grow the
-// block to 944, pushing it left.) The doubled class lifts specificity to (0,2,0). Below the
-// drawer breakpoint the column is already narrow, so the inset is dropped.
+// Reading Width: an opt-in block style (registered in functions.php) narrowing a block from
+// the 850px content area to the 756px reading measure.
+//
+// WHY: it narrows from the *right* so the block keeps its centered 850 box and the text stays
+// flush-left with the rest of the content instead of floating centered at 756.
+// WHY: `border-box` + `max-width` pin the box at 850, then `padding-right` eats into it. Plain
+// `padding-right` would sit outside the content box and grow the block to 944, pushing it left.
+// UPSTREAM: the doubled class lifts this to (0,2,0), over core's layout rule.
 .is-style-reading-width.is-style-reading-width {
 	box-sizing: border-box;
 	max-width: var(--wp--style--global--content-size);
@@ -42,8 +35,7 @@ body {
 	}
 }
 
-// Brand rule: square corners everywhere. Buttons opt back in via theme.json only if
-// a future component needs it.
+// SPEC: square corners everywhere. Buttons opt back in via theme.json if one ever needs it.
 button,
 input,
 select,
@@ -65,7 +57,7 @@ textarea,
 	}
 }
 
-// Off-screen but announced — used for the "Link copied" live region in brand-nav.js.
+// A11Y: off-screen but announced — the "Link copied" live region in brand-nav.js.
 .brand-visually-hidden {
 	border: 0;
 	clip-path: inset(50%);
@@ -96,10 +88,9 @@ textarea,
 	}
 }
 
-// Core's separator inherits `currentColor`, which makes it as dark as the copy around it.
-// Point it at the hairline role instead, so a pattern gets the field-appropriate rule
-// without naming a color token. An editor who sets one explicitly still wins — preset
-// color classes carry `!important`.
+// UPSTREAM: core's separator inherits `currentColor`, making it as dark as the copy. The
+// hairline role gives a pattern the field-appropriate rule without naming a token; an editor
+// who sets one explicitly still wins, since preset color classes carry `!important`.
 .wp-block-separator {
 	border-color: var(--brand-line, #{compositions.role-default("line")});
 }

@@ -3,38 +3,25 @@
 
 // ── Site header ──────────────────────────────────────────────────────────────
 //
-// The black band with the gold rule: the university lockup at the left, MyUCF at the
-// right. Markup is parts/header.html plus ucf-brand/site-mark (includes/branding.php).
+// The black band with the gold rule: university lockup left, MyUCF right. Markup is
+// parts/header.html plus ucf-brand/site-mark (includes/branding.php).
 //
-// The bar's height is the `headerHeight` token and nothing here sets it. The drawer pins
-// to that same token and sizes its scroll area against it, so a height written twice is a
-// drawer that floats over a gap — see _drawer.scss, which also owns the sticky rule and
-// the reasoning behind it.
-//
-// The header is deliberately edge-to-edge rather than wrapped at `--wp--custom--wrap`:
-// its dividers are meant to read as part of the page frame, alongside the drawer's right
-// edge. The footer still wraps, because it is content.
+// SYNC: the bar's height is the `headerHeight` token and nothing here sets it — the drawer
+// pins to that same token, so a height written twice is a drawer floating over a gap.
+// WHY: deliberately edge-to-edge rather than wrapped at `--wp--custom--wrap`; the dividers
+// read as part of the page frame. The footer still wraps, because it is content.
 
 .brand-header {
 	min-height: $header-height;
 
-	// Both zeroes are load-bearing, and neither is redundant. `wp-block-styles` ships
-	//
-	//   :where(.wp-block-group.has-background) { padding: 1.25em 2.375em }
-	//
-	// which every group carrying a background silently inherits — this bar included, since
-	// it is the black field. That is 20px of block padding, which would stop the dividers
-	// short of the gold rule, and 38px of inline padding, which stacked on top of the
-	// mark's own inset and left the logo sitting 66px from the edge but 28px from its
-	// divider. The bar owns its whole box; each cell inside carries the only inset.
+	// UPSTREAM: `wp-block-styles` pads every `.has-background` group (1.25em/2.375em), which
+	// stops the dividers short of the gold rule and offsets the logo. Both zeroes are needed.
 	padding-block: 0;
 	padding-inline: 0;
 }
 
-// One link, not two. The mark and the wordmark point at the same place, so wrapping both
-// gives assistive technology a single control with a single name. That name is the
-// `aria-label` the block renders — which is why the image is alt="" and why the wordmark
-// below can be display: none on narrow screens without the link going nameless.
+// A11Y: one link wrapping both mark and wordmark, named by the block's `aria-label` —
+// which is why the image is alt="" and the wordmark can hide without the link going nameless.
 .brand-header__lockup {
 	align-items: stretch;
 	align-self: stretch;
@@ -49,9 +36,8 @@
 	}
 }
 
-// `height` + `width: auto` rather than a fixed box: the mark's proportions come from the
-// SVG's own viewBox, so a replacement logo of a different shape needs no CSS change. That
-// is the whole point of keeping it a file — see includes/branding.php.
+// WHY: `height` + `width: auto` rather than a fixed box — the mark's proportions come from
+// the SVG's own viewBox, so a replacement logo of another shape needs no CSS change.
 .brand-header__mark {
 	align-items: center;
 	border-inline-end: 1px solid map.get($color, "line-dark");
@@ -65,9 +51,8 @@
 	}
 }
 
-// Montserrat, not the Oswald the rest of the theme's uppercase type uses. The wordmark is
-// the university's chrome sitting above the guide; the drawer masthead beneath it is the
-// guide's own title, and the two should not read as the same voice.
+// SPEC: Montserrat, not the Oswald the rest of the theme's uppercase type uses. This is the
+// university's chrome; the drawer masthead below is the guide's own voice.
 .brand-header__wordmark {
 	align-items: center;
 	border-inline-end: 1px solid map.get($color, "line-dark");
@@ -82,21 +67,12 @@
 	white-space: nowrap;
 }
 
-// MyUCF rides on theme.json's button element treatment — gold, black, uppercase, 800 —
-// and only trims it. The padding there is sized for a call to action in a page band and
-// would outgrow the bar.
-//
-// The person glyph is a mask rather than an <img> so it is painted with `currentColor`,
-// which means it inverts with the button's hover state for free and never needs a second
-// file in the opposite color.
-// The inset is padding, not margin, and deliberately so: core's layout support emits
-//
-//   .is-layout-flex > :is(*, div) { margin: 0 }
-//
-// whose `:is()` takes the specificity of its most specific argument, making it (0,1,1) —
-// enough to beat a plain class here and silently zero any margin this rule sets. Padding
-// is untouched by it, and it matches how the mark carries its own inset, so the button
-// ends up exactly as far from the right edge as the logo is from the left.
+// WHY: rides on theme.json's button element treatment and only trims it — that padding is
+// sized for a call to action in a page band and would outgrow the bar.
+// WHY: the person glyph is a mask rather than an <img>, so `currentColor` paints it and it
+// inverts with the hover state for free.
+// UPSTREAM: the inset is padding, not margin. Core emits `.is-layout-flex > :is(*, div)
+// { margin: 0 }` at (0,1,1), which silently zeroes any margin this rule sets.
 .brand-header__actions {
 	align-self: center;
 	padding-inline-end: clamp(1rem, 2vw, 1.75rem);
@@ -122,19 +98,15 @@
 	}
 }
 
-// Below this the lockup and the action stop fitting on one line. The wordmark stays — it
-// is the university's name and the bar should not reduce to an unlabelled glyph — so it
-// wraps to two lines instead, and the bar keeps its height by growing rather than by
-// dropping anything.
+// WHY: below this the lockup and the action stop fitting on one line. The wordmark wraps to
+// two rather than dropping — the bar should not reduce to an unlabelled glyph.
 @media (max-width: $breakpoint-header) {
 	.brand-header__mark {
 		padding-inline: 0.85rem;
 	}
 
-	// `max-width` is what picks the break, and it is tuned to land after "of": at this
-	// size "University of Central" overruns it and "Central Florida" does not. Tracking
-	// comes down with the size because 0.16em of it on a 10px face is most of the width.
-	// Anything much longer than the current label wants a look at this number.
+	// SPEC: `max-width` picks the break and is tuned to land after "of". Tracking comes down
+	// with the size; anything much longer than the current label wants a look at this number.
 	.brand-header__wordmark {
 		font-size: map.get($size, "meta");
 		letter-spacing: 0.08em;
