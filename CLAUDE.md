@@ -119,8 +119,7 @@ rules — `_drawer.scss` was 24% comments, most of it restating the CSS undernea
 not to write less reasoning. It is to tag each comment with the kind of reason it gives, and
 cap what that kind is worth.
 
-**Every comment opens with a tag.** The tag says what kind of reason follows, so a reader
-skimming for "what will break if I touch this" can tell in one word.
+**Every prose comment opens with a tag.** The tag says what kind of reason follows, so a reader skimming for "what will break if I touch this" can tell in one word. (Structural dividers / file-title banners like `// ── … ──` are allowed untagged.)
 
 | Tag         | Use when                                                        |
 | ----------- | ---------------------------------------------------------------- |
