@@ -141,7 +141,7 @@ Four rules:
     declaration itself. `CONTEXT:` is the one exception — use it wherever real information is
     missing, and keep it brief; the block in `_drawer.scss` spends its length on a diagram,
     not on more sentences.
--   **Untagged means restatement — delete it.** If a comment does not earn a tag, the code
+-   **Untagged prose means restatement — delete it.** If a comment does not earn a tag, the code
     below it already says the same thing.
 -   **Compress the important context; delete the edge case.** Do not relocate it to a doc.
     Two tiers means two things to keep in step, which is the drift this theme already knows
