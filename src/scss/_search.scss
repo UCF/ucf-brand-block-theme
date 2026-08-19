@@ -4,7 +4,7 @@
 
 // ── Search results ───────────────────────────────────────────────────────────
 //
-// The subsection deep links ucf-brand/search-subsections renders beneath each result — see
+// CONTEXT: the subsection deep links ucf-brand/search-subsections renders beneath each result — see
 // includes/search.php. The sidebar's own input is styled in _drawer.scss.
 //
 // WHY: colors go through `--brand-*` roles, not palette tokens, so a result list dropped
