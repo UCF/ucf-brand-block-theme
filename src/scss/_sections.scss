@@ -229,7 +229,7 @@
 
 // ── Swatch hex copy ──────────────────────────────────────────────────────────
 //
-// The heading-anchor gesture on the HEX line: hover fades in a clipboard icon, a click copies.
+// CONTEXT: the heading-anchor gesture on the HEX line: hover fades in a clipboard icon, a click copies.
 //
 // WHY: built at runtime by src/blocks/color-swatch/view.js, and the saved markup is a bare
 // text node — so the affordance and the behavior arrive together or not at all.
