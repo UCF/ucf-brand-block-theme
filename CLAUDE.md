@@ -109,4 +109,57 @@ These are about how to make a change here, not about what the theme is.
     compares stale code against stale code and proves nothing.
 -   **This codebase documents _why_, not _what_.** Comments here explain reasoning and record
     bugs that already shipped. Match that when adding code, and when moving code keep its
-    comment with it — including the file paths it references.
+    comment with it — including the file paths it references. Every comment is tagged and
+    budgeted — see [Comments](#comments) below.
+
+## Comments
+
+Documenting _why_ is right, and unbudgeted it produced twenty-line essays above four-line
+rules — `_drawer.scss` was 24% comments, most of it restating the CSS underneath. The fix is
+not to write less reasoning. It is to tag each comment with the kind of reason it gives, and
+cap what that kind is worth.
+
+**Every comment opens with a tag.** The tag says what kind of reason follows, so a reader
+skimming for "what will break if I touch this" can tell in one word.
+
+| Tag         | Use when                                                        |
+| ----------- | ---------------------------------------------------------------- |
+| `WHY:`      | Someone would reasonably delete or "simplify" this               |
+| `FIX:`      | This shipped broken once and the rule is what stops it recurring |
+| `UPSTREAM:` | The cause is in code we do not own — WP core, a browser, a lib   |
+| `SYNC:`     | Something elsewhere depends on this exact value                  |
+| `SPEC:`     | The comp dictates the value; it is not ours to normalize         |
+| `A11Y:`     | Removing it breaks assistive tech or fails the axe suite         |
+| `SAFETY:`   | The escaping method or its **order** is load-bearing             |
+| `PERF:`     | The obvious rewrite is correct but slower                        |
+| `CONTEXT:`  | Something is missing that the code cannot show — keep it short   |
+| `TODO:`     | Work not yet done. A different axis: meant to be deleted         |
+
+Four rules:
+
+-   **Two lines per comment, five for a file header.** A short `FIX:` rides on the
+    declaration itself. `CONTEXT:` is the one exception — use it wherever real information is
+    missing, and keep it brief; the block in `_drawer.scss` spends its length on a diagram,
+    not on more sentences.
+-   **Untagged means restatement — delete it.** If a comment does not earn a tag, the code
+    below it already says the same thing.
+-   **Compress the important context; delete the edge case.** Do not relocate it to a doc.
+    Two tiers means two things to keep in step, which is the drift this theme already knows
+    about. `git log -p` holds whatever gets cut, and that is the right place for it.
+-   **Most specific tag wins, and history goes in the text.** The drawer's contrast bug is
+    both a `FIX:` and an `A11Y:`; it is tagged `A11Y:` and says it shipped that way.
+
+The domain tags earn their slot by being rare, so keep their tests narrow. `A11Y:` is not for
+any code that touches ARIA — `role="tab"` in a tablist is just the implementation. `SAFETY:`
+is not for a routine `esc_html()` on output; it is for `ucf_brand_highlight_terms()` in
+`includes/search.php`, where escaping each run *before* joining is what makes `<mark>`
+survive, and the obvious order is silently wrong.
+
+`SYNC:` is the one worth grepping. `grep -rn "SYNC:" src/ includes/` returns every
+hand-maintained coupling in the theme — `$breakpoint-tabs` against `TABS_QUERY`, a `save()`
+against the markup already in the database — which is the list to read before a refactor.
+
+**`src/scss/_drawer.scss` is the reference.** It is converted; the rest of `src/scss/`,
+`includes/`, and `src/js/` are not yet. Convert a file when you are already working in it,
+and check the result the way that one was checked: strip the comments from both versions and
+diff. Nothing but comments may move.
