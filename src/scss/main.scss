@@ -1,9 +1,8 @@
 // UCF Brand Block Theme
 //
-// Compiled to build/css/main.css via `npm run build`. Do not edit the compiled CSS.
-// Load order matters: variables first, then compositions, then base, then components.
-// `compositions` is listed ahead of `base` because `base` depends on it — Sass emits a
-// module's CSS at its first load in the graph, so the order here matches the output.
+// WHY: load order is output order — Sass emits a module's CSS at its first load in the
+// graph, so `compositions` precedes `base`, which depends on it.
+// Compiled to build/css/main.css by `npm run build`. Never edit the compiled CSS.
 
 @use "variables";
 @use "compositions";
