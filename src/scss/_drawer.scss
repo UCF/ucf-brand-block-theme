@@ -5,21 +5,18 @@
 
 // ── The shell ────────────────────────────────────────────────────────────────
 //
-// How the drawer "stops at the footer" with zero JavaScript:
+// CONTEXT: how the drawer "stops at the footer" with zero JavaScript.
 //
-//   <main class="brand-shell">   ← sticky containing block
-//     <aside class="brand-sidebar">  position: sticky
+//   <main class="brand-shell">      ← sticky containing block
+//     <aside class="brand-sidebar">   position: sticky
 //     <div class="brand-content">
 //   </main>
-//   <footer>                     ← sibling, OUTSIDE the shell
+//   <footer>                        ← sibling, OUTSIDE the shell
 //
-// A sticky element can never travel past the bottom of its parent, so the sidebar
-// unpins exactly where <main> ends — which is exactly where the footer begins.
-//
-// `align-items: start` is load-bearing. The grid default of `stretch` would make the
-// sidebar full-height, leaving it nothing to scroll within and making sticky a no-op.
+// Sticky can't pass the bottom of its parent, so the rail unpins where <main> ends.
+// Moving <footer> inside the shell, or giving the sidebar a fillable height, breaks it.
 
-// The drawer pins to `top: $header-height`, so the header has to actually be there —
+// WHY: the drawer pins to $header-height, so the header has to actually occupy it —
 // otherwise the drawer floats over a gap where the header used to be.
 .wp-site-blocks > header {
 	min-height: $header-height;
@@ -28,24 +25,16 @@
 	z-index: 1200;
 }
 
-// Core's flow layout inserts `margin-block-start: var(--wp--style--block-gap)` between
-// every sibling:
-//
-//   :where(.wp-site-blocks) > *      { margin-block-start: 1rem }
-//   :root :where(.is-layout-flow) > * { margin-block-start: 1rem }
-//
-// On the page frame that reads as stray stripes of page background — above the drawer
-// (pushing it out of register with the header it pins beneath), below the content, and
-// above the footer. It also knocks the content column 1rem out of alignment with the
-// drawer's top edge. This frame is deliberately edge-to-edge, so opt every piece of it
-// out. The doubled class clears `:root :where(…)`, which is (0,1,0).
+// UPSTREAM: flow layout puts `margin-block-start` between every sibling, which on this
+// edge-to-edge frame reads as stray stripes of page background. Doubled class clears
+// `:root :where(.is-layout-flow) > *`, which is (0,1,0).
 .wp-site-blocks > *,
 .brand-shell.brand-shell > * {
 	margin-block: 0;
 }
 
 .brand-shell {
-	align-items: start;
+	align-items: start; // FIX: the grid default `stretch` makes sticky a no-op.
 	display: grid;
 	grid-template-columns: #{$sidebar-width} minmax(0, 1fr);
 	margin-inline: auto;
@@ -53,23 +42,9 @@
 	padding: 0;
 }
 
-// The drawer is its own scroll container, exactly the height of the viewport strip below the
-// header, pinned there. A bottom-anchored variant (`sticky bottom: 0` on a content-height
-// rail) was tried and reverted: with the rail almost exactly viewport-height it resolves to
-// the same top pin anyway, and it gives up the guarantee that the black column fills the
-// strip. Revealing the footer at the end of the page is handled in brand-nav.js instead —
-// see syncDrawerToPageEnd() there.
-//
-// The treatment is declared, not just the background. The rail's own chrome paints itself
-// with direct tokens below — it is fixed and must not invert — but the sidebar *footer* is
-// core blocks (site-title, paragraphs) carrying `is-style-meta`, and those read `--brand-*`
-// roles by definition. Without this include they resolved `role-default()`, which is the
-// light row: `#565656` meta and `#1F6A9A` links, painted on black at 2.86:1 and 3.58:1.
-// Shipped that way, and axe caught it on 39 pages. The values the dark row already points
-// at — `text-meta-dark` and `blue-tint` — clear AA at 6.08:1 and 10.90:1.
-//
-// Note what this is NOT: the light-row tokens are correct on a light field and are used
-// across the theme. The bug was the drawer selecting the wrong row, never the values.
+// WHY: its own scroll container — exactly the viewport strip below the header, pinned there.
+// A11Y: the treatment, not just a background. The footer's core blocks read `--brand-*`
+// roles, and shipped resolving the light row on black at 2.86:1.
 .brand-sidebar {
 	@include compositions.treatment("dark");
 
@@ -85,7 +60,7 @@
 	position: sticky;
 	top: $header-height;
 
-	// The drawer is chrome, not content — its scrollbar is visual noise.
+	// WHY: the drawer is chrome, not content — its scrollbar is visual noise.
 	-ms-overflow-style: none;
 	scrollbar-width: none;
 
@@ -145,51 +120,33 @@
 	}
 }
 
-// The sidebar's content comes from a template part invoked without a `tagName`, so WP wraps
-// it in `<div class="wp-block-template-part">`. `display: contents` drops that wrapper from
-// the box tree so the part's own blocks are the sidebar's flex children — anything the
-// sidebar's flex column is asked to do to them (alignment, sizing) reaches them directly
-// instead of being absorbed by a wrapper they'd be nested inside.
+// UPSTREAM: a template part invoked without a `tagName` gets wrapped in a div. Dropping the
+// wrapper from the box tree makes the part's blocks the sidebar's own flex children.
 .brand-sidebar > .wp-block-template-part {
 	display: contents;
 }
 
-// The content column: an 850px content area (the `contentSize` token) centered in the grid
-// beside the sidebar. It fills the whole grid track (a grid item justifies to `stretch` by
-// default, so no width cap or centering here). The reading content is held to 850 and centered
-// *inside* it by core's constrained layout on `.wp-block-post-content`, while full-width
-// sections bleed to the track edges — so a colored section band spans the full column. The
-// gutter is a token, applied here so the title and all content share one inset. See
-// templates/page.html.
+// WHY: fills the grid track; core's constrained layout holds the reading content to 850
+// inside it, so full-width bands can bleed to the track edges.
 .brand-content {
 	--brand-gutter: clamp(1.5rem, 4vw, 3.4rem);
 
 	box-sizing: border-box;
 	min-width: 0;
-	// No bottom inset. The column used to carry one, which stacked on top of whatever
-	// vertical rhythm the last block already had — section bands and the hero supply their
-	// own `padding-block` — so the gap above the site footer read as a stray strip of page
-	// background rather than as spacing belonging to anything.
+	// FIX: no bottom inset. It used to stack on the vertical rhythm the last block
+	// already had, reading as a stray strip of page background above the footer.
 	padding-block: map.get($space, "50") 0;
 	padding-inline: var(--brand-gutter);
 }
 
-// A hero leads the column flush with the header: its image has to reach the top edge, and it
-// carries its own vertical rhythm through the hero block's padding controls. Pages without a
-// hero are untouched.
+// WHY: a hero leads the column flush with the header — its image reaches the top edge
+// and it carries its own rhythm. Pages without a hero are untouched.
 .brand-content:has(> .brand-hero:first-child) {
 	padding-block-start: 0;
 }
 
-// Full-bleed: cancel the band gutter so image/color backgrounds reach the content-column
-// edges, then restore it as padding so the callout's own inner content keeps the reading
-// inset and lines up with the rest of the page. An editor's own horizontal padding, set
-// inline via the block's dimension controls, still wins over this default.
-//
-// Both levels of the column qualify: bands an editor aligns full inside the page content,
-// and the hero, which the template places as a direct child of the column rather than inside
-// `<post-content>`. Symmetric padding doesn't move a centered box, so the restored gutter
-// leaves the constrained content lined up either way.
+// WHY: cancel the band gutter so backgrounds reach the column edges, then restore it as
+// padding so inner content keeps the reading inset. Both levels of the column qualify.
 .brand-content > .alignfull,
 .brand-content .wp-block-post-content > .alignfull {
 	margin-inline: calc(-1 * var(--brand-gutter)) !important;
@@ -204,18 +161,8 @@
 
 // ── Sidebar masthead ─────────────────────────────────────────────────────────
 //
-// Both lines come from the site's own identity fields — core/site-title and
-// core/site-tagline, set in Settings → General — rather than being typed into
-// parts/brand-sidebar.html. The masthead names the guide, so it should say whatever the
-// install says it is, and the tagline had nowhere else to appear once the header became
-// the university lockup.
-//
-// The masthead's colors are direct tokens rather than `--brand-*` roles — it is fixed
-// chrome and must not invert. That reasoning covers this block and the nav, not the whole
-// rail: the sidebar footer is core blocks that read roles, which is why `.brand-sidebar`
-// declares the dark treatment above. Read this paragraph as scoped to the masthead.
-// "Always the black rail, must not invert" is the direct-token test in
-// docs/architecture.md — it is about a component's own chrome, not about its contents.
+// Both lines come from the site's identity fields, not from parts/brand-sidebar.html.
+// Colors are direct tokens, not `--brand-*` roles: fixed chrome, must not invert.
 
 .brand-sidebar__brand {
 	display: block;
@@ -239,9 +186,8 @@
 	}
 }
 
-// Gold and bold rather than the grey mono it used to be. This is the drawer's one piece
-// of branding — it labels what the guide *is* — so it reads as a companion to the title
-// above it, not as the caption the `meta` idiom would make it.
+// WHY: gold and bold rather than the grey mono it used to be — this is the drawer's one
+// piece of branding, a companion to the title, not the caption `meta` would make it.
 .brand-sidebar__sub {
 	color: map.get($color, "gold");
 	font-family: map.get($font, "body");
@@ -255,20 +201,34 @@
 
 // ── Sidebar footer, in flow after the nav ────────────────────────────────────
 //
-// It sits directly below the last nav item and scrolls away with it, rather than being
-// pinned to the bottom of the drawer viewport — the contact line is reference material,
-// not chrome that needs to stay on screen. It still carries the drawer's bottom inset
-// (the scroll area's own bottom padding is dropped so this sits flush).
+// WHY: scrolls away with the last nav item rather than pinning to the drawer's bottom —
+// the version line is reference material, not chrome that needs to stay on screen.
 
 .brand-sidebar__footer {
 	padding: map.get($space, "40") 1.3rem map.get($space, "50");
 }
 
-// ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
+// WHY: core/site-title plus build version on one meta line, matching the old static
+// "… - VERSION 1.0".
+.brand-sidebar__version {
+	align-items: baseline;
+	gap: 0.4rem;
 
-// Markup is rendered server-side from the ordered section list — see
-// ucf_brand_render_section_nav() in functions.php. Each link is a number + a title;
-// brand-nav.js appends the H2 sub-nav inside the `.is-current` item.
+	p {
+		margin: 0;
+		text-transform: uppercase;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+}
+
+// ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
+//
+// WHY: markup is server-rendered from the ordered section list — see
+// ucf_brand_render_section_nav() in functions.php. brand-nav.js appends the H2 sub-nav.
 
 .brand-nav__list {
 	list-style: none;
@@ -309,11 +269,8 @@
 	min-width: 1.6em;
 }
 
-// The same chevron primitive the accordion uses, closing the row at its far edge.
-// Nav uses the disclosure convention: it points right when collapsed and spins down
-// on the current (expanded) item. Quiet by default; `margin-left: auto` pins it
-// right, and `align-self: center` overrides the link's baseline alignment so it sits
-// on the text's optical center.
+// WHY: the accordion's chevron primitive on the disclosure convention — right when
+// collapsed, down on the current item. `align-self` overrides the link's baseline.
 .brand-nav__icon {
 	@include chevron(0.42em, $rotation: -45deg);
 	align-self: center;
@@ -324,7 +281,7 @@
 	width: 1em;
 }
 
-// Set server-side on the item matching the request (aria-current="page").
+// WHY: set server-side on the item matching the request (aria-current="page").
 .brand-nav__item.is-current > .brand-nav__link {
 	background: map.get($color, "card-dark");
 	border-left-color: map.get($color, "gold");
@@ -334,8 +291,7 @@
 		color: map.get($color, "gold");
 	}
 
-	// The current section is the expanded one (its sub-nav is shown), so its chevron
-	// spins from right down to ∨ and goes gold.
+	// WHY: the current section is the expanded one, so its chevron spins down to ∨.
 	.brand-nav__icon {
 		@include chevron-rotate(45deg);
 		color: map.get($color, "gold");
@@ -379,12 +335,9 @@
 
 // ── Mobile bar, off-canvas drawer, scrim ─────────────────────────────────────
 
-// The bar and scrim live in parts/mobile-bar.html so the three drawer templates share one
-// copy. Core always wraps a template part in a div — there is no opt-out — and that wrapper
-// would become the containing block for the `position: sticky` bar below. Its height is
-// exactly the bar's height, so the bar would have nowhere to travel and would silently stop
-// sticking. `display: contents` removes the wrapper from the box tree entirely, restoring
-// the flow the markup had when it was pasted inline in each template. Load-bearing.
+// UPSTREAM: a template part is always wrapped in a div, and that wrapper would become the
+// containing block for the sticky bar below — same height as the bar, so it would
+// silently stop sticking. Load-bearing.
 .brand-mobile-bar-part {
 	display: contents;
 }

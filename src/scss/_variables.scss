@@ -1,8 +1,7 @@
 // Sass-level aliases for theme.json presets.
 //
-// Values are always `--wp--preset--*` / `--wp--custom--*` custom properties, never
-// literals. A token that does not exist in theme.json does not belong here — add it
-// there first. See CLAUDE.md.
+// WHY: values are always `--wp--preset--*` / `--wp--custom--*`, never literals. A token
+// that is not in theme.json does not belong here — add it there first. See CLAUDE.md.
 
 $color: (
 	"gold": var(--wp--preset--color--gold),
@@ -32,10 +31,8 @@ $font: (
 	"mono": var(--wp--preset--font-family--mono),
 );
 
-// Keys match theme.json slugs exactly. Note that WordPress kebab-cases slugs when it
-// generates CSS variables and `has-*-font-size` classes, so a slug like `h1` becomes
-// `--wp--preset--font-size--h-1`. Every slug here is already kebab-stable, which keeps
-// the two names identical and the mapping obvious.
+// UPSTREAM: WordPress kebab-cases slugs when generating CSS vars, so `h1` would become
+// `--wp--preset--font-size--h-1`. Every slug here is already kebab-stable.
 $size: (
 	"meta": var(--wp--preset--font-size--meta),
 	"eyebrow": var(--wp--preset--font-size--eyebrow),
@@ -57,29 +54,25 @@ $space: (
 	"60": var(--wp--preset--spacing--60),
 );
 
-// High-emphasis text on the black drawer. Not a palette color — it must not show up
+// WHY: high-emphasis text on the black drawer. Not a palette color — it must not appear
 // in the editor's color picker, so it lives in settings.custom.
 $text-on-dark: var(--wp--custom--text-on-dark);
 
-// The accordion's closed heading label. Comes from the comp and matches no palette grey —
-// it sits between `text-secondary` (#565656) and `text-body` (#1A1A1A). Scoped to the one
-// component that asked for it rather than added to the palette, so it stays out of the
-// editor's color picker until something else needs it. Same reasoning as $text-on-dark.
+// SPEC: the comp's own grey, matching no palette value — between `text-secondary`
+// (#565656) and `text-body` (#1A1A1A). Scoped here, so it stays out of the color picker.
 $accordion-heading: var(--wp--custom--accordion-heading);
 
 $sidebar-width: var(--wp--custom--sidebar-width);
 $header-height: var(--wp--custom--header-height);
 $wrap: var(--wp--custom--wrap);
 
-// The single breakpoint where the drawer becomes off-canvas. Mirrors the prototype.
+// SPEC: where the drawer becomes off-canvas. Mirrors the prototype.
 $breakpoint-drawer: 960px;
 
-// Where the header's wordmark and the MyUCF action stop fitting on one line. Measured
-// against the longest of the two — "University of Central Florida" at its tracking — not
-// picked off a device list, which is why it does not match either breakpoint here.
+// SPEC: where the wordmark and the MyUCF action stop fitting on one line — measured
+// against "University of Central Florida" at its tracking, not picked off a device list.
 $breakpoint-header: 600px;
 
-// At and above this width, Tabs engage (tab strip + one visible panel); below it they
-// collapse to a stacked label→panel reading order. Deliberately below $breakpoint-drawer
-// so tabs persist through tablet. Kept in sync by hand with TABS_QUERY in src/blocks/tabs/view.js.
+// SYNC: TABS_QUERY in src/blocks/tabs/view.js — the grid and the script must agree on
+// where tabs engage. Deliberately below $breakpoint-drawer so tabs persist through tablet.
 $breakpoint-tabs: 768px;
