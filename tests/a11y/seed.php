@@ -506,8 +506,9 @@ function ucf_brand_a11y_seed_variants() {
  * `is-style-on-dark` is the exception, and `src/scss/_compositions.scss` says so where it is
  * defined — it "supplies the treatment only". It sets the `--brand-*` roles the helper
  * classes read and deliberately sets no background and no base `color`; both come from the
- * block's own color controls. `templates/front-page.html` is the reference usage, and it
- * supplies both: a black `.brand-shell` around a group carrying `textColor: "white"`.
+ * block's own color controls. `templates/front-page.html` used to be the reference usage —
+ * it supplied both, a black `.brand-shell` around a group carrying `textColor: "white"` —
+ * and that template is gone; the pairing it demonstrated is reproduced below instead.
  *
  * Audited on a bare page it produces five guaranteed failures — a near-black heading on
  * black, plus a gold eyebrow, grey meta, grey muted and a tint-blue link on white. Not one is

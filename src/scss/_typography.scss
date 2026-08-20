@@ -2,13 +2,12 @@
 @use "compositions";
 @use "variables" as *;
 
-// Each rule is paired with its `.is-style-*` selector so a registered block style and
-// a hand-applied class share one definition. Matches ucf-wordpress-block-theme.
+// ── Typography ───────────────────────────────────────────────────────────────
 //
-// This file assigns roles — `.lead` takes the lead color role — but never decides what a
-// role is worth. Both the live value (`--brand-lead`) and the no-composition fallback
-// (`compositions.role-default()`) come from _compositions.scss, so no color token is
-// named here.
+// WHY: each rule pairs with its `.is-style-*` selector so a registered block style and a
+// hand-applied class share one definition. Matches ucf-wordpress-block-theme.
+// WHY: this file assigns roles but never decides what a role is worth — both the live value
+// and the fallback come from _compositions.scss, so no color token is named here.
 
 .lead,
 .is-style-lead {
@@ -20,33 +19,24 @@
 	text-transform: none;
 }
 
-// Mono, letterspaced, rule-prefixed label. Reserved for eyebrows, meta and numbers —
-// never body copy.
+// WHY: reserved for eyebrows, meta and numbers — never body copy. It paints no background
+// of its own; the field it sits on supplies that.
+// SPEC: no leading rule. It competed with the accent rule under the title, and the comp sets
+// the label with nothing before it.
 .eyebrow,
 .is-style-eyebrow {
-	align-items: center;
 	color: var(--brand-eyebrow, #{compositions.role-default("eyebrow")});
-	display: flex;
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "eyebrow");
 	font-weight: 700;
-	gap: 0.7rem;
 	letter-spacing: 0.22em;
 	margin-bottom: map.get($space, "30");
 	text-transform: uppercase;
-
-	&::before {
-		background: currentcolor;
-		content: "";
-		display: inline-block;
-		height: 2px;
-		width: 26px;
-	}
 }
 
-// De-emphasized body copy. Same family and size as `p` — only the color role differs, so
-// a pattern can ask for grey copy without naming a token and freezing it to a light field.
-// `.meta` is not a substitute: it also switches to mono at meta size.
+// WHY: only the color role differs from `p`, so a pattern can ask for grey copy without
+// naming a token and freezing it to a light field. `.meta` also switches to mono, so it is
+// not a substitute.
 .muted,
 .is-style-muted {
 	color: var(--brand-body-muted, #{compositions.role-default("body-muted")});
@@ -62,32 +52,28 @@
 	text-transform: none;
 }
 
-// The bound section label above the page title (templates/page.html) collapses on pages
-// that have no Brand order set, so the binding resolves to an empty string.
+// UPSTREAM: the bound section label renders an empty element on pages with no Brand order
+// set, because the binding resolves to an empty string.
 .brand-page-number:empty {
 	display: none;
 }
 
-// Body copy and links read the same `--brand-*` properties the helper classes do. Which
-// background declares them, and why they are properties rather than descendant selectors,
-// is documented in _compositions.scss.
-//
-// `--brand-body` falls back to `inherit` so that outside a declared background nothing
-// changes — copy keeps inheriting whatever the page sets. `:hover` is listed alongside the
-// base link so the pair outranks theme.json's own `:root :where(a:hover)` color, which is
-// otherwise the more specific of the two.
+// WHY: `--brand-body` falls back to `inherit`, so outside a declared background nothing
+// changes and copy keeps inheriting whatever the page sets.
 p,
 li {
 	color: var(--brand-body, inherit);
 }
 
-// Headings are black on a light field rather than the `text-body` they used to inherit
-// from `styles.color.text`. Deliberately a role and not `styles.elements.heading.color` in
-// theme.json: WordPress emits that as `:root :where(h1, …, h6) { color: … }`, a rule that
-// matches the heading itself, and a matching rule always beats a color inherited from an
-// ancestor no matter the specificity. Every heading inside a Dark section — the footer, the
-// header, the halftone heroes — would have gone black on black. The role resolves from the
-// nearest composition instead, so a heading follows whatever field it lands on.
+// WHY: an element margin is enough here — a list item is a child of the `ul`, not of a
+// layout container, so core's layout rules do not reach it and no class is needed.
+li {
+	margin-bottom: 2px;
+}
+
+// A11Y: a role, not `styles.elements.heading.color`. WordPress emits that as
+// `:root :where(h1, …, h6)`, which matches the heading itself and so always beats a color
+// inherited from an ancestor — every heading in a Dark section would have gone black on black.
 h1,
 h2,
 h3,
@@ -97,10 +83,64 @@ h6 {
 	color: var(--brand-heading, #{compositions.role-default("heading")});
 }
 
-// `brand-` components are excluded: the drawer links, the skip link and the heading anchor
-// carry their own color at (0,1,0), which the `:hover` half of this rule would otherwise
-// outrank. Both halves keep the exclusion so the two states cannot drift apart.
-a:where(:not(.wp-block-button__link, [class*="brand-"])),
-a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
+// ── Heading rhythm ───────────────────────────────────────────────────────────
+//
+// UPSTREAM: heading margins live here, not in theme.json. Core emits its layout support as
+// `:root :where(.is-layout-constrained) > *` at (0,1,0) while theme.json writes element styles
+// as a bare `h2` at (0,0,1) — so on a real page core replaces both margins and theme.json's
+// were inert. A class in the selector clears (0,1,0) with no `!important`.
+//
+// FIX: `:not(:first-child)` / `:not(:last-child)` are load-bearing. Core pairs its rule with
+// first/last-child exceptions at the same (0,1,0), so outranking one outranks those too —
+// without the exclusions every `.brand-section` took the band's padding *plus* a full step.
+// WHY: `.is-root-container` is the editor's stand-in for `.wp-block-post-content`; both
+// selectors are what make the editor show the spacing the front end will.
+// WHY: H2 is excluded from the loop — it takes Extra Large on both sides, below.
+@each $level in h1, h3, h4, h5, h6 {
+	.wp-block-post-content #{$level}:not(:last-child),
+	.is-root-container #{$level}:not(:last-child) {
+		margin-block-end: map.get($space, "30");
+	}
+}
+
+// WHY: Large on mobile, Extra Large from tablet up. Three rem under a heading is a proportion
+// of a wide column; in a phone's measure it is most of a screen.
+.wp-block-post-content h2:not(:last-child),
+.is-root-container h2:not(:last-child) {
+	margin-block-end: map.get($space, "40");
+}
+
+@media (min-width: $breakpoint-tabs) {
+	.wp-block-post-content h2:not(:last-child),
+	.is-root-container h2:not(:last-child) {
+		margin-block-end: map.get($space, "50");
+	}
+}
+
+// WHY: H2 opens a subsection, so it takes Extra Large — the largest step meant for type.
+// `$space.60` is the bands' own `padding-block` and is not a type scale.
+.wp-block-post-content h2:not(:first-child),
+.is-root-container h2:not(:first-child) {
+	margin-block-start: map.get($space, "50");
+}
+
+.wp-block-post-content h3:not(:first-child),
+.is-root-container h3:not(:first-child) {
+	margin-block-start: map.get($space, "40");
+}
+
+// A11Y: this is the fallback, not what paints a link. theme.json's `styles.elements.link` is
+// emitted at (0,1,0) and outranks this (0,0,1) — while that named a token directly, every
+// link was `link-blue`, which on a dark field was 3.58:1 on black. theme.json reads the role
+// itself now, and this rule stays for links outside a composition.
+// WHY: `brand-` components are excluded — the drawer links, skip link and heading anchor
+// carry their own color at (0,1,0), which the `:hover` half would otherwise outrank.
+a:where(:not(.wp-block-button__link, [class*="brand-"])) {
 	color: var(--brand-link, #{compositions.role-default("link")});
+}
+
+// WHY: hover moves toward the field's own high-contrast text rather than the light field's
+// darker blue, which on black read as the link switching off.
+a:where(:not(.wp-block-button__link, [class*="brand-"])):hover {
+	color: var(--brand-link-hover, #{compositions.role-default("link-hover")});
 }

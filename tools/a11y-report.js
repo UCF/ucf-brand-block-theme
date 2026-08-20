@@ -39,7 +39,7 @@ const MAX_FINDINGS = 25;
  * row sitting next to each other.
  *
  * Tag plus class list is what survives both, and it is also what a fix is written against —
- * nobody styles `[aria-current]` here, they style `.brand-sidebar__version`.
+ * nobody styles `[aria-current]` here, they style `.brand-sidebar__title`.
  *
  * @param {Object} node Compact node record.
  * @return {string} Signature.

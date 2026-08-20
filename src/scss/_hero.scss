@@ -4,72 +4,52 @@
 
 // ── Page hero ────────────────────────────────────────────────────────────────
 //
-// The band at the top of every brand page: the featured image behind a scrim, with the
-// section eyebrow, the page title, an accent rule and two lines of copy sitting on it.
-// Built from core blocks in templates/page.html, inside the `ucf-brand/page-hero` wrapper —
-// a container that holds no content and exists so the editor has a block type it can keep
-// unlocked. See src/blocks/page-hero/index.js for why that indirection is needed.
+// CONTEXT: the band at the top of every brand page — featured image behind a scrim, with
+// the eyebrow, title, accent rule and copy on it. Built from core blocks in
+// templates/page.html inside the `ucf-brand/page-hero` wrapper, which holds no content and
+// exists so the editor has a block type it can keep unlocked (src/blocks/page-hero/index.js).
+// The blocks own the measure, the padding and the scrim; this file owns the stacking.
 //
-// The wrapper carries `is-style-dark`, so every color in the hero resolves through the dark
-// composition's `--brand-*` roles and nothing here or in the template names a token. That
-// class is also the no-image failure mode: `core/post-featured-image` renders *nothing* when
-// a page has no featured image — not even its overlay — so the composition's own black fill
-// is what shows through. A black hero with legible copy, rather than dark type on a white
-// field.
-//
-// What the blocks still own: the reading measure (core's constrained layout on the wrapper,
-// reading `contentSize`), the vertical padding (the wrapper's spacing control), and the
-// scrim (the featured image's own `dimRatio` + `gradient` controls, pointed at the `scrim`
-// preset in theme.json). What is left is the stacking, which is this file.
-//
-// On contrast: the copy sits on a photograph, so legibility cannot depend on the photo. The
-// `scrim` gradient is opaque enough at the bottom (0.85–0.95 alpha over the lower half,
-// where the copy is) that white type clears 4.5:1 against a *white* frame, which is the
-// worst case. That is also why the closing note is ordinary body copy rather than
-// `is-style-muted` — grey-on-photo is the one thing this band cannot afford.
+// WHY: the wrapper carries `is-style-dark`, so every color resolves through the dark
+// composition and nothing here names a token. It is also the no-image failure mode —
+// `core/post-featured-image` renders nothing at all without an image, so the composition's
+// own black fill shows through: a black hero with legible copy, not dark type on white.
+// A11Y: the copy sits on a photograph, so the `scrim` gradient (0.85–0.95 alpha over the
+// lower half) is what clears 4.5:1, measured against a white frame as the worst case. It is
+// also why the closing note is body copy, not `is-style-muted` — grey-on-photo cannot work.
 
 .brand-hero {
 	display: flex;
 	flex-direction: column;
 
-	// The copy stack has more air than the 1rem default block gap: at hero scale the eyebrow,
-	// title and copy need to read as three separate marks, not a paragraph. `gap` rather than
-	// a `* + *` margin because the featured image is the first child and is out of flow —
-	// flex gap skips it, an adjacent-sibling margin would not.
-	gap: map.get($space, "40");
+	// WHY: `gap` rather than a `* + *` margin — the featured image is the first child and out
+	// of flow, which flex gap skips and an adjacent-sibling margin would not.
+	// WHY: deliberately small. This is the eyebrow-to-title distance, the tightest pair in the
+	// band; everything below the title asks for more air through its own margin.
+	gap: map.get($space, "20");
 	justify-content: flex-end;
 	min-height: 40vh;
 
-	// Never `hidden`: an `overflow: hidden` ancestor kills `position: sticky` on every
+	// FIX: never `hidden` — an `overflow: hidden` ancestor kills `position: sticky` on every
 	// descendant, and the drawer is sticky. See CLAUDE.md.
 	overflow-x: clip;
 	position: relative;
 }
 
-// Core's constrained layout gives every child `max-width: contentSize` *and*
-// `margin-inline: auto !important`. In a flex container those auto margins beat
-// `align-items: stretch`, so each child shrinks to fit its own content and floats to the
-// middle of the band — unnoticeable on the full-measure paragraphs, obvious on a short
-// title. Giving each in-flow child a full-width basis puts the capping back on `max-width`
-// and leaves the auto margins centering a box that is already the measure. Same move as the
-// accent rule below, for the same reason.
-//
-// `position` is the other half: painting order puts *every* positioned box above every
-// non-positioned one whatever the source order, so the absolutely positioned image below
-// would cover copy that is merely later in the document. Giving the copy a position of its
-// own puts it back on top. Core does the same thing to `.wp-block-cover__inner-container`.
+// UPSTREAM: core's constrained layout gives every child `margin-inline: auto !important`,
+// which in a flex container beats `align-items: stretch` — a short title floats to the
+// middle of the band. A full-width basis puts the capping back on `max-width`.
+// UPSTREAM: painting order puts every positioned box above non-positioned ones whatever the
+// source order, so the absolute image would cover the copy. `position` puts it back on top.
 .brand-hero > *:not(.wp-block-post-featured-image) {
 	position: relative;
 	width: 100%;
 }
 
-// The image and its scrim fill the band. `inset: 0` resolves against the wrapper's *padding*
-// box, which runs to the inner border edge — so the image covers the hero's own padding
-// rather than being inset by it, and no negative offsets are needed to undo it.
-//
-// `align: full` on the block is load-bearing: core's constrained layout caps every child at
-// `contentSize` except the ones it excludes by alignment class, and a capped `max-width`
-// would apply here even though the element is out of flow.
+// WHY: `inset: 0` resolves against the wrapper's *padding* box, so the image covers the
+// hero's own padding rather than being inset by it. No negative offsets needed.
+// UPSTREAM: `align: full` on the block is load-bearing — core's constrained layout would
+// otherwise cap this at `contentSize` even though the element is out of flow.
 .brand-hero > .wp-block-post-featured-image {
 	inset: 0;
 	margin: 0;
@@ -82,35 +62,41 @@
 	}
 }
 
-// A bound paragraph whose meta field is empty still renders as an empty `<p>`, which would
-// open a gap in the stack. Same treatment as `.brand-page-number:empty` in _typography.scss.
+// UPSTREAM: a bound paragraph with an empty meta field still renders an empty `<p>`, which
+// opens a gap in the stack. Same as `.brand-page-number:empty` in _typography.scss.
 .brand-hero p:empty {
 	display: none;
 }
 
+// FIX: the eyebrow's and the separator's own block margins land on top of the flex gap
+// rather than collapsing into it — three different distances in a stack that declares one.
+.brand-hero .is-style-eyebrow,
+.brand-hero .wp-block-separator {
+	margin-block: 0;
+}
+
+// FIX: half-leading is the other half of that distance — the eyebrow's line box is taller
+// than its caps, so the gap measured from empty space. At 0.72rem it is one line anyway.
+.brand-hero .is-style-eyebrow {
+	line-height: 1;
+}
+
+// WHY: the closing note answers the deck rather than continuing it, so it gets the one
+// larger step in the band.
+.brand-hero > p:last-child {
+	margin-top: map.get($space, "30");
+}
+
 // ── Accent rule ──────────────────────────────────────────────────────────────
-//
-// A core Separator carrying the block style registered in functions.php: short, heavy and
-// left-anchored rather than core's centered hairline. Reads `--brand-accent`, so it is gold
-// on the hero, the deeper gold on a Bold Gold field, and correct anywhere else without the
-// pattern that uses it naming a color.
-//
-// Two pieces of core have to be answered, and the selector and the technique each answer
-// one:
-//
-//   width   `.wp-block-separator:not(.is-style-wide):not(.is-style-dots)` sets `100px` at
-//           (0,3,0), which a plain `.wp-block-separator.is-style-accent-rule` at (0,2,0)
-//           loses to. Mirroring core's own `:not()` chain lifts this to (0,4,0) and reads
-//           as what it is — the same selector, one class more specific.
-//
-//   offset  The constrained layout centers every child with `margin-inline: auto
-//           !important`, so a 110px-wide rule lands in the middle of the column no matter
-//           what this file says about margins. Rather than answer an `!important` with
-//           another one, the element stays the full reading measure — auto margins on a box
-//           that already fills the column are a no-op — and the bar is painted into its
-//           leading 110px as a background rather than drawn as a border. Same reasoning as
-//           `.is-style-reading-width` in _base.scss, which is the one place this codebase
-//           handles the constrained-layout centering.
+// CONTEXT: core Separator with the block style from functions.php — short, heavy, left-anchored;
+// reads `--brand-accent` so no pattern needs to name a color.
+// UPSTREAM: core sets `100px` at (0,3,0) through its own `:not()` chain, which a plain
+// `.is-style-accent-rule` at (0,2,0) loses to. Mirroring that chain lifts this to (0,4,0).
+// UPSTREAM: the constrained layout centers every child with `margin-inline: auto
+// !important`. Rather than answer one `!important` with another, the element stays the full
+// measure — auto margins on a box that already fills the column are a no-op — and the bar is
+// painted into its leading 110px as a background. Same as `.is-style-reading-width` in
+// _base.scss.
 .wp-block-separator.is-style-accent-rule:not(.is-style-wide):not(.is-style-dots) {
 	background-image: linear-gradient(
 		var(--brand-accent, #{compositions.role-default("accent")}) 0 0

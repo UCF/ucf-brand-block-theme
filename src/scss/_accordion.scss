@@ -4,26 +4,21 @@
 
 // ── Brand accordion ──────────────────────────────────────────────────────────
 //
-// A branded treatment for core's native Accordion block (core/accordion), applied
-// through the "Brand" block style. Core owns the disclosure behavior — the toggle
-// runs on the Interactivity API and the .wp-block-accordion-* markup is core's — so
-// this partial only restyles it; there is no theme JS and no custom block.
+// A branded treatment for core's Accordion block, applied through the "Brand" block style.
+// Core owns the disclosure behavior (Interactivity API) and the markup, so this partial only
+// restyles it — no theme JS, no custom block.
 //
-// Keep the accordion headings at H3. An H2 here would feed the drawer sub-nav and
-// pick up the gold subsection badge, and its copy-link click would fight the toggle
-// (see _sections.scss / brand-nav.js). H3 keeps the accordion self-contained.
+// WHY: keep the headings at H3. An H2 would feed the drawer sub-nav, pick up the gold
+// subsection badge, and its copy-link click would fight the toggle — see _sections.scss.
 
 .wp-block-accordion.is-style-brand {
-	// Rows are separated by a bottom rule, so the last row carries none (nothing
-	// follows it to divide). Grey while closed. The rule is drawn as an inset
-	// pseudo-element rather than a `border-bottom` so it stops short of both edges
-	// and lines up with the heading label — a border always spans the item's full box.
+	// WHY: the divider is an inset pseudo-element rather than a `border-bottom` so it stops
+	// short of both edges and lines up with the heading label. Grey while closed.
 	.wp-block-accordion-item {
 		position: relative;
 
-		// Core's flow layout drops a `margin-block-start: 1rem` between the items via
-		// `:root :where(.is-layout-flow) > *`. The rows butt against their dividers here,
-		// so zero that gap out.
+		// UPSTREAM: core's flow layout drops `margin-block-start: 1rem` between items; the
+		// rows butt against their dividers here.
 		&:not(:first-child) {
 			margin-block-start: 0;
 		}
@@ -38,36 +33,28 @@
 		}
 	}
 
-	// The gold accent marks the header row only, not the panel beside it. The
-	// transparent border is always present so opening a row cannot shift its label
+	// WHY: the transparent border is always present, so opening a row cannot shift its label
 	// sideways — same trick as the drawer's active-item rule.
 	.wp-block-accordion-heading {
 		border-left: 3px solid transparent;
 		margin: 0;
 	}
 
-	// The clickable header, in the theme's display/uppercase/letterspaced label idiom.
-	// Closed rows sit at a lighter grey-black; the open row goes full ink below so the
-	// active section reads darkest.
-	//
-	// The closed grey is the comp's own value, not a palette token — see $accordion-heading
-	// in _variables.scss for why it is scoped here. The chevron below deliberately stays at
-	// `text-secondary`: it used to match this label exactly, and now sits a step lighter,
-	// which is the "closed rows keep it quiet" intent rather than drift.
+	// SPEC: the closed grey is the comp's own value, not a palette token — see
+	// $accordion-heading in _variables.scss. The chevron sits a step lighter on purpose.
 	.wp-block-accordion-heading__toggle {
 		color: $accordion-heading;
 		font-family: map.get($font, "display");
 		font-size: var(--wp--preset--font-size--heading-4);
 		font-weight: 700;
-		letter-spacing: 0.12em;
+		// WHY: no letter-spacing. Tracking belongs to the theme's label idioms (eyebrow, meta,
+		// badge); at heading-4 in the condensed face it cost a full row of width on a long title.
 		padding: var(--wp--preset--spacing--30);
 		text-transform: uppercase;
 	}
 
-	// A badge dropped into the heading label baseline-aligns by default, which sits it
-	// low against the large cap-height display type. `vertical-align` only centers on
-	// the x-height midpoint, still low — so make the label a flex line and center its
-	// children (the text run and the badge) on each other instead.
+	// WHY: a badge in the label baseline-aligns low against the large cap-height display
+	// type, and `vertical-align` only reaches the x-height midpoint. Flex centering instead.
 	.wp-block-accordion-heading__toggle-title {
 		align-items: center;
 		display: flex;
@@ -75,18 +62,28 @@
 		gap: 0.5em;
 	}
 
-	// Core underlines the title on hover; swap that for a brand gold shift.
+	// UPSTREAM: core underlines the title on hover; swap that for the brand's own state.
 	.wp-block-accordion-heading__toggle:hover .wp-block-accordion-heading__toggle-title {
-		border-left-color: map.get($color, "gold");
-		// color: map.get($color, "gold-deep");
 		text-decoration: none;
 	}
 
-	// Core's icon is a literal "+" glyph that it rotates 45° into an × when the row
-	// opens. The brand mark is our chevron primitive instead, so hide the glyph —
-	// `visibility: hidden` rather than `font-size: 0`, which would collapse the
-	// em-sized box the arms are positioned inside — and draw the chevron over it.
-	// Closed rows keep it quiet; only the open row goes gold via `currentColor`.
+	// WHY: three steps on one ramp — closed (no rule, grey), hover (grey rule, darker label),
+	// open (gold rule, ink). Grey not a dimmer gold: two golds read as one accent.
+	// WHY: the border lives on `.wp-block-accordion-heading`, so `:hover` goes there and no
+	// `:has()` is needed. Excluded on the open row, already at the end of both ramps.
+	// FIX: pointer-only — `:hover` sticks after a tap, leaving a row looking half-open.
+	@media (hover: hover) {
+		.wp-block-accordion-item:not(.is-open) > .wp-block-accordion-heading:hover {
+			border-left-color: map.get($color, "text-secondary");
+
+			.wp-block-accordion-heading__toggle {
+				color: map.get($color, "text-body");
+			}
+		}
+	}
+
+	// UPSTREAM: core's icon is a "+" it rotates into an ×. Hide it and draw the chevron over
+	// it — `visibility: hidden`, not `font-size: 0`, which collapses the em box the arms need.
 	.wp-block-accordion-heading__toggle-icon {
 		@include chevron;
 		color: map.get($color, "text-secondary");
@@ -94,10 +91,8 @@
 		font-size: map.get($size, "ui");
 	}
 
-	// The open row's bottom rule goes gold and full-width — the "bottom of an open
-	// tab" — overriding the grey divider, and drawn even on the last row (whose divider
-	// is otherwise suppressed) by forcing the pseudo-element back on. Unlike the inset
-	// grey dividers, this one runs edge to edge.
+	// WHY: the open row's rule goes gold and runs edge to edge — the "bottom of an open tab" —
+	// overriding the grey divider, and drawn even on the last row, whose divider is suppressed.
 	.wp-block-accordion-item.is-open {
 		&::after {
 			border-bottom: 1px solid map.get($color, "gold");
@@ -112,21 +107,18 @@
 			border-left-color: map.get($color, "gold");
 		}
 
-		// The open row's label goes full ink, a step darker than the closed rows.
 		> .wp-block-accordion-heading .wp-block-accordion-heading__toggle {
 			color: map.get($color, "ink");
 		}
 
-		// Core rotates the whole icon span 45° when open (its "+"-to-×). We spin the
-		// chevron ourselves, so cancel that rotation on the span, then aim ∨ up to ∧.
+		// UPSTREAM: core rotates the icon span 45° when open; cancel it, then aim ∨ up to ∧.
 		> .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon {
 			@include chevron-rotate(225deg);
 			transform: none;
 		}
 	}
 
-	// Give the revealed panel room before the next rule, and align it with the
-	// heading label rather than the border.
+	// WHY: aligns the revealed panel with the heading label rather than the border.
 	.wp-block-accordion-panel {
 		border-left: 3px solid transparent;
 		padding: 0 map.get($space, "30") map.get($space, "30");
