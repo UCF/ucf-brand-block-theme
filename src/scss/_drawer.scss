@@ -202,27 +202,10 @@
 // ── Sidebar footer, in flow after the nav ────────────────────────────────────
 //
 // WHY: scrolls away with the last nav item rather than pinning to the drawer's bottom —
-// the version line is reference material, not chrome that needs to stay on screen.
+// the contact line is reference material, not chrome that needs to stay on screen.
 
 .brand-sidebar__footer {
 	padding: map.get($space, "40") 1.3rem map.get($space, "50");
-}
-
-// WHY: core/site-title plus build version on one meta line, matching the old static
-// "… - VERSION 1.0".
-.brand-sidebar__version {
-	align-items: baseline;
-	gap: 0.4rem;
-
-	p {
-		margin: 0;
-		text-transform: uppercase;
-	}
-
-	a {
-		color: inherit;
-		text-decoration: none;
-	}
 }
 
 // ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
