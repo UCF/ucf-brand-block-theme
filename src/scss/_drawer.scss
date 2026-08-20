@@ -392,6 +392,10 @@
 		width: 40px;
 	}
 
+	// core/site-title with `level: 0` and `isLink: false`, so this lands on a bare `<p>` —
+	// the same element the label was before it went dynamic. It carries
+	// `.wp-block-site-title` too, whose core rules are equal-specificity; main.css is
+	// enqueued after the block library, so these win on order.
 	.brand-mobile-bar__label {
 		color: map.get($color, "white");
 		font-family: map.get($font, "display");
