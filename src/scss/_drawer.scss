@@ -15,15 +15,10 @@
 //
 // Sticky can't pass the bottom of its parent, so the rail unpins where <main> ends.
 // Moving <footer> inside the shell, or giving the sidebar a fillable height, breaks it.
-
-// WHY: the drawer pins to $header-height, so the header has to actually occupy it —
-// otherwise the drawer floats over a gap where the header used to be.
-.wp-site-blocks > header {
-	min-height: $header-height;
-	position: sticky;
-	top: 0;
-	z-index: 1200;
-}
+//
+// CONTEXT: nothing is pinned above the shell. The bar over it is the University Header
+// (includes/university-header.php), which sits in normal flow outside .wp-site-blocks and
+// scrolls away — so the rail pins to the viewport top, not to an offset.
 
 // UPSTREAM: flow layout puts `margin-block-start` between every sibling, which on this
 // edge-to-edge frame reads as stray stripes of page background. Doubled class clears
@@ -42,7 +37,7 @@
 	padding: 0;
 }
 
-// WHY: its own scroll container — exactly the viewport strip below the header, pinned there.
+// WHY: its own scroll container — a full viewport strip, pinned to the top of it.
 // A11Y: the treatment, not just a background. The footer's core blocks read `--brand-*`
 // roles, and shipped resolving the light row on black at 2.86:1.
 .brand-sidebar {
@@ -53,12 +48,12 @@
 	color: map.get($color, "white");
 	display: flex;
 	flex-direction: column;
-	height: calc(100vh - #{$header-height});
+	height: 100vh;
 	overflow-y: auto;
 	overscroll-behavior: contain;
 	padding: map.get($space, "40") 0 0;
 	position: sticky;
-	top: $header-height;
+	top: 0;
 
 	// WHY: the drawer is chrome, not content — its scrollbar is visual noise.
 	-ms-overflow-style: none;
@@ -371,15 +366,18 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 
+	// SYNC: `min-height` is the $mobile-bar-height token and the padding below only has to
+	// fit inside it — _base.scss offsets every in-page anchor by that same token.
 	.brand-mobile-bar {
 		align-items: center;
 		background: map.get($color, "black");
 		border-bottom: 1px solid map.get($color, "line-dark");
 		display: flex;
 		gap: 0.8rem;
+		min-height: $mobile-bar-height;
 		padding: 0.6rem 1rem;
 		position: sticky;
-		top: $header-height;
+		top: 0;
 		z-index: 1100;
 	}
 

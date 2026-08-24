@@ -27,7 +27,7 @@ $ucf_brand_includes = array(
 	'blocks',             // Static custom blocks compiled from src/blocks/.
 	'block-styles',       // register_block_style() for core blocks.
 	'pattern-categories', // The units → groups → sections → pages ladder.
-	'branding',           // The header's university lockup block and its logo asset.
+	'university-header',  // The UCF University Header: its script tag and placeholder.
 	'meta',               // Per-page fields: brand number, hero deck and note.
 	'sections',           // Section numbering, ordering and the number binding.
 	'section-nav',        // The drawer's server-rendered navigation block.

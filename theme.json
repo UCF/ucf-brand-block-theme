@@ -118,7 +118,7 @@
 			"textOnDark": "#EAEAEA",
 			"accordionHeading": "#444444",
 			"sidebarWidth": "288px",
-			"headerHeight": "56px",
+			"mobileBarHeight": "60px",
 			"wrap": "1160px",
 			"readingWidth": "756px"
 		},

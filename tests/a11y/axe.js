@@ -154,20 +154,30 @@ async function auditPage( page, testInfo, target ) {
 	}
 
 	/*
-	 * A cover's background video is excluded from the audit. axe reaches inside the embed and
-	 * audits YouTube's own player — `#movie_player`, the channel-avatar button, the title bar
-	 * — reporting three violations in markup this theme neither writes nor can change.
+	 * Two exclusions, both the same argument: markup this theme neither writes nor can change.
 	 *
-	 * CONTEXT: dormant as things stand. No template, pattern or fixture ships a cover video
-	 * since the home hero's URL was taken out, so nothing matches this today. It is kept
-	 * because the failure it prevents is baffling rather than informative: the first author
-	 * to set a video on the home page would otherwise turn the suite red with Google's
-	 * accessibility bugs and no obvious link to anything in this repository.
+	 * `#ucfhb` is the University Header, built at runtime by universityheader.ucf.edu (see
+	 * includes/university-header.php). UCF's terms forbid altering it locally, so a violation
+	 * inside it is not a finding this repository can act on — and because the bar is on every
+	 * page, an un-excluded one would fail every audit in the suite at once and gate every
+	 * merge behind someone else's fix. The placeholder div the theme *does* own is one empty
+	 * element with no content to audit.
+	 *
+	 * This hides nothing known: audited on its own at 1280 and 360, the bar reports zero
+	 * WCAG A/AA violations as of WordPress 7.0.2. The exclusion is about who could act on a
+	 * future one, not about a current failure.
+	 *
+	 * A cover's background video is the older case: axe reaches inside the embed and audits
+	 * YouTube's own player — `#movie_player`, the channel-avatar button, the title bar —
+	 * reporting three violations in Google's markup. It is dormant as things stand, since no
+	 * template, pattern or fixture ships a cover video any more, and kept because the failure
+	 * it prevents is baffling rather than informative.
 	 */
 	const results = await new AxeBuilder( { page } )
 		.withTags( WCAG_TAGS )
 		.exclude(
-			'.wp-block-cover__embed-background iframe[src*="youtube.com"], ' +
+			'#ucfhb, ' +
+				'.wp-block-cover__embed-background iframe[src*="youtube.com"], ' +
 				'.wp-block-cover__embed-background iframe[src*="youtu.be"]'
 		)
 		.analyze();

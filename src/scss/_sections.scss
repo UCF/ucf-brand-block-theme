@@ -160,7 +160,7 @@
 // wrapping the mono value lines mid-number.
 // WHY: `min-height: 0` — the 210px floor gives a swatch its proportions on a wide band, but
 // stacked it is just empty color, turning a reference table into screens of scrolling.
-@media (max-width: $breakpoint-header) {
+@media (max-width: $breakpoint-phone) {
 	.brand-swatch {
 		flex-basis: 100%;
 		min-height: 0;

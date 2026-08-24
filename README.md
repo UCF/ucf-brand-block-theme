@@ -25,7 +25,7 @@ is in `build/`, and `assets/` holds only static files that are neither.**
 | `includes/` | All PHP behavior, one topic per file (table below). |
 | `functions.php` | A loader for `includes/` and nothing else. |
 | `templates/` | Page templates: `404`, `front-page`, `index`, `page`, `search`, `single`. |
-| `parts/` | Template parts: `header`, `footer`, `brand-sidebar`, `mobile-bar`. |
+| `parts/` | Template parts: `footer`, `brand-sidebar`, `mobile-bar`. |
 | `patterns/` | Block patterns, filed by rung of the composition ladder. |
 | `theme.json` | Every design token: palette, type scale, spacing, layout, webfonts. |
 | `style.css` | Theme header only — name, version, requirements. No CSS. |
@@ -40,6 +40,7 @@ is in `build/`, and `assets/` holds only static files that are neither.**
 | `blocks.php` | Static custom block registration |
 | `block-styles.php` | Every `register_block_style()` |
 | `pattern-categories.php` | The four pattern categories |
+| `university-header.php` | The UCF University Header: its script tag and its placeholder |
 | `meta.php` | Per-page fields: brand number, hero deck, hero note |
 | `sections.php` | Section numbering, drawer ordering, the number binding |
 | `section-nav.php` | The drawer's server-rendered navigation block |
@@ -111,6 +112,37 @@ block markup references a font by name.
 > `--wp--preset--font-size--h-1`. Every slug here is already kebab-stable
 > (`heading-1`, `ui`, `meta`) so the two names stay identical.
 
+## The university header
+
+The black bar across the top of every page is **not this theme's markup**. It is the UCF
+University Header, built at runtime by a script from
+[universityheader.ucf.edu](https://universityheader.ucf.edu/), which owns its links, its
+search and its appearance — UCF's terms are that none of the three may be altered locally.
+The theme's whole share of it is `includes/university-header.php`: enqueue the script, and
+print an empty `<div id="ucfhb">` at `wp_body_open` for it to fill.
+
+Two details are load-bearing and both fail *silently* — the bar renders either way, just
+boxed at 940px instead of full width:
+
+-   **`?use-full-width=1` has to be in the script's `src`.** The host serves a different
+    build for that query string; the default build has no full-width branch compiled into it
+    at all.
+-   **The tag has to carry `id="ucfhb-script"`.** That build reads the option back out of its
+    own `src` by looking itself up by that id. WordPress emits `id="{handle}-js"`, so
+    `ucf_brand_university_header_script_tag()` rewrites it on `script_loader_tag`.
+
+`tests/php/UniversityHeaderTest.php` covers both, for exactly that reason. Other documented
+options (`use-1200-breakpoint`, `use-bootstrap-overrides`) go through the
+`ucf_brand_university_header_src` filter rather than an edit here.
+
+**The bar scrolls away.** It sits in normal flow above `.wp-site-blocks` and nothing pins
+it, which is why the drawer below pins to the top of the viewport rather than to an offset.
+The theme has no header of its own and no `parts/header.html`; site identity lives in the
+drawer masthead, and on mobile in `parts/mobile-bar.html`.
+
+The accessibility suite excludes `#ucfhb` from its audit — the same argument it already
+applies to an embedded YouTube player. See the exclusion list in `tests/a11y/axe.js`.
+
 ## The drawer
 
 The left drawer is the site's primary navigation and the reason for most of the layout
@@ -120,8 +152,9 @@ code. Three behaviors, in order of how they're implemented:
 positions the drawer.
 
 ```
+<div id="ucfhb">                  ← the university header, normal flow, scrolls away
 <main class="brand-shell">        ← sticky containing block
-  <aside class="brand-sidebar">   ← position: sticky
+  <aside class="brand-sidebar">   ← position: sticky, top: 0
   <div class="brand-content">
 </main>
 <footer>                          ← sibling, OUTSIDE the shell

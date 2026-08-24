@@ -4,10 +4,12 @@
 
 // FIX: `clip`, never `hidden` — an `overflow: hidden` ancestor silently disables
 // `position: sticky` on every descendant, and the drawer is sticky.
+// WHY: 12px of clearance and nothing more. The University Header scrolls away and the rail
+// is beside the content, not over it, so on desktop no chrome sits above an anchor target.
 html {
 	overflow-x: clip;
 	scroll-behavior: smooth;
-	scroll-padding-top: calc(#{$header-height} + 12px);
+	scroll-padding-top: 12px;
 }
 
 body {
@@ -32,6 +34,12 @@ body {
 @media (max-width: $breakpoint-drawer) {
 	.is-style-reading-width.is-style-reading-width {
 		padding-right: 0;
+	}
+
+	// SYNC: $mobile-bar-height is that bar's `min-height` in _drawer.scss. Below this width
+	// it is sticky at top 0, so an un-offset anchor lands underneath it.
+	html {
+		scroll-padding-top: calc(#{$mobile-bar-height} + 12px);
 	}
 }
 
