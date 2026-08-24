@@ -153,8 +153,23 @@ async function auditPage( page, testInfo, target ) {
 		).toBeAttached();
 	}
 
+	/*
+	 * A cover's background video is excluded from the audit. axe reaches inside the embed and
+	 * audits YouTube's own player — `#movie_player`, the channel-avatar button, the title bar
+	 * — reporting three violations in markup this theme neither writes nor can change.
+	 *
+	 * CONTEXT: dormant as things stand. No template, pattern or fixture ships a cover video
+	 * since the home hero's URL was taken out, so nothing matches this today. It is kept
+	 * because the failure it prevents is baffling rather than informative: the first author
+	 * to set a video on the home page would otherwise turn the suite red with Google's
+	 * accessibility bugs and no obvious link to anything in this repository.
+	 */
 	const results = await new AxeBuilder( { page } )
 		.withTags( WCAG_TAGS )
+		.exclude(
+			'.wp-block-cover__embed-background iframe[src*="youtube.com"], ' +
+				'.wp-block-cover__embed-background iframe[src*="youtu.be"]'
+		)
 		.analyze();
 
 	/*

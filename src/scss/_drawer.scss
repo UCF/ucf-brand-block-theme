@@ -159,6 +159,24 @@
 	}
 }
 
+// UPSTREAM: the editor canvas never sees `.alignfull`, so the rule above cannot match there.
+// `.brand-content` is a flow group with no `contentSize`, and the editor treats alignments as
+// unsupported inside one — it emits neither the class nor `data-align`. `save()` writes
+// `alignfull` into the saved markup regardless, so the front end bleeds and only the canvas
+// showed both heroes inset by one gutter. Matching on their own classes makes the preview
+// agree with the page. Front-end selectors are untouched; this only ever applies in the editor.
+.editor-styles-wrapper .brand-content > .brand-hero,
+.editor-styles-wrapper .brand-content > .brand-home-hero__band,
+.editor-styles-wrapper .brand-content > .brand-home-hero__image {
+	margin-inline: calc(-1 * var(--brand-gutter));
+	max-width: none;
+}
+
+.editor-styles-wrapper .brand-content > .brand-hero,
+.editor-styles-wrapper .brand-content > .brand-home-hero__band {
+	padding-inline: var(--brand-gutter);
+}
+
 // ── Sidebar masthead ─────────────────────────────────────────────────────────
 //
 // Both lines come from the site's identity fields, not from parts/brand-sidebar.html.

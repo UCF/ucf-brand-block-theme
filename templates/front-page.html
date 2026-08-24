@@ -1,0 +1,42 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:template-part {"slug":"mobile-bar","className":"brand-mobile-bar-part"} /-->
+
+<!-- wp:group {"tagName":"main","className":"brand-shell","style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}}},"layout":{"type":"default"}} -->
+<main class="wp-block-group brand-shell" style="padding-top:0;padding-right:0;padding-bottom:0;padding-left:0">
+	<!-- wp:group {"tagName":"aside","metadata":{"name":"Brand Sidebar"},"anchor":"brand-sidebar","className":"brand-sidebar","layout":{"type":"default"}} -->
+	<aside id="brand-sidebar" class="wp-block-group brand-sidebar">
+		<!-- wp:template-part {"slug":"brand-sidebar"} /-->
+	</aside>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"className":"brand-content","layout":{"type":"default"}} -->
+	<div class="wp-block-group brand-content">
+		<!-- wp:post-featured-image {"align":"full","className":"brand-home-hero__image"} /-->
+
+		<!-- wp:cover {"dimRatio":50,"align":"full","className":"is-style-dark brand-home-hero__band","layout":{"type":"constrained"}} -->
+		<div class="wp-block-cover alignfull is-style-dark brand-home-hero__band">
+			<span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span>
+			<div class="wp-block-cover__inner-container">
+				<!-- wp:group {"borderColor":"black","textColor":"white","gradient":"scrim","className":"is-style-default brand-home-hero__card","style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|40","left":"var:preset|spacing|40","right":"var:preset|spacing|40"},"blockGap":"0"},"border":{"width":"1px"}},"layout":{"type":"flex","orientation":"vertical","justifyContent":"center","verticalAlignment":"center"}} -->
+				<div class="wp-block-group is-style-default brand-home-hero__card has-border-color has-black-border-color has-white-color has-scrim-gradient-background has-text-color has-background" style="border-width:1px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--40);padding-left:var(--wp--preset--spacing--40)">
+					<!-- wp:heading {"level":1,"style":{"typography":{"textAlign":"center"},"layout":{"selfStretch":"fit","flexSize":null}}} -->
+					<h1 class="wp-block-heading has-text-align-center">Unmistakably UCF</h1>
+					<!-- /wp:heading -->
+
+					<!-- wp:paragraph {"textColor":"gold","fontSize":"meta","style":{"typography":{"textTransform":"uppercase","textAlign":"center","letterSpacing":"0.25em"},"layout":{"selfStretch":"fill","flexSize":null}}} -->
+					<p class="has-text-align-center has-gold-color has-text-color has-meta-font-size" style="letter-spacing:0.25em;text-transform:uppercase"><strong>The Official <mark style="background-color:var(--wp--preset--color--ink)" class="has-inline-color has-white-color">University of Central Florida</mark> Brand Guidelines</strong></p>
+					<!-- /wp:paragraph -->
+				</div>
+				<!-- /wp:group -->
+			</div>
+		</div>
+		<!-- /wp:cover -->
+
+		<!-- wp:post-content {"layout":{"type":"constrained"}} /-->
+	</div>
+	<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
