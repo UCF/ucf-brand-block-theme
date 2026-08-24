@@ -26,8 +26,8 @@ const home = routes.find( ( route ) => 'front-page' === route.name );
 test( 'home hero: band above the breakpoint, image below', async ( {
 	page,
 }, testInfo ) => {
+	expect( home, 'Expected an a11y route named "front-page" in the manifest.' ).toBeTruthy();
 	await auditPage( page, testInfo, { ...home, name: 'home-hero' } );
-
 	// The hero owns the page's h1. Content that opens with its own heading has to use h2,
 	// and nothing in axe catches the duplicate — `page-has-heading-one` only checks that at
 	// least one exists.
