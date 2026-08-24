@@ -1,0 +1,135 @@
+@use "sass:map";
+@use "variables" as *;
+
+// ── Home hero ────────────────────────────────────────────────────────────────
+//
+// CONTEXT: the front page only — templates/front-page.html, which WordPress picks ahead of
+// page.html for the static front page with nothing to register and no template for an author
+// to choose. Section pages keep the hero in _hero.scss; this one is deliberately a different
+// band, because home is the one page with a video and its own title treatment.
+//
+// Two layouts:
+//
+//   below $breakpoint-video   featured image, then the band's copy stacked underneath it
+//   at and above              core Cover with its background video, copy laid over it
+//
+// CONTEXT: the swap is visual only. Core writes a live `src` into the background iframe, and
+// a hidden iframe is still a downloaded one, so a phone fetches the player it is never
+// shown. Deferring that needs a `render_block` filter to park the `src` in `data-src` plus a
+// script to restore it above the breakpoint — deliberately not carried here, because the
+// layout below is the whole of the design and that pair is a bandwidth optimization.
+//
+// FIX: both blocks are direct children of `.brand-content` and both carry `align: full`,
+// which is what earns them the bleed rule in _drawer.scss. Wrapping them in a group for
+// tidiness cost exactly that — the band rendered inset in the column's gutter, because the
+// rule matches `.brand-content > .alignfull` and the group made them grandchildren.
+
+// SYNC: mirrors the `.brand-hero:first-child` rule in _drawer.scss, which flushes a hero
+// to the header.
+//
+// FIX: it matches on the band, not the featured image. The first version keyed on the image
+// and shipped with 48px of white above the hero on any page with no featured image set —
+// `core/post-featured-image` renders nothing at all when there is no thumbnail, so the
+// element the selector needed was simply absent. The band is in the template unconditionally.
+.brand-content:has(> .brand-home-hero__band) {
+	padding-block-start: 0;
+
+	// UPSTREAM: theme.json's `blockGap` reaches every flow child through core's
+	// `:root :where(.is-layout-flow) > *` rule, which opens 1rem of page background between
+	// the featured image and the band — a white seam across the hero on mobile. Home stacks
+	// its band flush, so the gap is zeroed for this column's direct children only. Content
+	// inside `core/post-content` keeps its rhythm, and no other template is touched.
+	> * {
+		margin-block-start: 0;
+	}
+}
+
+// The mobile half.
+.brand-home-hero__image {
+	margin: 0;
+
+	img {
+		// SPEC: 16:9 matches the video the wide layout shows, so the two crops agree.
+		aspect-ratio: 16 / 9;
+		height: auto;
+		object-fit: cover;
+		width: 100%;
+	}
+}
+
+.brand-home-hero__band {
+	// A11Y: `is-style-dark` on the block supplies the fill and every `--brand-*` role with
+	// it, which is what makes the deck legible: `is-style-lead` resolves to near-black
+	// otherwise, and it shipped that way here — invisible on the band and invisible to axe,
+	// which cannot judge text over a video. Same composition the section hero uses.
+	min-height: 0;
+	padding-block: map.get($space, "50");
+}
+
+// WHY: the home title is the one h1 in the theme that is not a section heading, so it gets
+// its own step rather than `heading-1`. Centering and color come from the block's own
+// controls — this sets size only, which no control can express as a fluid clamp.
+.brand-home-hero__card h1 {
+	font-size: clamp(2.5rem, 7vw, 4.5rem);
+	line-height: 0.95;
+	margin-block: 0;
+}
+
+// WHY: the eyebrow's tracking is set on the block; this is the leading it needs once it
+// wraps, which no block control expresses. Width is deliberately not capped — the comp
+// breaks it at the column edge, so the measure is whatever the band gives it.
+.brand-home-hero__card p {
+	line-height: 1.6;
+	margin-block-start: map.get($space, "30");
+}
+
+// FIX: the video is hidden below the breakpoint, not merely covered. Core's cover paints
+// the embed over the band's own fill, so without this the mobile hero is the video playing
+// behind the copy — the image above it and the stacked layout, with the wrong backdrop.
+.brand-home-hero__band .wp-block-cover__embed-background {
+	display: none;
+}
+
+@media (min-width: $breakpoint-video) {
+	.brand-home-hero__image {
+		display: none;
+	}
+
+	.brand-home-hero__band {
+		min-height: 60vh;
+	}
+
+	.brand-home-hero__band .wp-block-cover__embed-background {
+		display: block;
+	}
+}
+
+// FIX: core sizes the background iframe at `100vw`/`100vh`, so its aspect is the viewport's,
+// not the video's. YouTube fits 16:9 inside whatever box it is given and centres it, so on a
+// wide short screen the player painted ~177px of its own background down each side and the
+// video read as inset — the band was full-bleed the whole time, the picture inside it was not.
+//
+// Sizing the frame to 16:9 and to at least the band's own box puts the fit lines outside the
+// clip instead. `cq` units measure the figure rather than the viewport, which is what makes
+// this hold at any band height.
+.brand-home-hero__band .wp-block-cover__embed-background {
+	container-type: size;
+}
+
+.brand-home-hero__band .wp-block-cover__embed-background iframe {
+	aspect-ratio: 16 / 9;
+	height: auto;
+	left: 50%;
+	min-height: 100cqh;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: max(100cqw, 100cqh * 16 / 9);
+}
+
+// UPSTREAM: core's Cover centers its inner container. The band's copy is left-aligned to
+// the same measure as the rest of the page, so the container takes the full width and lets
+// the constrained layout inside it do the capping.
+.brand-home-hero__band > .wp-block-cover__inner-container {
+	width: 100%;
+}

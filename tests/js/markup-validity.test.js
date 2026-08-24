@@ -1,5 +1,5 @@
 /**
- * Every block in every template part and pattern must parse as valid.
+ * Every block in every template, template part and pattern must parse as valid.
  *
  * `docs/architecture.md` states the rule this enforces: "Pattern PHP must serialize exactly
  * what `save()` would produce or the editor flags the block invalid," and records that
@@ -8,9 +8,9 @@
  * group. Nothing caught it, because **invalid blocks still render on the front end**. A page
  * render is not a check; this is.
  *
- * Two sources, read differently:
+ * Three sources, two of them read the same way:
  *
- * - `parts/*.html` is literal markup and is read straight off disk.
+ * - `parts/*.html` and `templates/*.html` are literal markup, read straight off disk.
  * - `patterns/**\/*.php` interpolates PHP *inside* its block markup, so the file on disk is
  *   not what WordPress registers. `tests/php/render-patterns.php` renders each one the way
  *   core does and hands back the result — see that file for why it shells out to PHP.
@@ -58,13 +58,36 @@ function renderPatterns() {
  * @return {Array<{file: string, content: string}>} Template parts.
  */
 function readParts() {
-	const dir = join( THEME_DIR, 'parts' );
+	return readHtmlDir( 'parts' );
+}
+
+/**
+ * Read the templates off disk.
+ *
+ * Templates are swept for the same reason parts are, and the reason is not hypothetical: a
+ * cover block hand-written into a template is markup nobody's editor produced, and the front
+ * end renders it whether or not it matches `save()`. This is the only check that sees it.
+ *
+ * @return {Array<{file: string, content: string}>} Templates.
+ */
+function readTemplates() {
+	return readHtmlDir( 'templates' );
+}
+
+/**
+ * Read every .html file in one of the theme's markup directories.
+ *
+ * @param {string} dirName Directory under the theme root.
+ * @return {Array<{file: string, content: string}>} Sources.
+ */
+function readHtmlDir( dirName ) {
+	const dir = join( THEME_DIR, dirName );
 
 	return readdirSync( dir )
 		.filter( ( name ) => name.endsWith( '.html' ) )
 		.sort()
 		.map( ( name ) => ( {
-			file: `parts/${ name }`,
+			file: `${ dirName }/${ name }`,
 			content: readFileSync( join( dir, name ), 'utf8' ),
 		} ) );
 }
@@ -193,6 +216,7 @@ const SILENCED = [
 const originalConsole = {};
 
 let PARTS = [];
+let TEMPLATES = [];
 let PATTERNS = [];
 
 beforeAll( () => {
@@ -223,6 +247,7 @@ beforeAll( () => {
 	registerDynamicBlocks();
 
 	PARTS = readParts();
+	TEMPLATES = readTemplates();
 	PATTERNS = renderPatterns();
 } );
 
@@ -245,6 +270,13 @@ describe( 'the sweep itself', () => {
 		);
 	} );
 
+	it( 'found templates to check', () => {
+		expect( TEMPLATES.length ).toBeGreaterThan( 0 );
+		TEMPLATES.forEach( ( template ) =>
+			expect( template.content.length ).toBeGreaterThan( 0 )
+		);
+	} );
+
 	it( 'found patterns to check', () => {
 		expect( PATTERNS.length ).toBeGreaterThan( 0 );
 		PATTERNS.forEach( ( p ) =>
@@ -261,7 +293,7 @@ describe( 'the sweep itself', () => {
 	} );
 
 	it( 'parses actual blocks out of each source', () => {
-		[ ...PARTS, ...PATTERNS ].forEach( ( source ) => {
+		[ ...PARTS, ...TEMPLATES, ...PATTERNS ].forEach( ( source ) => {
 			expect( {
 				file: source.file,
 				blocks: flatten( parse( source.content ) ).length,
@@ -284,6 +316,16 @@ describe( 'template parts', () => {
 
 	it( 'contain no unrecognized blocks', () => {
 		expect( PARTS.flatMap( unrecognizedBlocksIn ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'templates', () => {
+	it( 'match what save() currently emits', () => {
+		expect( TEMPLATES.flatMap( staleBlocksIn ) ).toEqual( [] );
+	} );
+
+	it( 'contain no unrecognized blocks', () => {
+		expect( TEMPLATES.flatMap( unrecognizedBlocksIn ) ).toEqual( [] );
 	} );
 } );
 

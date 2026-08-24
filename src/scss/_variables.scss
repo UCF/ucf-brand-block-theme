@@ -76,3 +76,7 @@ $breakpoint-header: 600px;
 // SYNC: TABS_QUERY in src/blocks/tabs/view.js — the grid and the script must agree on
 // where tabs engage. Deliberately below $breakpoint-drawer so tabs persist through tablet.
 $breakpoint-tabs: 768px;
+
+// SPEC: where the home hero swaps between its stacked image layout and its video band.
+// Nothing else reads it — the swap is entirely in _home-hero.scss.
+$breakpoint-video: 768px;

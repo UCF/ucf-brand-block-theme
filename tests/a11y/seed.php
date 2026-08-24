@@ -166,6 +166,58 @@ function ucf_brand_a11y_write_htaccess() {
 }
 
 /**
+ * Give a page a featured image.
+ *
+ * The home hero's mobile half *is* the featured image — below the breakpoint it replaces the
+ * video outright — so a fixture without one cannot show whether that swap works.
+ *
+ * The bytes are a 1×1 PNG inline rather than a checked-in fixture file: `object-fit: cover`
+ * scales it to the band either way, and one less binary in the repo is one less thing to
+ * explain.
+ *
+ * @param int $post_id Page to attach it to.
+ * @return void
+ */
+function ucf_brand_a11y_attach_featured_image( $post_id ) {
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Fixture image bytes, not obfuscation.
+	$png     = base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' );
+	$uploads = wp_upload_dir();
+	$path    = trailingslashit( $uploads['path'] ) . 'ucf-brand-a11y-hero-' . $post_id . '.png';
+
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- CLI-only fixture writer; WP_Filesystem is not bootstrapped here.
+	if ( false === file_put_contents( $path, $png ) ) {
+		WP_CLI::error( "Could not write the fixture featured image to {$path}." );
+	}
+
+	$attachment_id = wp_insert_attachment(
+		array(
+			'post_mime_type' => 'image/png',
+			'post_title'     => 'Fixture featured image',
+			'post_status'    => 'inherit',
+		),
+		$path,
+		$post_id
+	);
+
+	if ( ! $attachment_id ) {
+		WP_CLI::error( 'Could not create the fixture featured image attachment.' );
+	}
+
+	wp_update_attachment_metadata(
+		$attachment_id,
+		wp_generate_attachment_metadata( $attachment_id, $path )
+	);
+
+	// A11Y: decorative. The hero's own h1 names the page, so an alt repeating it would
+	// announce the same words twice — the same trade as the wordmark in includes/branding.php.
+	update_post_meta( $attachment_id, '_wp_attachment_image_alt', '' );
+
+	set_post_thumbnail( $post_id, $attachment_id );
+}
+
+/**
  * Delete everything a previous run created.
  *
  * By meta rather than by slug: a run that changed the naming scheme would otherwise leave
@@ -244,6 +296,10 @@ function ucf_brand_a11y_seed_routes() {
 
 	update_option( 'show_on_front', 'page' );
 	update_option( 'page_on_front', $home );
+
+	// templates/front-page.html shows this below the video breakpoint, in place of the
+	// video. Without it the mobile half of the home hero is empty. See home-hero.spec.js.
+	ucf_brand_a11y_attach_featured_image( $home );
 
 	// Three, not one: `ucf_brand_get_ordered_sections()` sorts numerically, and a drawer with
 	// a single entry would render the same whether or not that ordering works.
@@ -698,8 +754,11 @@ function ucf_brand_a11y_probe() {
  * @return string Block markup.
  */
 function ucf_brand_a11y_front_page_content() {
-	return '<!-- wp:heading {"level":1} -->' . "\n"
-		. '<h1 class="wp-block-heading">The UCF brand</h1>' . "\n"
+	// A11Y: an h2, not an h1. templates/front-page.html gives the home hero a
+	// `core/post-title` h1, so content that opens with its own would put two on the page —
+	// which axe does not flag and a screen-reader user navigating by heading level does hit.
+	return '<!-- wp:heading -->' . "\n"
+		. '<h2 class="wp-block-heading">The UCF brand</h2>' . "\n"
 		. '<!-- /wp:heading -->' . "\n"
 		. '<!-- wp:paragraph {"className":"is-style-lead"} -->' . "\n"
 		. '<p class="is-style-lead">Everything the university looks and sounds like, in one place.</p>' . "\n"
