@@ -166,7 +166,10 @@ async function auditPage( page, testInfo, target ) {
 	 */
 	const results = await new AxeBuilder( { page } )
 		.withTags( WCAG_TAGS )
-		.exclude( '.wp-block-cover__embed-background' )
+		.exclude(
+			'.wp-block-cover__embed-background iframe[src*="youtube.com"], ' +
+				'.wp-block-cover__embed-background iframe[src*="youtu.be"]'
+		)
 		.analyze();
 
 	/*
