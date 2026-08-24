@@ -88,22 +88,24 @@ add_action( 'wp_enqueue_scripts', 'ucf_brand_enqueue_university_header' );
  * its defaults, and `use-full-width` is ignored — with no error anywhere, on a bar that
  * still renders.
  *
- * Matching on `$src` rather than `$handle` is UCF's own published snippet, kept verbatim: it
- * keeps working if the handle above ever changes, and costs nothing.
+ * FIX: matched on the handle, never on `$src`. UCF's published snippet tests the src for
+ * `universityheader.ucf.edu`, which is wrong in both directions: it also stamps this id onto
+ * any *other* script from that host — the UCF Header Bar plugin's — and two elements sharing
+ * one id makes `getElementById` a coin toss; and it stops matching the moment an optimizer
+ * filters our own src to a proxy. The handle is a constant here and names one enqueue.
  *
  * @param string $tag    The `<script>` tag for the enqueued script.
  * @param string $handle The script's registered handle.
- * @param string $src    The script's source URL.
  * @return string Filtered tag.
  */
-function ucf_brand_university_header_script_tag( $tag, $handle, $src ) {
-	if ( false === strpos( $src, 'universityheader.ucf.edu' ) ) {
+function ucf_brand_university_header_script_tag( $tag, $handle ) {
+	if ( UCF_BRAND_UNIVERSITY_HEADER_HANDLE !== $handle ) {
 		return $tag;
 	}
 
 	return str_replace( "{$handle}-js", 'ucfhb-script', $tag );
 }
-add_filter( 'script_loader_tag', 'ucf_brand_university_header_script_tag', 10, 3 );
+add_filter( 'script_loader_tag', 'ucf_brand_university_header_script_tag', 10, 2 );
 
 /**
  * Print the element the header renders itself into.

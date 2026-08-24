@@ -104,7 +104,7 @@ final class UniversityHeaderTest extends TestCase {
 			$handle
 		);
 
-		$filtered = ucf_brand_university_header_script_tag( $tag, $handle, $src );
+		$filtered = ucf_brand_university_header_script_tag( $tag, $handle );
 
 		$this->assertStringContainsString( 'id="ucfhb-script"', $filtered );
 		$this->assertStringNotContainsString( "{$handle}-js", $filtered );
@@ -123,7 +123,7 @@ final class UniversityHeaderTest extends TestCase {
 
 		$this->assertStringContainsString(
 			"id='ucfhb-script'",
-			ucf_brand_university_header_script_tag( $tag, $handle, $src )
+			ucf_brand_university_header_script_tag( $tag, $handle )
 		);
 	}
 
@@ -136,9 +136,36 @@ final class UniversityHeaderTest extends TestCase {
 	public function test_other_scripts_are_left_alone() {
 		$tag = '<script src="https://example.test/other.js" id="other-js"></script>';
 
-		$this->assertSame(
-			$tag,
-			ucf_brand_university_header_script_tag( $tag, 'other', 'https://example.test/other.js' )
+		$this->assertSame( $tag, ucf_brand_university_header_script_tag( $tag, 'other' ) );
+	}
+
+	/**
+	 * The reason this matches on the handle and not the src. UCF's published snippet tests
+	 * the src for their host, which also stamps `ucfhb-script` onto anything *else* served
+	 * from it — the UCF Header Bar plugin's own tag — and two elements with one id makes
+	 * `document.getElementById()` a coin toss between them.
+	 *
+	 * @return void
+	 */
+	public function test_another_script_from_the_same_host_is_left_alone() {
+		$tag = '<script src="https://universityheader.ucf.edu/bar/js/university-header-full.js" id="ucfhb-plugin-js"></script>';
+
+		$this->assertSame( $tag, ucf_brand_university_header_script_tag( $tag, 'ucfhb-plugin' ) );
+	}
+
+	/**
+	 * The same choice, in the other direction: an optimizer that proxies the URL must not
+	 * cost us the id. The handle names the enqueue, so a rewritten src changes nothing.
+	 *
+	 * @return void
+	 */
+	public function test_the_id_is_rewritten_even_when_the_src_has_been_filtered() {
+		$handle = UCF_BRAND_UNIVERSITY_HEADER_HANDLE;
+		$tag    = sprintf( '<script src="https://cdn.example.test/proxied/uh.js" id="%s-js"></script>', $handle );
+
+		$this->assertStringContainsString(
+			'id="ucfhb-script"',
+			ucf_brand_university_header_script_tag( $tag, $handle )
 		);
 	}
 
