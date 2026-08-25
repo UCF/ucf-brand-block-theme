@@ -41,13 +41,48 @@ import {
 	// format is recognized on load); bg = palette slug of the badge's fill, used
 	// for the swatch color; title = swatch label. Tones map to src/scss/_badge.scss.
 	var tones = [
-		{ name: 'ucf/badge', className: 'badge', bg: 'line', title: __( 'Default', 'ucf-brand-block-theme' ) },
-		{ name: 'ucf/badge-gold', className: 'badge-gold', bg: 'gold', title: __( 'Gold', 'ucf-brand-block-theme' ) },
-		{ name: 'ucf/badge-blue', className: 'badge-blue', bg: 'link-blue', title: __( 'Blue', 'ucf-brand-block-theme' ) },
-		{ name: 'ucf/badge-success', className: 'badge-success', bg: 'success', title: __( 'Success', 'ucf-brand-block-theme' ) },
-		{ name: 'ucf/badge-danger', className: 'badge-danger', bg: 'danger', title: __( 'Danger', 'ucf-brand-block-theme' ) },
-		{ name: 'ucf/badge-dark', className: 'badge-dark', bg: 'ink', title: __( 'Dark', 'ucf-brand-block-theme' ) },
-		{ name: 'ucf/badge-inverse', className: 'badge-inverse', bg: 'white', title: __( 'Inverse', 'ucf-brand-block-theme' ) },
+		{
+			name: 'ucf/badge',
+			className: 'badge',
+			bg: 'line',
+			title: __( 'Default', 'ucf-brand-block-theme' ),
+		},
+		{
+			name: 'ucf/badge-gold',
+			className: 'badge-gold',
+			bg: 'gold',
+			title: __( 'Gold', 'ucf-brand-block-theme' ),
+		},
+		{
+			name: 'ucf/badge-blue',
+			className: 'badge-blue',
+			bg: 'link-blue',
+			title: __( 'Blue', 'ucf-brand-block-theme' ),
+		},
+		{
+			name: 'ucf/badge-success',
+			className: 'badge-success',
+			bg: 'success',
+			title: __( 'Success', 'ucf-brand-block-theme' ),
+		},
+		{
+			name: 'ucf/badge-danger',
+			className: 'badge-danger',
+			bg: 'danger',
+			title: __( 'Danger', 'ucf-brand-block-theme' ),
+		},
+		{
+			name: 'ucf/badge-dark',
+			className: 'badge-dark',
+			bg: 'ink',
+			title: __( 'Dark', 'ucf-brand-block-theme' ),
+		},
+		{
+			name: 'ucf/badge-inverse',
+			className: 'badge-inverse',
+			bg: 'white',
+			title: __( 'Inverse', 'ucf-brand-block-theme' ),
+		},
 	];
 
 	// Apply one tone to the selection, first clearing every other tone so the
@@ -118,8 +153,14 @@ import {
 			// highlighted text, like core's rich-text popovers — instead of the
 			// toolbar-slot mount point at the screen edge.
 			var popoverAnchor = useAnchor( {
-				editableContentElement: props.contentRef ? props.contentRef.current : undefined,
-				settings: { tagName: 'span', className: 'ucf-badge-picker', isActive: !! active },
+				editableContentElement: props.contentRef
+					? props.contentRef.current
+					: undefined,
+				settings: {
+					tagName: 'span',
+					className: 'ucf-badge-picker',
+					isActive: !! active,
+				},
 			} );
 
 			// ColorPalette entries: one swatch per tone, colored by its fill.
@@ -174,7 +215,10 @@ import {
 						},
 						el(
 							'div',
-							{ className: 'ucf-badge-popover__inner', style: { padding: '12px', maxWidth: '220px' } },
+							{
+								className: 'ucf-badge-popover__inner',
+								style: { padding: '12px', maxWidth: '220px' },
+							},
 							el(
 								'div',
 								{
@@ -189,7 +233,9 @@ import {
 							),
 							el( ColorPalette, {
 								colors: swatches,
-								value: active ? paletteHex( active.bg ) : undefined,
+								value: active
+									? paletteHex( active.bg )
+									: undefined,
 								onChange: onSelectColor,
 								disableCustomColors: true,
 								clearable: true,

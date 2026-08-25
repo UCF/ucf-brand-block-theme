@@ -488,7 +488,10 @@
 
 			// If the author linked the heading text, do not hijack that navigation.
 			// Only intercept clicks on our appended anchor icon.
-			if ( link && ! link.classList.contains( 'brand-heading__anchor' ) ) {
+			if (
+				link &&
+				! link.classList.contains( 'brand-heading__anchor' )
+			) {
 				return;
 			}
 

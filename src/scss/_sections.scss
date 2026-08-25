@@ -28,7 +28,8 @@
 	background: map.get($color, "black");
 	border-left: 3px solid map.get($color, "gold");
 	color: map.get($color, "gold");
-	content: var(--brand-section) counter(brand-subsection, decimal-leading-zero);
+	content: var(--brand-section)
+		counter(brand-subsection, decimal-leading-zero);
 	display: inline-block;
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "meta");

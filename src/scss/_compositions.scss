@@ -28,55 +28,58 @@
 $treatments: (
 	// SYNC: `role-default()` reads this row for the `var()` fallbacks the typography helpers
 	// use, so the two cannot drift.
-	"light": (
-		"accent": "gold",
-		"body": "text-body",
-		// A11Y: black, not the link blue it used to be — the gold it takes on black is nowhere
-		// near 4.5:1 here, so mono and letterspacing carry the distinction instead of color.
-		"body-muted": "text-secondary",
-		"eyebrow": "black",
-		"heading": "black",
-		"lead": "text-body",
-		"line": "line",
-		"link": "link-blue",
-		"link-hover": "link-blue-hover",
-		"meta": "text-secondary",
-		"on-accent": "black",
-	),
+	"light":
+		(
+			"accent": "gold",
+			"body": "text-body",
+			// A11Y: black, not the link blue it used to be — the gold it takes on black is nowhere
+			// near 4.5:1 here, so mono and letterspacing carry the distinction instead of color.
+			"body-muted": "text-secondary",
+			"eyebrow": "black",
+			"heading": "black",
+			"lead": "text-body",
+			"line": "line",
+			"link": "link-blue",
+			"link-hover": "link-blue-hover",
+			"meta": "text-secondary",
+			"on-accent": "black",
+		),
 	// WHY: body copy is white, not `text-secondary-dark` — the grey read as washed out on
 	// black. `.meta` keeps its grey so the hierarchy survives.
-	"dark": (
-		"accent": "gold-deep",
-		"body": "white",
-		"body-muted": "text-secondary-dark",
-		"eyebrow": "gold",
-		"heading": "white",
-		"lead": "white",
-		"line": "line-dark",
-		"link": "blue-tint",
-		// WHY: gold on hover, not the light field's darker blue, which on black reads as the
-		// link switching off. Every other interactive state on black moves to gold; 10.4:1.
-		"link-hover": "gold",
-		"meta": "text-meta-dark",
-		"on-accent": "black",
-	),
+	"dark":
+		(
+			"accent": "gold-deep",
+			"body": "white",
+			"body-muted": "text-secondary-dark",
+			"eyebrow": "gold",
+			"heading": "white",
+			"lead": "white",
+			"line": "line-dark",
+			"link": "blue-tint",
+			// WHY: gold on hover, not the light field's darker blue, which on black reads as the
+			// link switching off. Every other interactive state on black moves to gold; 10.4:1.
+			"link-hover": "gold",
+			"meta": "text-meta-dark",
+			"on-accent": "black",
+		),
 	// A11Y: nothing lighter than `text-body` clears 4.5:1 on gold — `text-secondary` is
 	// 4.01:1, `link-blue` 3.20:1 — so `meta` and `body-muted` give up grey and de-emphasize
 	// through family and size instead.
 	// WHY: accent and line are the deeper gold, or the edge disappears into the field.
-	"gold": (
-		"accent": "gold-deep",
-		"body": "black",
-		"body-muted": "text-body",
-		"eyebrow": "black",
-		"heading": "black",
-		"lead": "text-body",
-		"line": "gold-deep",
-		"link": "black",
-		"link-hover": "black",
-		"meta": "text-body",
-		"on-accent": "black",
-	),
+	"gold":
+		(
+			"accent": "gold-deep",
+			"body": "black",
+			"body-muted": "text-body",
+			"eyebrow": "black",
+			"heading": "black",
+			"lead": "text-body",
+			"line": "gold-deep",
+			"link": "black",
+			"link-hover": "black",
+			"meta": "text-body",
+			"on-accent": "black",
+		)
 );
 
 // WHY: `treatment` is the foreign key into $treatments above.

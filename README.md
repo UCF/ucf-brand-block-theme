@@ -13,39 +13,39 @@ required reading before you do.
 One rule governs the layout: **everything hand-written is in `src/`, everything generated
 is in `build/`, and `assets/` holds only static files that are neither.**
 
-| Path | What's in it |
-| --- | --- |
-| `src/blocks/` | Custom block sources, one folder per block. Discovered by their `block.json`. |
-| `src/js/editor/` | Block-editor customizations, one job per module, bundled into `build/editor.js`. |
-| `src/js/brand-nav.js` | The drawer's sub-navigation, scroll-spy and mobile toggle. |
-| `src/js/badge-format.js` | The Badge rich-text format on the editor toolbar. |
-| `src/scss/` | Every stylesheet, one partial per concern, compiled to `build/css/main.css`. |
-| `build/` | **Generated and committed.** Blocks, bundled scripts, the stylesheet. Never edit. |
-| `assets/fonts/` | Self-hosted webfonts, referenced from `theme.json`. |
-| `includes/` | All PHP behavior, one topic per file (table below). |
-| `functions.php` | A loader for `includes/` and nothing else. |
-| `templates/` | Page templates: `404`, `front-page`, `index`, `page`, `search`, `single`. |
-| `parts/` | Template parts: `footer`, `brand-sidebar`, `mobile-bar`. |
-| `patterns/` | Block patterns, filed by rung of the composition ladder. |
-| `theme.json` | Every design token: palette, type scale, spacing, layout, webfonts. |
-| `style.css` | Theme header only — name, version, requirements. No CSS. |
-| `docs/` | Developer documentation. |
+| Path                     | What's in it                                                                      |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| `src/blocks/`            | Custom block sources, one folder per block. Discovered by their `block.json`.     |
+| `src/js/editor/`         | Block-editor customizations, one job per module, bundled into `build/editor.js`.  |
+| `src/js/brand-nav.js`    | The drawer's sub-navigation, scroll-spy and mobile toggle.                        |
+| `src/js/badge-format.js` | The Badge rich-text format on the editor toolbar.                                 |
+| `src/scss/`              | Every stylesheet, one partial per concern, compiled to `build/css/main.css`.      |
+| `build/`                 | **Generated and committed.** Blocks, bundled scripts, the stylesheet. Never edit. |
+| `assets/fonts/`          | Self-hosted webfonts, referenced from `theme.json`.                               |
+| `includes/`              | All PHP behavior, one topic per file (table below).                               |
+| `functions.php`          | A loader for `includes/` and nothing else.                                        |
+| `templates/`             | Page templates: `404`, `front-page`, `index`, `page`, `search`, `single`.         |
+| `parts/`                 | Template parts: `footer`, `brand-sidebar`, `mobile-bar`.                          |
+| `patterns/`              | Block patterns, filed by rung of the composition ladder.                          |
+| `theme.json`             | Every design token: palette, type scale, spacing, layout, webfonts.               |
+| `style.css`              | Theme header only — name, version, requirements. No CSS.                          |
+| `docs/`                  | Developer documentation.                                                          |
 
 ### What each `includes/` file owns
 
-| File | Owns |
-| --- | --- |
-| `setup.php` | Theme supports; the `template-locked` page editing mode |
-| `enqueue.php` | Every script and stylesheet, front end and editor canvas |
-| `blocks.php` | Static custom block registration |
-| `block-styles.php` | Every `register_block_style()` |
-| `pattern-categories.php` | The four pattern categories |
-| `university-header.php` | The UCF University Header: its script tag and its placeholder |
-| `meta.php` | Per-page fields: brand number, hero deck, hero note |
-| `sections.php` | Section numbering, drawer ordering, the number binding |
-| `section-nav.php` | The drawer's server-rendered navigation block |
-| `headings.php` | H2 anchor ids and section extraction |
-| `search.php` | Search scoping and subsection deep links |
+| File                     | Owns                                                          |
+| ------------------------ | ------------------------------------------------------------- |
+| `setup.php`              | Theme supports; the `template-locked` page editing mode       |
+| `enqueue.php`            | Every script and stylesheet, front end and editor canvas      |
+| `blocks.php`             | Static custom block registration                              |
+| `block-styles.php`       | Every `register_block_style()`                                |
+| `pattern-categories.php` | The four pattern categories                                   |
+| `university-header.php`  | The UCF University Header: its script tag and its placeholder |
+| `meta.php`               | Per-page fields: brand number, hero deck, hero note           |
+| `sections.php`           | Section numbering, drawer ordering, the number binding        |
+| `section-nav.php`        | The drawer's server-rendered navigation block                 |
+| `headings.php`           | H2 anchor ids and section extraction                          |
+| `search.php`             | Search scoping and subsection deep links                      |
 
 ## Getting started
 
@@ -121,7 +121,7 @@ search and its appearance — UCF's terms are that none of the three may be alte
 The theme's whole share of it is `includes/university-header.php`: enqueue the script, and
 print an empty `<div id="ucfhb">` at `wp_body_open` for it to fill.
 
-Two details are load-bearing and both fail *silently* — the bar renders either way, just
+Two details are load-bearing and both fail _silently_ — the bar renders either way, just
 boxed at 940px instead of full width:
 
 -   **`?use-full-width=1` has to be in the script's `src`.** The host serves a different
@@ -190,7 +190,7 @@ no sidebar, so they deliberately have no toggle.
 
 ## Search
 
-Search resolves to a *section*, not just a page: each result lists up to three matching H2s
+Search resolves to a _section_, not just a page: each result lists up to three matching H2s
 beneath it, linked to their anchors, with the query highlighted in a snippet. If Relevanssi
 is installed it ranks the pages; the theme picks the heading within each one. Without
 Relevanssi, core's search picks the pages and everything else behaves the same.
@@ -227,7 +227,7 @@ binding is one string, so the deck is one paragraph and the note is the second; 
 work in both. Nothing in the hero can be added, removed or reordered.
 
 That took one small block, `ucf-brand/page-hero`. It holds no content — it is a container
-that exists so the editor has a block *type* to keep unlocked, because the allowlist that
+that exists so the editor has a block _type_ to keep unlocked, because the allowlist that
 decides what stays editable while a page is open matches by name (see below). Its
 `templateLock: 'contentOnly'` then sorts its children: core keeps the ones that declare a
 `role: "content"` attribute and disables the rest, which is why the separator is inert and
@@ -238,8 +238,8 @@ typed into.
 depend on the photo being dark. The `scrim` gradient runs to 0.85–0.95 alpha over the lower
 half where the copy sits, which clears 4.5:1 for white type even against a white frame — and
 the closing note is ordinary body copy rather than `muted`, because grey-on-photo is the one
-thing this band cannot afford. A page with no featured image renders no image *and no
-scrim* — `core/post-featured-image` emits nothing at all — so what shows through is the
+thing this band cannot afford. A page with no featured image renders no image _and no
+scrim_ — `core/post-featured-image` emits nothing at all — so what shows through is the
 black fill `is-style-dark` supplies. Legible rather than broken.
 
 ### Pages open with the template showing
@@ -283,7 +283,7 @@ either a custom block, a pattern, or core blocks carrying a registered block sty
 | `ucf-brand/tab`            | One tab: a label and a panel. Child of Tabs.                                  |
 | `ucf-brand/tab-label`      | The clickable label. Child of Tab.                                            |
 | `ucf-brand/tab-panel`      | The panel body, an open drop zone. Child of Tab.                              |
-| `ucf-brand/page-hero`      | The page hero's container. Holds no content; locks and unlocks what it wraps.  |
+| `ucf-brand/page-hero`      | The page hero's container. Holds no content; locks and unlocks what it wraps. |
 
 Every block is **static** — `save()` emits real markup and there is no `render.php`, so
 none of them renders on the server. The swatch chip takes its color from a palette **slug**
@@ -293,21 +293,21 @@ keeps tracking its token if that token's value ever changes.
 Tabs are the exception to "nothing but markup": the saved output is a plain stack of
 label/panel pairs, and `src/blocks/tabs/view.js` is the only thing that turns that stack
 into tabs, above its breakpoint. Below it — and whenever the script does not run — the
-stack *is* the mobile layout, every panel visible. That script is registered as the block's
+stack _is_ the mobile layout, every panel visible. That script is registered as the block's
 `viewScript`, so WordPress loads it only on pages that use the block.
 
 These are written to lift into a distribution plugin unchanged: nothing in `src/blocks/`
 references the theme, so the move is a copy of the folder plus the `register_block_type()`
 loop in `includes/blocks.php`.
 
-### Theme glue that is *not* in `src/blocks/`
+### Theme glue that is _not_ in `src/blocks/`
 
 Two blocks are server-rendered and stay in `includes/`, with the data they render:
 
-| Block                          | Renders |
-| ------------------------------ | ------------------------------------------------------------------ |
-| `ucf-brand/section-nav`        | The drawer menu, from each page's Brand order.                      |
-| `ucf-brand/search-subsections` | The matching-H2 deep links beneath each search result.              |
+| Block                          | Renders                                                |
+| ------------------------------ | ------------------------------------------------------ |
+| `ucf-brand/section-nav`        | The drawer menu, from each page's Brand order.         |
+| `ucf-brand/search-subsections` | The matching-H2 deep links beneath each search result. |
 
 They are theme glue rather than distributable design blocks, which is why the static-only
 rule applies to `src/blocks/` and not to them. Each has a client-side stand-in in
@@ -320,15 +320,15 @@ Patterns are filed in a compositional ladder, small to large — `ucf-brand-unit
 primitives) → `ucf-brand-groups` (clusters of units) → `ucf-brand-sections` (full-width
 bands) → `ucf-brand-pages` (whole-page layouts).
 
-| Pattern                    | Category | Built from                                                  |
-| -------------------------- | -------- | ----------------------------------------------------------- |
-| `ucf-brand/detail-card`    | units    | Core Group. Accent header bar over an open body drop zone.  |
+| Pattern                    | Category | Built from                                                    |
+| -------------------------- | -------- | ------------------------------------------------------------- |
+| `ucf-brand/detail-card`    | units    | Core Group. Accent header bar over an open body drop zone.    |
 | `ucf-brand/list-card`      | units    | Core Group + Columns. Numbered rows divided by a bottom rule. |
-| `ucf-brand/color-swatches` | groups   | The two blocks above, pre-filled with the six core colors.  |
-| `ucf-brand/index`          | groups   | Core Columns + Separator. A numbered index of a section.    |
-| `ucf-brand/type-specimens` | groups   | Core Group + Paragraph. One row per typeface.               |
-| `ucf-brand/type-scale`     | groups   | Core Group + Paragraph, generated from a PHP array.         |
-| `ucf-brand/section`        | sections | Core Group (`section`, alignfull). H2, intro, drop zone.    |
+| `ucf-brand/color-swatches` | groups   | The two blocks above, pre-filled with the six core colors.    |
+| `ucf-brand/index`          | groups   | Core Columns + Separator. A numbered index of a section.      |
+| `ucf-brand/type-specimens` | groups   | Core Group + Paragraph. One row per typeface.                 |
+| `ucf-brand/type-scale`     | groups   | Core Group + Paragraph, generated from a PHP array.           |
+| `ucf-brand/section`        | sections | Core Group (`section`, alignfull). H2, intro, drop zone.      |
 
 **A pattern is core blocks and nothing else.** Every pattern here is vanilla Gutenberg
 markup — structure, spacing, borders and type all come from the blocks' own controls. The
@@ -353,15 +353,15 @@ hand-written transcription and **can** drift; update them alongside `theme.json`
 
 Registered in `includes/block-styles.php`, defined in `src/scss/`.
 
-| Block                | Styles                                                                  |
-| -------------------- | ----------------------------------------------------------------------- |
-| Group                | `light`, `paper`, `dark`, `bold-gold` — each also in an `-accent` flavor |
-| Group                | `on-dark`, `halftone`, `specimen`                                       |
-| Separator            | `accent-rule` — the short, heavy rule under a hero or section title      |
-| Paragraph, Heading   | `lead`, `eyebrow`, `meta`, `muted`                                      |
-| Group, Columns, Paragraph, Heading, List | `reading-width`                                     |
-| Button               | `glyph`                                                                  |
-| Accordion            | `brand`                                                                  |
+| Block                                    | Styles                                                                   |
+| ---------------------------------------- | ------------------------------------------------------------------------ |
+| Group                                    | `light`, `paper`, `dark`, `bold-gold` — each also in an `-accent` flavor |
+| Group                                    | `on-dark`, `halftone`, `specimen`                                        |
+| Separator                                | `accent-rule` — the short, heavy rule under a hero or section title      |
+| Paragraph, Heading                       | `lead`, `eyebrow`, `meta`, `muted`                                       |
+| Group, Columns, Paragraph, Heading, List | `reading-width`                                                          |
+| Button                                   | `glyph`                                                                  |
+| Accordion                                | `brand`                                                                  |
 
 The four Group color pairs are the **compositions** — a background plus everything that has
 to be true of what sits on it. Each declares a set of `--brand-*` roles (`accent`, `line`,

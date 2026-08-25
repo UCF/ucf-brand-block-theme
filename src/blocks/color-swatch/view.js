@@ -144,7 +144,10 @@
 		button.className = 'brand-swatch__copy';
 		button.innerHTML = CLIPBOARD_ICON;
 		// The icon has no text of its own, so this is the button's whole accessible name.
-		button.setAttribute( 'aria-label', 'Copy ' + hex + ' to the clipboard' );
+		button.setAttribute(
+			'aria-label',
+			'Copy ' + hex + ' to the clipboard'
+		);
 		line.appendChild( button );
 
 		/**

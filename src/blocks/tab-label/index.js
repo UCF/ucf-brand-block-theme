@@ -43,10 +43,7 @@ registerBlockType( metadata.name, {
 					className="ucf-tabs__heading"
 					value={ heading }
 					allowedFormats={ [] }
-					placeholder={ __(
-						'Tab heading',
-						'ucf-brand-block-theme'
-					) }
+					placeholder={ __( 'Tab heading', 'ucf-brand-block-theme' ) }
 					onChange={ ( value ) =>
 						setAttributes( { heading: value } )
 					}

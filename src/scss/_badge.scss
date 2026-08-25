@@ -37,12 +37,30 @@
 
 // SYNC: one entry per format in src/js/badge-format.js. (background slug, text slug).
 $badge-tones: (
-	"gold":    ("gold", "black"),
-	"blue":    ("link-blue", "white"),
-	"success": ("success", "white"),
-	"danger":  ("danger", "white"),
-	"dark":    ("ink", "white"),
-	"inverse": ("white", "black"),
+	"gold": (
+		"gold",
+		"black",
+	),
+	"blue": (
+		"link-blue",
+		"white",
+	),
+	"success": (
+		"success",
+		"white",
+	),
+	"danger": (
+		"danger",
+		"white",
+	),
+	"dark": (
+		"ink",
+		"white",
+	),
+	"inverse": (
+		"white",
+		"black",
+	),
 );
 
 @each $name, $pair in $badge-tones {

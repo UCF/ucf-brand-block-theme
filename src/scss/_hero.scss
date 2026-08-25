@@ -97,7 +97,9 @@
 // measure — auto margins on a box that already fills the column are a no-op — and the bar is
 // painted into its leading 110px as a background. Same as `.is-style-reading-width` in
 // _base.scss.
-.wp-block-separator.is-style-accent-rule:not(.is-style-wide):not(.is-style-dots) {
+.wp-block-separator.is-style-accent-rule:not(.is-style-wide):not(
+		.is-style-dots
+	) {
 	background-image: linear-gradient(
 		var(--brand-accent, #{compositions.role-default("accent")}) 0 0
 	);

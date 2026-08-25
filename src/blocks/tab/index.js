@@ -42,7 +42,10 @@ registerBlockType( metadata.name, {
 					<ToolbarGroup>
 						<ToolbarButton
 							icon="trash"
-							label={ __( 'Remove tab', 'ucf-brand-block-theme' ) }
+							label={ __(
+								'Remove tab',
+								'ucf-brand-block-theme'
+							) }
 							onClick={ () => removeBlock( clientId ) }
 						/>
 					</ToolbarGroup>

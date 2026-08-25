@@ -24,7 +24,10 @@
 
 // WHY: real links and controls must sit above the overlay to stay clickable — native
 // form controls too, or the overlay swallows them.
-.wp-block-group:has(.wp-block-button.has-stretch-link) :where(a, button, input, select, textarea, label, summary):not(.wp-block-button.has-stretch-link > a) {
+.wp-block-group:has(.wp-block-button.has-stretch-link)
+	:where(a, button, input, select, textarea, label, summary):not(
+		.wp-block-button.has-stretch-link > a
+	) {
 	position: relative;
 	z-index: 2;
 }

@@ -51,10 +51,14 @@
 	 */
 	function collect( root ) {
 		var labels = Array.prototype.slice.call(
-			root.querySelectorAll( ':scope > .ucf-tabs__set > .ucf-tabs__label' )
+			root.querySelectorAll(
+				':scope > .ucf-tabs__set > .ucf-tabs__label'
+			)
 		);
 		var panels = Array.prototype.slice.call(
-			root.querySelectorAll( ':scope > .ucf-tabs__set > .ucf-tabs__panel' )
+			root.querySelectorAll(
+				':scope > .ucf-tabs__set > .ucf-tabs__panel'
+			)
 		);
 
 		if ( ! labels.length || labels.length !== panels.length ) {
