@@ -215,6 +215,10 @@
 // WHY: which applies is the author's call, per swatch — see `labelInk` in
 // src/blocks/color-swatch/index.js. Black is the unset default, so already-saved swatches keep
 // the markup they have and need no migration.
+//
+// WHY: a second block for the same selector, deliberately. The box above is layout; this is
+// the label-ink pair, and it reads with the `is-label-light` rule below it.
+// stylelint-disable-next-line no-duplicate-selectors
 .brand-swatch__body {
 	color: map.get($color, "black");
 }
@@ -261,20 +265,20 @@
 	}
 }
 
+// A11Y: `currentColor`, not a token — the button sits on the swatch's own color, and the
+// label ink is already the one value known to read against it.
+.brand-swatch__copy:focus-visible {
+	opacity: 1;
+	outline: 2px solid currentcolor;
+	outline-offset: 2px;
+}
+
 // A11Y: focus needs the same reveal as hover, or the icon is a control a keyboard can reach
 // and not see. `:focus-within` on the line covers it, since the button is inside.
 .brand-swatch__hex:hover .brand-swatch__copy,
 .brand-swatch__hex:focus-within .brand-swatch__copy,
 .brand-swatch__hex.is-copied .brand-swatch__copy {
 	opacity: 0.7;
-}
-
-// A11Y: `currentColor`, not a token — the button sits on the swatch's own color, and the
-// label ink is already the one value known to read against it.
-.brand-swatch__copy:focus-visible {
-	opacity: 1;
-	outline: 2px solid currentColor;
-	outline-offset: 2px;
 }
 
 .brand-swatch__copy::after {

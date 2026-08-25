@@ -18,6 +18,7 @@ Skim this index; go read the section before you touch the area it covers.
 | PHP lives in `includes/`                                | One topic per file; `functions.php` is a loader only             |
 | JavaScript is one pipeline                              | `src/` → `build/`, generated `.asset.php` dependency lists       |
 | Build and content                                       | What `npm run build` does; block CSS belongs in `src/scss/`      |
+| Formatting and linting                                  | Which formatter owns which file type, and why stylelint defers   |
 | H2s are structural                                      | `includes/headings.php` owns every anchor id                     |
 | Gotchas that have already bitten                        | The list not to "clean up"                                       |
 
