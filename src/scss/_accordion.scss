@@ -63,7 +63,8 @@
 	}
 
 	// UPSTREAM: core underlines the title on hover; swap that for the brand's own state.
-	.wp-block-accordion-heading__toggle:hover .wp-block-accordion-heading__toggle-title {
+	.wp-block-accordion-heading__toggle:hover
+		.wp-block-accordion-heading__toggle-title {
 		text-decoration: none;
 	}
 
@@ -73,7 +74,8 @@
 	// `:has()` is needed. Excluded on the open row, already at the end of both ramps.
 	// FIX: pointer-only — `:hover` sticks after a tap, leaving a row looking half-open.
 	@media (hover: hover) {
-		.wp-block-accordion-item:not(.is-open) > .wp-block-accordion-heading:hover {
+		.wp-block-accordion-item:not(.is-open)
+			> .wp-block-accordion-heading:hover {
 			border-left-color: map.get($color, "text-secondary");
 
 			.wp-block-accordion-heading__toggle {

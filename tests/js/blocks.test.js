@@ -130,6 +130,11 @@ describe( 'ucf-brand/tab-label', () => {
 			'<h3 class="ucf-tabs__heading">Use the primary mark</h3>' +
 			'</div>';
 
+		// WHY: not logging — silencing. `isValidBlockContent()` warns to the console by
+		// design when markup does not match, and the WordPress jest preset fails a test on
+		// any unasserted console output. The call below is expected to pass, but core warns
+		// on the way there, so the channel is muted for the duration and restored after.
+		/* eslint-disable no-console */
 		const originalWarn = console.warn;
 		console.warn = () => {};
 		try {
@@ -143,6 +148,7 @@ describe( 'ucf-brand/tab-label', () => {
 		} finally {
 			console.warn = originalWarn;
 		}
+		/* eslint-enable no-console */
 	} );
 
 	it( 'round-trips with the optional description omitted', () => {

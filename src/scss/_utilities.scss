@@ -14,7 +14,10 @@
 
 // A11Y: always paired — a background without a legible text color is the bug.
 .accent-fill {
-	background-color: var(--brand-accent, #{compositions.role-default("accent")});
+	background-color: var(
+		--brand-accent,
+		#{compositions.role-default("accent")}
+	);
 	color: var(--brand-on-accent, #{compositions.role-default("on-accent")});
 }
 

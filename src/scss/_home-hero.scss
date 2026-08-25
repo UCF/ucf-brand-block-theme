@@ -112,6 +112,11 @@
 // Sizing the frame to 16:9 and to at least the band's own box puts the fit lines outside the
 // clip instead. `cq` units measure the figure rather than the viewport, which is what makes
 // this hold at any band height.
+//
+// WHY: a second block for the same selector, deliberately. The `display` rule above is the
+// mobile fix and reads with the media query beside it; this one is the aspect fix and reads
+// with the iframe rule below. Merging them files both under one comment.
+// stylelint-disable-next-line no-duplicate-selectors
 .brand-home-hero__band .wp-block-cover__embed-background {
 	container-type: size;
 }

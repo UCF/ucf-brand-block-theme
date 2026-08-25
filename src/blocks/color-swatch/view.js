@@ -35,7 +35,7 @@
 	 * Three to eight digits rather than a flat six: `derivedFromColor()` writes six, but a
 	 * HEX typed by hand may be short-form or carry an alpha pair.
 	 */
-	var HEX_LINE = /^\s*HEX\s+(#?[0-9A-Fa-f]{3,8})\s*$/;
+	const HEX_LINE = /^\s*HEX\s+(#?[0-9A-Fa-f]{3,8})\s*$/;
 
 	/**
 	 * Clipboard, drawn to sit beside the link icon in brand-nav.js without looking like a
@@ -43,7 +43,7 @@
 	 * carries the name). Stroked rather than filled because a solid glyph at this size reads
 	 * as a blob against a saturated swatch.
 	 */
-	var CLIPBOARD_ICON =
+	const CLIPBOARD_ICON =
 		'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" ' +
 		'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" ' +
 		'stroke-linejoin="round">' +
@@ -52,10 +52,10 @@
 		'</svg>';
 
 	/** How long the "Copied" bubble stays up. Matches the heading anchors. */
-	var DONE_MS = 1600;
+	const DONE_MS = 1600;
 
 	/** The one polite live region, created on first use. */
-	var live = null;
+	let live = null;
 
 	/**
 	 * Copy text to the clipboard, preferring the async API and falling back to a hidden
@@ -63,7 +63,7 @@
 	 *
 	 * Deliberately duplicated from `src/js/brand-nav.js` rather than shared: a block source
 	 * has to lift into a plugin unchanged, so it may not import from the theme. The fallback
-	 * is not optional cruft — `navigator.clipboard` is undefined on any plain-http host, which
+	 * is not optional cruft — `window.navigator.clipboard` is undefined on any plain-http host, which
 	 * describes most local stacks, and without it the whole affordance silently disappears
 	 * there.
 	 *
@@ -71,12 +71,17 @@
 	 * @param {Function} onDone Called once, only if the copy succeeded.
 	 */
 	function copyText( text, onDone ) {
-		if ( navigator.clipboard && navigator.clipboard.writeText ) {
-			navigator.clipboard.writeText( text ).then( onDone, function () {
-				if ( fallbackCopy( text ) ) {
-					onDone();
-				}
-			} );
+		if (
+			window.navigator.clipboard &&
+			window.navigator.clipboard.writeText
+		) {
+			window.navigator.clipboard
+				.writeText( text )
+				.then( onDone, function () {
+					if ( fallbackCopy( text ) ) {
+						onDone();
+					}
+				} );
 		} else if ( fallbackCopy( text ) ) {
 			onDone();
 		}
@@ -87,10 +92,10 @@
 	 * @return {boolean} Whether the copy succeeded.
 	 */
 	function fallbackCopy( text ) {
-		var ok = false;
+		let ok = false;
 
 		try {
-			var field = document.createElement( 'textarea' );
+			const field = document.createElement( 'textarea' );
 			field.value = text;
 			field.setAttribute( 'readonly', '' );
 			field.style.position = 'fixed';
@@ -133,9 +138,9 @@
 	 * @param {string} hex  The value to copy.
 	 */
 	function enhanceLine( node, hex ) {
-		var line = document.createElement( 'span' );
-		var button = document.createElement( 'button' );
-		var timer = null;
+		const line = document.createElement( 'span' );
+		const button = document.createElement( 'button' );
+		let timer = null;
 
 		line.className = 'brand-swatch__hex';
 		line.appendChild( document.createTextNode( node.nodeValue ) );
@@ -144,7 +149,10 @@
 		button.className = 'brand-swatch__copy';
 		button.innerHTML = CLIPBOARD_ICON;
 		// The icon has no text of its own, so this is the button's whole accessible name.
-		button.setAttribute( 'aria-label', 'Copy ' + hex + ' to the clipboard' );
+		button.setAttribute(
+			'aria-label',
+			'Copy ' + hex + ' to the clipboard'
+		);
 		line.appendChild( button );
 
 		/**
@@ -170,7 +178,8 @@
 			// the hex to select it wants the selection, not the clipboard. Clicking the icon
 			// is unambiguous, so it is exempt. Same guard as the headings.
 			if ( ! event.target.closest( '.brand-swatch__copy' ) ) {
-				var selection = window.getSelection && window.getSelection();
+				const view = event.target.ownerDocument.defaultView;
+				const selection = view.getSelection && view.getSelection();
 
 				if ( selection && ! selection.isCollapsed ) {
 					return;
@@ -184,18 +193,18 @@
 	}
 
 	function init() {
-		var values = document.querySelectorAll( '.brand-swatch__value' );
+		const values = document.querySelectorAll( '.brand-swatch__value' );
 
 		Array.prototype.forEach.call( values, function ( value ) {
 			// A static copy: replacing a child mutates the live childNodes list underneath us.
-			var nodes = Array.prototype.slice.call( value.childNodes );
+			const nodes = Array.prototype.slice.call( value.childNodes );
 
 			nodes.forEach( function ( node ) {
 				if ( node.nodeType !== 3 ) {
 					return;
 				}
 
-				var match = HEX_LINE.exec( node.nodeValue );
+				const match = HEX_LINE.exec( node.nodeValue );
 
 				if ( match ) {
 					enhanceLine( node, match[ 1 ] );

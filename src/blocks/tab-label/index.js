@@ -13,15 +13,12 @@
  * Static block: `save` emits the real markup. view.js promotes the wrapper to
  * `role="tab"` at runtime (above the tabs breakpoint only). The heading is an H3 on
  * purpose — H2 is structural and drives the drawer (see CLAUDE.md).
- *
- * @package ucf-brand-block-theme
  */
 
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import metadata from './block.json';
-
 /**
  * v1 — the label when it still carried a gold `badge` span above the heading.
  *
@@ -80,42 +77,42 @@ const v1 = {
 	},
 };
 
-registerBlockType( metadata.name, {
-	edit( { attributes, setAttributes } ) {
-		const { heading, description } = attributes;
-		const blockProps = useBlockProps( { className: 'ucf-tabs__label' } );
+// UPSTREAM: `edit` is a named component, not an inline method — `useBlockProps` is a hook,
+// and the react-hooks lint rule only recognises one inside a capitalised function. Every
+// block in src/blocks/ follows this shape.
+function Edit( { attributes, setAttributes } ) {
+	const { heading, description } = attributes;
+	const blockProps = useBlockProps( { className: 'ucf-tabs__label' } );
 
-		return (
-			<div { ...blockProps }>
-				<RichText
-					tagName="h3"
-					className="ucf-tabs__heading"
-					value={ heading }
-					allowedFormats={ [] }
-					placeholder={ __(
-						'Tab heading',
-						'ucf-brand-block-theme'
-					) }
-					onChange={ ( value ) =>
-						setAttributes( { heading: value } )
-					}
-				/>
-				<RichText
-					tagName="p"
-					className="ucf-tabs__description"
-					value={ description }
-					allowedFormats={ [] }
-					placeholder={ __(
-						'Supporting copy (optional)',
-						'ucf-brand-block-theme'
-					) }
-					onChange={ ( value ) =>
-						setAttributes( { description: value } )
-					}
-				/>
-			</div>
-		);
-	},
+	return (
+		<div { ...blockProps }>
+			<RichText
+				tagName="h3"
+				className="ucf-tabs__heading"
+				value={ heading }
+				allowedFormats={ [] }
+				placeholder={ __( 'Tab heading', 'ucf-brand-block-theme' ) }
+				onChange={ ( value ) => setAttributes( { heading: value } ) }
+			/>
+			<RichText
+				tagName="p"
+				className="ucf-tabs__description"
+				value={ description }
+				allowedFormats={ [] }
+				placeholder={ __(
+					'Supporting copy (optional)',
+					'ucf-brand-block-theme'
+				) }
+				onChange={ ( value ) =>
+					setAttributes( { description: value } )
+				}
+			/>
+		</div>
+	);
+}
+
+registerBlockType( metadata.name, {
+	edit: Edit,
 
 	save( { attributes } ) {
 		const { heading, description } = attributes;

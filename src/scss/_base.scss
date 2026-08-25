@@ -14,7 +14,7 @@ html {
 
 body {
 	-webkit-font-smoothing: antialiased;
-	text-rendering: optimizeLegibility;
+	text-rendering: optimizelegibility;
 }
 
 // Reading Width: an opt-in block style (registered in functions.php) narrowing a block from
@@ -28,7 +28,11 @@ body {
 .is-style-reading-width.is-style-reading-width {
 	box-sizing: border-box;
 	max-width: var(--wp--style--global--content-size);
-	padding-right: calc(var(--wp--style--global--content-size) - var(--wp--custom--reading-width));
+	padding-right: calc(
+		var(--wp--style--global--content-size) - var(
+				--wp--custom--reading-width
+			)
+	);
 }
 
 @media (max-width: $breakpoint-drawer) {

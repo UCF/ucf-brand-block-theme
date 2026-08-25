@@ -5,8 +5,6 @@
  * blocks the author nests. view.js promotes it to `role="tabpanel"` and hides the
  * inactive panels at runtime (above the tabs breakpoint only), so with no JS every
  * panel is simply visible beneath its label.
- *
- * @package ucf-brand-block-theme
  */
 
 import { registerBlockType } from '@wordpress/blocks';
@@ -21,19 +19,21 @@ const TEMPLATE = [
 	],
 ];
 
-registerBlockType( metadata.name, {
-	edit() {
-		const blockProps = useBlockProps( { className: 'ucf-tabs__panel' } );
-		const innerProps = useInnerBlocksProps( blockProps, {
-			template: TEMPLATE,
-			// The parent Tab locks its label/panel pair with templateLock: 'all',
-			// which descendants inherit. Opt this region back out so a panel accepts
-			// any blocks — headings, images, columns, buttons, etc.
-			templateLock: false,
-		} );
+function Edit() {
+	const blockProps = useBlockProps( { className: 'ucf-tabs__panel' } );
+	const innerProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+		// The parent Tab locks its label/panel pair with templateLock: 'all',
+		// which descendants inherit. Opt this region back out so a panel accepts
+		// any blocks — headings, images, columns, buttons, etc.
+		templateLock: false,
+	} );
 
-		return <div { ...innerProps } />;
-	},
+	return <div { ...innerProps } />;
+}
+
+registerBlockType( metadata.name, {
+	edit: Edit,
 
 	save() {
 		const blockProps = useBlockProps.save( {

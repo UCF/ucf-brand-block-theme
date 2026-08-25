@@ -21,23 +21,23 @@
  * Static block: `save` emits real markup and nothing renders on the server. Everything
  * dynamic in the hero is a core block this one merely wraps, which is what keeps it free of
  * any reference to the theme.
- *
- * @package ucf-brand-block-theme
  */
 
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import metadata from './block.json';
 
-registerBlockType( metadata.name, {
-	edit() {
-		const blockProps = useBlockProps( { className: 'brand-hero' } );
-		const innerProps = useInnerBlocksProps( blockProps, {
-			templateLock: 'contentOnly',
-		} );
+function Edit() {
+	const blockProps = useBlockProps( { className: 'brand-hero' } );
+	const innerProps = useInnerBlocksProps( blockProps, {
+		templateLock: 'contentOnly',
+	} );
 
-		return <div { ...innerProps } />;
-	},
+	return <div { ...innerProps } />;
+}
+
+registerBlockType( metadata.name, {
+	edit: Edit,
 
 	save() {
 		const blockProps = useBlockProps.save( { className: 'brand-hero' } );
