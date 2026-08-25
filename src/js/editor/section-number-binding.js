@@ -32,7 +32,7 @@ registerBlockBindingsSource( {
 			values[ attribute ] =
 				number && binding.args?.label
 					? sprintf(
-							/* translators: 1: guide name, e.g. "Brand Guidelines". 2: zero-padded section number, e.g. "05". */
+							/* translators: 1: guide name, e.g. "Brand Guidelines". 2: section number, e.g. "5". */
 							__( '%1$s · Section %2$s', 'ucf-brand-block-theme' ),
 							binding.args.label,
 							number

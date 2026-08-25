@@ -44,16 +44,17 @@ final class SectionNumberTest extends TestCase {
 	 */
 	public static function numberCases() {
 		return array(
-			'pads to two digits'       => array( 1, '01' ),
-			'nine pads'                => array( 9, '09' ),
-			'ten is unpadded'          => array( 10, '10' ),
-			'three digits are not cut' => array( 100, '100' ),
+			// SPEC: unpadded — the guide numbers sections "1", "2", "3", not "01".
+			'single digit'             => array( 1, '1' ),
+			'nine'                     => array( 9, '9' ),
+			'ten'                      => array( 10, '10' ),
+			'three digits'             => array( 100, '100' ),
 
 			// Meta comes back from the database as a string.
-			'numeric string'           => array( '7', '07' ),
+			'numeric string'           => array( '7', '7' ),
 
 			// Everything below means "unnumbered", and must render as an empty label —
-			// `.brand-page-number:empty` is what hides the element. A "00" here would
+			// `.brand-page-number:empty` is what hides the element. A "0" here would
 			// print a badge on every unnumbered page.
 			'zero is unset'            => array( 0, '' ),
 			'negative is unset'        => array( -3, '' ),
@@ -76,7 +77,7 @@ final class SectionNumberTest extends TestCase {
 
 		$block = new WP_Block( array( 'postId' => 42 ) );
 
-		$this->assertSame( '05', ucf_brand_binding_section_number( array(), $block ) );
+		$this->assertSame( '5', ucf_brand_binding_section_number( array(), $block ) );
 	}
 
 	/**
@@ -92,7 +93,7 @@ final class SectionNumberTest extends TestCase {
 		);
 		Functions\when( 'get_queried_object_id' )->justReturn( 7 );
 
-		$this->assertSame( '03', ucf_brand_binding_section_number( array(), null ) );
+		$this->assertSame( '3', ucf_brand_binding_section_number( array(), null ) );
 	}
 
 	/**
@@ -105,7 +106,7 @@ final class SectionNumberTest extends TestCase {
 		Functions\when( 'get_queried_object_id' )->justReturn( 1 );
 
 		$this->assertSame(
-			'Brand Guidelines · Section 05',
+			'Brand Guidelines · Section 5',
 			ucf_brand_binding_section_number( array( 'label' => 'Brand Guidelines' ), null )
 		);
 	}

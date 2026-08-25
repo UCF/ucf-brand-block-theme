@@ -14,13 +14,15 @@
 export const META_KEY = 'ucf_brand_number';
 
 /**
- * Zero-pad a section number for display (1 → "01").
+ * Format a section number for display.
+ *
+ * SYNC: unpadded, matching `ucf_brand_format_number()` in includes/sections.php.
  *
  * @param {number|string} value Raw meta value.
- * @return {string} Zero-padded number, or '' when unset/0.
+ * @return {string} Decimal number, or '' when unset/0.
  */
 export function formatSectionNumber( value ) {
 	const number = parseInt( value, 10 );
 
-	return number > 0 ? String( number ).padStart( 2, '0' ) : '';
+	return number > 0 ? String( number ) : '';
 }
