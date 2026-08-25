@@ -194,7 +194,7 @@ final class SectionNavTest extends TestCase {
 
 		$sections = ucf_brand_get_ordered_sections();
 
-		$this->assertSame( '01', $sections[0]['label'] );
+		$this->assertSame( '1', $sections[0]['label'] );
 	}
 
 	/**
@@ -243,7 +243,7 @@ final class SectionNavTest extends TestCase {
 		$this->assertStringContainsString( '<ul class="brand-nav__list">', $html );
 		$this->assertStringContainsString( 'class="brand-nav__item"', $html );
 		$this->assertStringContainsString( 'href="https://example.test/page-10/"', $html );
-		$this->assertStringContainsString( '<span class="brand-nav__num">01</span>', $html );
+		$this->assertStringContainsString( '<span class="brand-nav__num">1</span>', $html );
 		$this->assertStringContainsString( '<span class="brand-nav__text">Foundation</span>', $html );
 		$this->assertStringContainsString( 'aria-hidden="true"', $html );
 	}

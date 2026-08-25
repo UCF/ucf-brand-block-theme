@@ -221,6 +221,43 @@
 	padding: map.get($space, "40") 1.3rem map.get($space, "50");
 }
 
+// WHY: white with a rule under it, not the dark field's blue-tint `link` role. These sit
+// directly under the nav as chrome, and the role color read as a third accent competing
+// with the gold org line below it.
+// A11Y: gold on hover and focus, matching every other interactive state on black.
+.brand-sidebar__footer a {
+	color: map.get($color, "white");
+	text-decoration: underline;
+	text-underline-offset: 0.25em;
+
+	&:hover,
+	&:focus-visible {
+		color: map.get($color, "gold");
+	}
+}
+
+// WHY: the group's blockGap keeps the two utility links paired; the org line opens a new
+// tier and needs the gap the gap cannot give it without splitting the links apart.
+// SPEC: the comp draws this line below the type scale and far tighter than the eyebrow
+// style — 33 characters have to reach the "//" on line one inside a 245px rail, and no
+// preset size does that at a tracking worth keeping. `meta` at 0.08em fits by one pixel,
+// which is a coincidence rather than a design.
+// WHY: scoped to the drawer footer, so `is-style-eyebrow` is untouched everywhere else.
+// The class still supplies the mono face, the weight and the `--brand-eyebrow` role, so
+// the color still follows the composition rather than naming gold here.
+.brand-sidebar__footer .is-style-eyebrow {
+	font-size: 0.62rem;
+	letter-spacing: 0.12em;
+	margin-block-start: map.get($space, "40");
+}
+
+// SPEC: wider tracking than `.is-style-meta`, and uppercased here rather than typed that
+// way so the version string stays sentence case in the template part.
+.brand-sidebar__version {
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
 // ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
 //
 // WHY: markup is server-rendered from the ordered section list — see
@@ -349,7 +386,10 @@
 	pointer-events: none;
 	position: fixed;
 	transition: opacity 0.25s;
-	z-index: 1400;
+
+	// FIX: above the University Header. At 1400 the bar painted over the scrim and the
+	// drawer, burying the close button — see $z-university-header in _variables.scss.
+	z-index: $z-university-header + 1;
 
 	&.is-open {
 		opacity: 1;
@@ -414,21 +454,34 @@
 		transform: translateX(-100%);
 		transition: transform 0.25s ease;
 		width: min(86vw, 320px);
-		z-index: 1500;
+
+		// FIX: one above the scrim, both above the University Header. The drawer is an
+		// overlay, so it covers the bar while open — the bar itself is untouched.
+		z-index: $z-university-header + 2;
 
 		&.is-open {
 			transform: translateX(0);
 		}
 	}
 
+	// UPSTREAM: a <button> does not inherit the page font, so each engine fell back to its
+	// own UA default — Arial on Chromium, -apple-system on Firefox, system-ui on WebKit —
+	// and "×" sits at a different size and optical centre in every one of them. Naming the
+	// face pins it: the latin subset covers U+00D7, so the glyph comes from the self-hosted
+	// file rather than whatever the device happens to have installed.
+	// FIX: `line-height: 1` for the same reason — `normal` is font-dependent, so it shifted
+	// the glyph inside the 44px grid box even once the family matched.
 	.brand-sidebar__close {
+		appearance: none;
 		background: none;
 		border: 0;
 		color: map.get($color, "white");
 		cursor: pointer;
 		display: grid;
+		font-family: map.get($font, "body");
 		font-size: 1.3rem;
 		height: 44px;
+		line-height: 1;
 		place-items: center;
 		position: absolute;
 		right: 0.5rem;

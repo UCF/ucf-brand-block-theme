@@ -84,23 +84,35 @@ describe.each( BLOCK_FIXTURES.map( ( f ) => [ f.name, f ] ) )(
 );
 
 describe( 'ucf-brand/tab-label', () => {
-	// The badge is conditional in save() — `{ badge && ... }`. A block saved without one
-	// must still round-trip, and the branch must not leave an empty element behind that a
-	// later save would not reproduce.
-	it( 'round-trips with the optional badge omitted', () => {
-		const html = serialize(
-			createBlock( 'ucf-brand/tabs', {}, [
-				createBlock( 'ucf-brand/tab', {}, [
-					createBlock( 'ucf-brand/tab-label', {
-						heading: 'No badge here',
-					} ),
-					createBlock( 'ucf-brand/tab-panel', {}, [] ),
-				] ),
-			] )
-		);
+	// The `badge` attribute was removed after labels carrying one had already been saved.
+	// Those pages hold a `.ucf-tabs__badge` span that the current save() never emits, so
+	// they survive only through the v1 entry in the block's `deprecated` array. Without it
+	// every tab in the database parses as invalid and the front end drops it.
+	//
+	// `parse()` here on purpose — the point *is* the deprecation path. The assertions are
+	// on the migration's outcome, not on `isValid` alone: a block that silently failed to
+	// migrate would still report valid. See CLAUDE.md.
+	it( 'migrates markup saved while the badge still existed', () => {
+		const legacy =
+			'<!-- wp:ucf-brand/tab-label -->' +
+			'<div class="wp-block-ucf-brand-tab-label ucf-tabs__label">' +
+			'<span class="ucf-tabs__badge">Do</span>' +
+			'<h3 class="ucf-tabs__heading">Use the primary mark</h3>' +
+			'</div>' +
+			'<!-- /wp:ucf-brand/tab-label -->';
 
-		expect( collectInvalid( parse( html ) ) ).toEqual( [] );
-		expect( html ).not.toContain( 'ucf-tabs__badge' );
+		const block = parse( legacy )[ 0 ];
+
+		// UPSTREAM: the migration logs "Block successfully updated" through console.info,
+		// and @wordpress/jest-console fails any unexpected console call. Asserting it is
+		// also the positive signal that the deprecation ran rather than the current save()
+		// happening to match.
+		expect( console ).toHaveInformed();
+
+		expect( collectInvalid( [ block ] ) ).toEqual( [] );
+		expect( block.attributes.badge ).toBeUndefined();
+		expect( block.attributes.heading ).toBe( 'Use the primary mark' );
+		expect( serialize( block ) ).not.toContain( 'ucf-tabs__badge' );
 	} );
 
 	// `description` was added to this block after labels had already been saved without it.
@@ -115,7 +127,6 @@ describe( 'ucf-brand/tab-label', () => {
 	it( 'still validates markup saved before the description existed', () => {
 		const legacy =
 			'<div class="wp-block-ucf-brand-tab-label ucf-tabs__label">' +
-			'<span class="ucf-tabs__badge">Do</span>' +
 			'<h3 class="ucf-tabs__heading">Use the primary mark</h3>' +
 			'</div>';
 
@@ -130,7 +141,7 @@ describe( 'ucf-brand/tab-label', () => {
 			expect(
 				isValidBlockContent(
 					'ucf-brand/tab-label',
-					{ badge: 'Do', heading: 'Use the primary mark' },
+					{ heading: 'Use the primary mark' },
 					legacy
 				)
 			).toBe( true );
@@ -145,7 +156,6 @@ describe( 'ucf-brand/tab-label', () => {
 			createBlock( 'ucf-brand/tabs', {}, [
 				createBlock( 'ucf-brand/tab', {}, [
 					createBlock( 'ucf-brand/tab-label', {
-						badge: 'Do',
 						heading: 'No supporting copy here',
 					} ),
 					createBlock( 'ucf-brand/tab-panel', {}, [] ),
@@ -162,7 +172,6 @@ describe( 'ucf-brand/tab-label', () => {
 			createBlock( 'ucf-brand/tabs', {}, [
 				createBlock( 'ucf-brand/tab', {}, [
 					createBlock( 'ucf-brand/tab-label', {
-						badge: 'Do',
 						heading: 'Use the primary mark',
 						description: 'On a field with room to breathe.',
 					} ),
@@ -176,7 +185,6 @@ describe( 'ucf-brand/tab-label', () => {
 		// `source: html` attributes are re-derived from the markup on parse, not from the
 		// block comment. If the selector in block.json and the class in save() ever drift
 		// apart, these come back empty while the block still looks valid.
-		expect( label.attributes.badge ).toBe( 'Do' );
 		expect( label.attributes.heading ).toBe( 'Use the primary mark' );
 		expect( label.attributes.description ).toBe(
 			'On a field with room to breathe.'

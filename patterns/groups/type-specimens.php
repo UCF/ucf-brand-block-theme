@@ -43,7 +43,7 @@
 	<!-- /wp:paragraph -->
 
 	<!-- wp:paragraph {"fontFamily":"mono","fontSize":"heading-4","style":{"typography":{"letterSpacing":"0.06em","textTransform":"uppercase"}}} -->
-	<p class="has-mono-font-family has-heading-4-font-size" style="letter-spacing:0.06em;text-transform:uppercase">Pantone 124 · #EDB80D · 11.46:1</p>
+	<p class="has-mono-font-family has-heading-4-font-size" style="letter-spacing:0.06em;text-transform:uppercase">Pantone 124 · #EDB80C · 11.46:1</p>
 	<!-- /wp:paragraph -->
 </div>
 <!-- /wp:group -->

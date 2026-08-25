@@ -4,7 +4,7 @@
  *
  * Each brand page carries a `ucf_brand_number` — set by the editor in the Brand panel
  * (see src/js/editor/brand-order-panel.js). That single value both orders the page in the
- * drawer and prints as its decimal label (1 → "01"). One PHP source of truth,
+ * drawer and prints as its decimal label. One PHP source of truth,
  * `ucf_brand_get_ordered_sections()`, feeds two consumers: the drawer menu (the
  * `ucf-brand/section-nav` dynamic block, in includes/section-nav.php) and each page's
  * on-page label (the `ucf-brand/section-number` block binding, below), so the two can
@@ -22,10 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Format a section number as its zero-padded decimal label (1 → "01").
+ * Format a section number as its decimal label.
+ *
+ * SPEC: unpadded. The guide numbers sections "1", "2", "3" and subsections "1.1", "1.2" —
+ * the zero-padded form this used to return printed "01" and "01.01" instead.
  *
  * @param int $number Raw section number.
- * @return string Two-digit-minimum label, or '' when unset.
+ * @return string Decimal label, or '' when unset.
  */
 function ucf_brand_format_number( $number ) {
 	$number = (int) $number;
@@ -34,7 +37,7 @@ function ucf_brand_format_number( $number ) {
 		return '';
 	}
 
-	return str_pad( (string) $number, 2, '0', STR_PAD_LEFT );
+	return (string) $number;
 }
 
 /**
@@ -139,10 +142,10 @@ function ucf_brand_register_bindings() {
 add_action( 'init', 'ucf_brand_register_bindings' );
 
 /**
- * Resolve the bound value: the queried page's zero-padded number, or '' when unset.
+ * Resolve the bound value: the queried page's decimal number, or '' when unset.
  *
  * With a `label` argument the number is expanded into the hero's eyebrow line —
- * "Brand Guidelines · Section 05" — rather than returned bare. Both forms come off the
+ * "Brand Guidelines · Section 5" — rather than returned bare. Both forms come off the
  * same meta value on purpose: the drawer prints one number per page and the hero prints
  * the same one, so the two cannot drift the way a hand-typed eyebrow does.
  *
@@ -170,7 +173,7 @@ function ucf_brand_binding_section_number( $source_args, $block_instance = null 
 	}
 
 	return sprintf(
-		/* translators: 1: guide name, e.g. "Brand Guidelines". 2: zero-padded section number, e.g. "05". */
+		/* translators: 1: guide name, e.g. "Brand Guidelines". 2: section number, e.g. "5". */
 		__( '%1$s · Section %2$s', 'ucf-brand-block-theme' ),
 		$source_args['label'],
 		$number

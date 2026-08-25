@@ -4,7 +4,7 @@
 // ── Subsection badges ────────────────────────────────────────────────────────
 //
 // CONTEXT: every content H2 is a subsection and gets an automatic badge pairing the page's
-// number with the H2's position — "01.01", "01.02". The page number arrives as
+// number with the H2's position — "1.1", "1.2". The page number arrives as
 // `--brand-section`, set inline per page in functions.php.
 //
 // WHY: on a page with no Brand order the property is unset, so `content` is invalid and the
@@ -28,8 +28,9 @@
 	background: map.get($color, "black");
 	border-left: 3px solid map.get($color, "gold");
 	color: map.get($color, "gold");
-	content: var(--brand-section)
-		counter(brand-subsection, decimal-leading-zero);
+	// SPEC: plain `decimal`. `decimal-leading-zero` printed "1.01" once the page number
+	// itself stopped being padded — see ucf_brand_format_number() in includes/sections.php.
+	content: var(--brand-section) counter(brand-subsection);
 	display: inline-block;
 	font-family: map.get($font, "mono");
 	font-size: map.get($size, "meta");

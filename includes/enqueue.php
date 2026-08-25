@@ -67,7 +67,7 @@ function ucf_brand_enqueue_assets() {
 	);
 
 	// Expose the current page's number to CSS so each H2 badge can prefix its subsection
-	// counter with it (01.01, 01.02 …). Unset on pages with no Brand order, which makes the
+	// counter with it (1.1, 1.2 …). Unset on pages with no Brand order, which makes the
 	// badge's `content` invalid and hides it — see _sections.scss. The editor canvas gets
 	// the same variable by a different route; see ucf_brand_editor_section_style() below.
 	// The formatter lives in includes/sections.php, loaded ahead of this file.

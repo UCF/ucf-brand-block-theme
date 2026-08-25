@@ -27,19 +27,13 @@
 	margin-top: map.get($space, "40");
 }
 
-// TODO: temporary treatment, borrowing the eyebrow's type boxed in gold. When the badge
-// primitive lands, swap this and the span in src/blocks/tab-label without touching layout.
+// TODO: transitional. The `badge` attribute is gone from src/blocks/tab-label, but its
+// span survives in already-saved markup until each page is opened in the editor and
+// re-saved — the deprecation migrates on the client, never on render. Without this the
+// acronyms render unstyled on black, which is both wrong and a contrast failure.
+// Delete once every page holding tabs has been re-saved.
 .ucf-tabs__badge {
-	align-self: start;
-	background: map.get($color, "gold");
-	color: map.get($color, "black");
-	font-family: map.get($font, "mono");
-	font-size: map.get($size, "eyebrow");
-	font-weight: 700;
-	letter-spacing: 0.22em;
-	line-height: 1;
-	padding: 0.5em 0.75em;
-	text-transform: uppercase;
+	display: none;
 }
 
 .ucf-tabs__heading {

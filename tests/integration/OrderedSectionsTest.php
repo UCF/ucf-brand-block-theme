@@ -177,7 +177,7 @@ final class OrderedSectionsTest extends WP_UnitTestCase {
 
 		$sections = ucf_brand_get_ordered_sections();
 
-		$this->assertSame( '01', $sections[0]['label'] );
+		$this->assertSame( '1', $sections[0]['label'] );
 		$this->assertSame( get_permalink( $foundation ), $sections[0]['url'] );
 		$this->assertTrue( $sections[0]['is_current'] );
 		$this->assertFalse( $sections[1]['is_current'] );
@@ -203,6 +203,6 @@ final class OrderedSectionsTest extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'brand-nav__list', $html );
 		$this->assertStringContainsString( 'Foundation', $html );
-		$this->assertStringContainsString( '01', $html );
+		$this->assertStringContainsString( '<span class="brand-nav__num">1</span>', $html );
 	}
 }

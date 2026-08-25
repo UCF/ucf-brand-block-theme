@@ -69,6 +69,13 @@ $wrap: var(--wp--custom--wrap);
 // header is the University Header, which scrolls away. _base.scss offsets anchors by it.
 $mobile-bar-height: var(--wp--custom--mobile-bar-height);
 
+// UPSTREAM: the University Header paints at z-index 10000 and is script-built by
+// universityheader.ucf.edu — not ours to restyle (includes/university-header.php). It sits
+// in normal flow but its own stacking context outranks every layer this theme had, so the
+// open drawer, its scrim and the skip link all rendered *under* the bar. Anything that has
+// to cover the page measures from here.
+$z-university-header: 10000;
+
 // SPEC: where the drawer becomes off-canvas. Mirrors the prototype.
 $breakpoint-drawer: 960px;
 
