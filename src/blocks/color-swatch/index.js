@@ -53,7 +53,7 @@ const RGB_SEP = ' · ';
 /**
  * Split a six-digit hex color into its three channel values.
  *
- * @param {string} hex Color like `#EDB80D` (leading `#` optional).
+ * @param {string} hex Color like `#EDB80C` (leading `#` optional).
  * @return {?number[]} `[ r, g, b ]`, or null if the string isn't a hex color.
  */
 function hexToRgb( hex ) {

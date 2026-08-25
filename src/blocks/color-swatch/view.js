@@ -29,7 +29,7 @@
 	'use strict';
 
 	/**
-	 * The saved HEX line, e.g. `HEX #EDB80D`. Group 1 is what gets copied — the value alone,
+	 * The saved HEX line, e.g. `HEX #EDB80C`. Group 1 is what gets copied — the value alone,
 	 * without the label, because what an author wants on the clipboard is the color.
 	 *
 	 * Three to eight digits rather than a flat six: `derivedFromColor()` writes six, but a

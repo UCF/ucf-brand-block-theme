@@ -2,8 +2,8 @@
 
 exports[`ucf-brand/color-swatches produces stable save() markup 1`] = `
 "<!-- wp:ucf-brand/color-swatches -->
-<div class="wp-block-ucf-brand-color-swatches brand-swatches"><!-- wp:ucf-brand/color-swatch {"hex":"#EDB80D","rgb":"237 · 184 · 13","cmyk":"0 22 95 0","pantone":"7409 C","usage":"Primary accent","ratio":"1.9:1","ratioStatus":"fail"} -->
-<div class="wp-block-ucf-brand-color-swatch brand-swatch"><span class="brand-swatch__chip has-gold-background-color has-background"></span><div class="brand-swatch__body"><p class="brand-swatch__name">Bold Gold</p><p class="brand-swatch__value">HEX #EDB80D<br/>RGB 237 · 184 · 13<br/>CMYK 0 22 95 0<br/>PANTONE 7409 C<br/>Primary accent</p><span class="brand-swatch__ratio is-fail">1.9:1</span></div></div>
+<div class="wp-block-ucf-brand-color-swatches brand-swatches"><!-- wp:ucf-brand/color-swatch {"hex":"#EDB80C","rgb":"237 · 184 · 12","cmyk":"0 22 95 0","pantone":"7409 C","usage":"Primary accent","ratio":"1.9:1","ratioStatus":"fail"} -->
+<div class="wp-block-ucf-brand-color-swatch brand-swatch"><span class="brand-swatch__chip has-gold-background-color has-background"></span><div class="brand-swatch__body"><p class="brand-swatch__name">Bold Gold</p><p class="brand-swatch__value">HEX #EDB80C<br/>RGB 237 · 184 · 12<br/>CMYK 0 22 95 0<br/>PANTONE 7409 C<br/>Primary accent</p><span class="brand-swatch__ratio is-fail">1.9:1</span></div></div>
 <!-- /wp:ucf-brand/color-swatch --></div>
 <!-- /wp:ucf-brand/color-swatches -->"
 `;

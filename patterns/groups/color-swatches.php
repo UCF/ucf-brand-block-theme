@@ -15,8 +15,8 @@
 <div class="wp-block-group">
 <!-- wp:ucf-brand/color-swatches -->
 <div class="wp-block-ucf-brand-color-swatches brand-swatches">
-	<!-- wp:ucf-brand/color-swatch {"colorSlug":"gold","name":"<?php esc_attr_e( 'Bold Gold', 'ucf-brand-block-theme' ); ?>","hex":"#EDB80D","rgb":"237 · 184 · 13","cmyk":"0 · 23 · 100 · 7","pantone":"124","ratio":"11.46:1 on black"} -->
-	<div class="wp-block-ucf-brand-color-swatch brand-swatch"><span class="brand-swatch__chip has-gold-background-color has-background"></span><div class="brand-swatch__body"><p class="brand-swatch__name"><?php esc_html_e( 'Bold Gold', 'ucf-brand-block-theme' ); ?></p><p class="brand-swatch__value">HEX #EDB80D<br>RGB 237 · 184 · 13<br>CMYK 0 · 23 · 100 · 7<br>PANTONE 124</p><span class="brand-swatch__ratio is-pass">11.46:1 on black</span></div></div>
+	<!-- wp:ucf-brand/color-swatch {"colorSlug":"gold","name":"<?php esc_attr_e( 'Bold Gold', 'ucf-brand-block-theme' ); ?>","hex":"#EDB80C","rgb":"237 · 184 · 12","cmyk":"0 · 23 · 100 · 7","pantone":"124","ratio":"11.46:1 on black"} -->
+	<div class="wp-block-ucf-brand-color-swatch brand-swatch"><span class="brand-swatch__chip has-gold-background-color has-background"></span><div class="brand-swatch__body"><p class="brand-swatch__name"><?php esc_html_e( 'Bold Gold', 'ucf-brand-block-theme' ); ?></p><p class="brand-swatch__value">HEX #EDB80C<br>RGB 237 · 184 · 12<br>CMYK 0 · 23 · 100 · 7<br>PANTONE 124</p><span class="brand-swatch__ratio is-pass">11.46:1 on black</span></div></div>
 	<!-- /wp:ucf-brand/color-swatch -->
 
 	<!-- wp:ucf-brand/color-swatch {"colorSlug":"black","labelInk":"light","name":"<?php esc_attr_e( 'UCF Black', 'ucf-brand-block-theme' ); ?>","hex":"#000000","rgb":"0 · 0 · 0","cmyk":"0 · 0 · 0 · 100","ratio":"21:1 on white"} -->
