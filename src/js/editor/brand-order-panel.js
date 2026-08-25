@@ -43,7 +43,7 @@ function BrandOrderPanel() {
 				step={ 1 }
 				label={ __( 'Brand order', 'ucf-brand-block-theme' ) }
 				help={ __(
-					'Orders this page in the drawer and prints as its label (1 → 01). Leave 0 to hide it from the drawer.',
+					'Orders this page in the drawer and prints as its label — 1 for section 1, whose H2 badges then read 1.1, 1.2. Leave 0 to hide it from the drawer.',
 					'ucf-brand-block-theme'
 				) }
 				value={ value ? String( value ) : '' }

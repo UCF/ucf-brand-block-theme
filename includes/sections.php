@@ -142,10 +142,10 @@ function ucf_brand_register_bindings() {
 add_action( 'init', 'ucf_brand_register_bindings' );
 
 /**
- * Resolve the bound value: the queried page's zero-padded number, or '' when unset.
+ * Resolve the bound value: the queried page's decimal number, or '' when unset.
  *
  * With a `label` argument the number is expanded into the hero's eyebrow line —
- * "Brand Guidelines · Section 05" — rather than returned bare. Both forms come off the
+ * "Brand Guidelines · Section 5" — rather than returned bare. Both forms come off the
  * same meta value on purpose: the drawer prints one number per page and the hero prints
  * the same one, so the two cannot drift the way a hand-typed eyebrow does.
  *
