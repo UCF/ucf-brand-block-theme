@@ -151,8 +151,7 @@
 	// surface. The selected tab is excluded, or hovering it would read as the selection moving.
 	// FIX: pointer-only — `:hover` sticks after a tap on touch.
 	@media (hover: hover) {
-		.is-enhanced
-			.ucf-tabs__label:not([aria-selected="true"]):hover {
+		.is-enhanced .ucf-tabs__label:not([aria-selected="true"]):hover {
 			background: map.get($color, "card-dark");
 		}
 	}
@@ -184,16 +183,12 @@
 		border-top-color: map.get($color, "gold");
 	}
 
-	.is-enhanced
-		.ucf-tabs__label[aria-selected="true"]
-		.ucf-tabs__heading {
+	.is-enhanced .ucf-tabs__label[aria-selected="true"] .ucf-tabs__heading {
 		color: map.get($color, "black");
 	}
 
 	// WHY: back to the light-field grey once the tab itself is white.
-	.is-enhanced
-		.ucf-tabs__label[aria-selected="true"]
-		.ucf-tabs__description {
+	.is-enhanced .ucf-tabs__label[aria-selected="true"] .ucf-tabs__description {
 		color: map.get($color, "text-secondary");
 	}
 

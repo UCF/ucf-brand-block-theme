@@ -100,6 +100,10 @@ registered by the loop in `ucf_brand_register_blocks()` (`includes/blocks.php`),
 discovers them by globbing for `block.json` rather than from a hand-maintained list.
 
 -   **Static only.** `save()` must emit real markup. No `render.php`, no `render_callback`.
+-   **`edit` is a named, capitalized component**, declared above the registration and passed
+    as `edit: Edit`. An inline `edit()` method calls hooks in a function neither React nor
+    `react-hooks/rules-of-hooks` recognizes as a component. `save()` stays a method — it is
+    not a component and must not grow into one.
 -   Take colors by palette **slug** and apply core's `has-{slug}-background-color` /
     `has-{slug}-color` classes — never write an inline hex into `save()`.
 -   Don't reference theme functions or paths from block sources; they must lift into a
@@ -208,6 +212,36 @@ PHP opcache is on in the usual local stack with `revalidate_freq=2`. Swapping fi
 immediately requesting a page serves the _old_ compiled code, which makes a
 before/after comparison silently meaningless. Wait past the revalidation window before
 capturing anything you intend to trust.
+
+## Formatting and linting
+
+One formatter per file type, and they do not overlap:
+
+| Files                               | Formatted by          | Checked by                                     |
+| ----------------------------------- | --------------------- | ---------------------------------------------- |
+| `*.php`                             | `phpcbf`              | `composer lint`                                |
+| `src/blocks/`, `src/js/`, `tests/`  | Prettier              | `npm run lint:js` (via ESLint), `format:check` |
+| `src/scss/`                         | Prettier              | `npm run format:check`                         |
+| `*.md`, `*.json`, `*.yml`           | Prettier              | `npm run format:check`                         |
+| `patterns/`, `parts/`, `templates/` | nothing, deliberately | the markup sweep in `npm run test:js`          |
+
+`npm run format` fixes everything Prettier owns; `composer lint:fix` is the PHP half. Three
+things follow from the split, and all three are easy to undo by accident:
+
+-   **Prettier is part of wp-scripts, not an addition to it.** `@wordpress/scripts` depends
+    on `wp-prettier`, and `@wordpress/eslint-plugin/recommended` switches on its
+    `prettier/prettier` rule whenever it finds Prettier installed — which is why
+    `npm run lint:js` _is_ Prettier for JS, and why there is no ESLint-versus-Prettier
+    conflict to resolve. It is pinned in `devDependencies` at the version wp-scripts
+    resolves, so a wp-scripts bump cannot silently reformat the codebase.
+-   **stylelint checks meaning, not whitespace.** `.stylelintrc.js` extends
+    `@wordpress/stylelint-config/scss` rather than the `scss-stylistic` preset wp-scripts
+    defaults to. The stylistic rules contradict Prettier on any declaration long enough to
+    wrap, and their `--fix` corrupts the Sass maps in `_compositions.scss`. That file's
+    header records both, and is the thing to read before changing the preset.
+-   **Prettier never sees PHP or block markup.** `*.php` is in `.prettierignore` because
+    phpcs owns it, and `patterns/`, `parts/` and `templates/` are there because their markup
+    must match what `save()` emits — see "Hand-writing block markup in patterns" above.
 
 ## H2s are structural
 

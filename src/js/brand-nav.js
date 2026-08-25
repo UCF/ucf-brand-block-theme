@@ -15,20 +15,20 @@
 ( function () {
 	'use strict';
 
-	var shell = document.querySelector( '.brand-shell' );
+	const shell = document.querySelector( '.brand-shell' );
 
 	if ( ! shell ) {
 		return;
 	}
 
-	var sidebar = shell.querySelector( '.brand-sidebar' );
-	var content = shell.querySelector( '.brand-content' );
-	var reduceMotion = window.matchMedia(
+	const sidebar = shell.querySelector( '.brand-sidebar' );
+	const content = shell.querySelector( '.brand-content' );
+	const reduceMotion = window.matchMedia(
 		'(prefers-reduced-motion: reduce)'
 	).matches;
 
 	// Link glyph appended to each H2. aria-hidden — the anchor carries its own label.
-	var LINK_ICON =
+	const LINK_ICON =
 		'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">' +
 		'<path fill="currentColor" d="M3.9 12a3.1 3.1 0 0 1 3.1-3.1h4V7H7a5 5 0 0 0 0 10h4v-1.9H7A3.1 3.1 0 0 1 3.9 12zm4.1 1h8v-2H8v2zm9-6h-4v1.9h4a3.1 3.1 0 0 1 0 6.2h-4V17h4a5 5 0 0 0 0-10z"/>' +
 		'</svg>';
@@ -68,9 +68,9 @@
 		// every H2 lands here at once, and `section-2` is a name an authored anchor could
 		// already hold. Positions are unique, so this only guards against ids owned by
 		// something other than another heading.
-		var base = 'section-' + ( index + 1 );
-		var candidate = base;
-		var suffix = 1;
+		const base = 'section-' + ( index + 1 );
+		let candidate = base;
+		let suffix = 1;
 
 		while ( document.getElementById( candidate ) ) {
 			suffix += 1;
@@ -92,13 +92,13 @@
 	 * @return {HTMLElement|null} The matching <li>, or null.
 	 */
 	function findCurrentNavItem() {
-		var nav = sidebar && sidebar.querySelector( '.brand-nav' );
+		const nav = sidebar && sidebar.querySelector( '.brand-nav' );
 
 		if ( ! nav ) {
 			return null;
 		}
 
-		var flagged = nav.querySelector(
+		const flagged = nav.querySelector(
 			'.brand-nav__item.is-current, [aria-current="page"]'
 		);
 
@@ -106,14 +106,14 @@
 			return flagged.closest( '.brand-nav__item' );
 		}
 
-		var here = normalizePath( window.location.pathname );
-		var links = Array.prototype.slice.call(
+		const here = normalizePath( window.location.pathname );
+		const links = Array.prototype.slice.call(
 			nav.querySelectorAll( 'a[href]' )
 		);
-		var match = null;
+		let match = null;
 
 		links.forEach( function ( link ) {
-			var linkPath;
+			let linkPath;
 
 			try {
 				linkPath = normalizePath(
@@ -137,7 +137,7 @@
 	 * @return {{list: HTMLElement, headings: HTMLElement[]}|null} List and targets.
 	 */
 	function buildSubnav() {
-		var headings = Array.prototype.slice.call(
+		const headings = Array.prototype.slice.call(
 			content.querySelectorAll( 'h2' )
 		);
 
@@ -145,13 +145,13 @@
 			return null;
 		}
 
-		var list = document.createElement( 'ul' );
+		const list = document.createElement( 'ul' );
 		list.className = 'brand-subnav';
 
 		headings.forEach( function ( heading, index ) {
-			var id = headingId( heading, index );
-			var item = document.createElement( 'li' );
-			var link = document.createElement( 'a' );
+			const id = headingId( heading, index );
+			const item = document.createElement( 'li' );
+			const link = document.createElement( 'a' );
 
 			item.className = 'brand-subnav__item';
 			link.className = 'brand-subnav__link';
@@ -162,7 +162,7 @@
 			list.appendChild( item );
 		} );
 
-		return { list: list, headings: headings };
+		return { list, headings };
 	}
 
 	/**
@@ -172,7 +172,7 @@
 	 * @param {HTMLElement}   list     The sub-nav list.
 	 */
 	function watchHeadings( headings, list ) {
-		var links = Array.prototype.slice.call(
+		const links = Array.prototype.slice.call(
 			list.querySelectorAll( '.brand-subnav__link' )
 		);
 
@@ -187,9 +187,9 @@
 
 		// The band runs from 30% to 45% down the viewport. A heading is "current" while
 		// it sits in that band, which reads as the reader's focal point.
-		var observer = new IntersectionObserver(
+		const observer = new window.IntersectionObserver(
 			function ( entries ) {
-				var visible = entries
+				const visible = entries
 					.filter( function ( entry ) {
 						return entry.isIntersecting;
 					} )
@@ -215,7 +215,7 @@
 		activate( headings[ 0 ].id );
 
 		list.addEventListener( 'click', function ( event ) {
-			var link = event.target.closest( '.brand-subnav__link' );
+			const link = event.target.closest( '.brand-subnav__link' );
 
 			if ( link ) {
 				activate( link.getAttribute( 'href' ).slice( 1 ) );
@@ -247,20 +247,20 @@
 	function syncDrawerToPageEnd() {
 		// Only on the docked rail. Below the breakpoint the drawer is a fixed off-canvas
 		// panel with its own scroll and no relationship to page position at all.
-		var docked = window.matchMedia( '(min-width: 961px)' );
+		const docked = window.matchMedia( '(min-width: 961px)' );
 
 		function sync() {
 			if ( ! docked.matches ) {
 				return;
 			}
 
-			var overflow = sidebar.scrollHeight - sidebar.clientHeight;
+			const overflow = sidebar.scrollHeight - sidebar.clientHeight;
 
 			if ( overflow <= 0 ) {
 				return;
 			}
 
-			var pageOverflow =
+			const pageOverflow =
 				document.documentElement.scrollHeight - window.innerHeight;
 
 			// The page needs more scroll room than the drawer is borrowing, or the "last
@@ -272,7 +272,7 @@
 				return;
 			}
 
-			var toPageEnd = pageOverflow - window.scrollY;
+			const toPageEnd = pageOverflow - window.scrollY;
 
 			if ( toPageEnd > overflow ) {
 				return;
@@ -285,7 +285,7 @@
 			);
 		}
 
-		var queued = false;
+		let queued = false;
 
 		function onScroll() {
 			// sync() checks this too, but bailing here keeps the off-canvas breakpoint from
@@ -314,9 +314,10 @@
 	 * Wire the off-canvas drawer used below the 960px breakpoint.
 	 */
 	function initMobileDrawer() {
-		var toggle = document.querySelector( '.brand-mobile-bar__toggle' );
-		var close = sidebar && sidebar.querySelector( '.brand-sidebar__close' );
-		var scrim = document.querySelector( '.brand-scrim' );
+		const toggle = document.querySelector( '.brand-mobile-bar__toggle' );
+		const close =
+			sidebar && sidebar.querySelector( '.brand-sidebar__close' );
+		const scrim = document.querySelector( '.brand-scrim' );
 
 		if ( ! toggle || ! sidebar || ! scrim ) {
 			return;
@@ -391,12 +392,17 @@
 	 * @param {Function} onDone Called once, only if the copy succeeded.
 	 */
 	function copyText( text, onDone ) {
-		if ( navigator.clipboard && navigator.clipboard.writeText ) {
-			navigator.clipboard.writeText( text ).then( onDone, function () {
-				if ( fallbackCopy( text ) ) {
-					onDone();
-				}
-			} );
+		if (
+			window.navigator.clipboard &&
+			window.navigator.clipboard.writeText
+		) {
+			window.navigator.clipboard
+				.writeText( text )
+				.then( onDone, function () {
+					if ( fallbackCopy( text ) ) {
+						onDone();
+					}
+				} );
 		} else if ( fallbackCopy( text ) ) {
 			onDone();
 		}
@@ -407,10 +413,10 @@
 	 * @return {boolean} Whether the copy succeeded.
 	 */
 	function fallbackCopy( text ) {
-		var ok = false;
+		let ok = false;
 
 		try {
-			var field = document.createElement( 'textarea' );
+			const field = document.createElement( 'textarea' );
 			field.value = text;
 			field.setAttribute( 'readonly', '' );
 			field.style.position = 'fixed';
@@ -431,7 +437,7 @@
 	 * heading (or the anchor) update the URL to the heading's #id and copy that link.
 	 */
 	function initHeadingLinks() {
-		var headings = Array.prototype.slice.call(
+		const headings = Array.prototype.slice.call(
 			content.querySelectorAll( 'h2' )
 		);
 
@@ -439,14 +445,14 @@
 			return;
 		}
 
-		var live = document.createElement( 'div' );
+		const live = document.createElement( 'div' );
 		live.className = 'brand-visually-hidden';
 		live.setAttribute( 'aria-live', 'polite' );
 		document.body.appendChild( live );
 
 		headings.forEach( function ( heading, index ) {
-			var id = headingId( heading, index );
-			var anchor = document.createElement( 'a' );
+			const id = headingId( heading, index );
+			const anchor = document.createElement( 'a' );
 
 			anchor.className = 'brand-heading__anchor';
 			anchor.href = '#' + id;
@@ -456,13 +462,13 @@
 		} );
 
 		function activate( heading ) {
-			var id = heading.id;
+			const id = heading.id;
 
 			if ( ! id ) {
 				return;
 			}
 
-			var url =
+			const url =
 				window.location.origin + window.location.pathname + '#' + id;
 
 			// Assigning the hash updates the URL and jumps, honouring the CSS
@@ -483,14 +489,18 @@
 		}
 
 		content.addEventListener( 'click', function ( event ) {
-			var heading = event.target.closest( 'h2' );
-			var link = event.target.closest( 'a[href]' );
+			const link = event.target.closest( 'a[href]' );
 
 			// If the author linked the heading text, do not hijack that navigation.
 			// Only intercept clicks on our appended anchor icon.
-			if ( link && ! link.classList.contains( 'brand-heading__anchor' ) ) {
+			if (
+				link &&
+				! link.classList.contains( 'brand-heading__anchor' )
+			) {
 				return;
 			}
+
+			const heading = event.target.closest( 'h2' );
 
 			if ( ! heading || ! content.contains( heading ) ) {
 				return;
@@ -508,7 +518,8 @@
 
 			// A body click should not fight an in-progress text selection.
 			if ( ! event.target.closest( '.brand-heading__anchor' ) ) {
-				var selection = window.getSelection && window.getSelection();
+				const view = event.target.ownerDocument.defaultView;
+				const selection = view.getSelection && view.getSelection();
 
 				if ( selection && ! selection.isCollapsed ) {
 					return;
@@ -524,12 +535,12 @@
 		initHeadingLinks();
 
 		if ( sidebar ) {
-			var currentItem = findCurrentNavItem();
+			const currentItem = findCurrentNavItem();
 
 			if ( currentItem ) {
 				currentItem.classList.add( 'is-current' );
 
-				var subnav = buildSubnav();
+				const subnav = buildSubnav();
 
 				if ( subnav ) {
 					currentItem.appendChild( subnav.list );

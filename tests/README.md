@@ -2,11 +2,11 @@
 
 Four suites. `npm test` runs the two fast ones:
 
-| Suite                            | Command                    | Needs                        | Runtime              |
-| -------------------------------- | -------------------------- | ---------------------------- | -------------------- |
-| PHP units                        | `npm run test:php`         | PHP + Composer               | ~0.1s                |
-| Block round-trips + markup sweep | `npm run test:js`          | Node, and PHP for the sweep  | ~3s                  |
-| PHP integration                  | `npm run test:integration` | Docker (wp-env)              | ~2min cold, ~1s warm |
+| Suite                            | Command                    | Needs                        | Runtime               |
+| -------------------------------- | -------------------------- | ---------------------------- | --------------------- |
+| PHP units                        | `npm run test:php`         | PHP + Composer               | ~0.1s                 |
+| Block round-trips + markup sweep | `npm run test:js`          | Node, and PHP for the sweep  | ~3s                   |
+| PHP integration                  | `npm run test:integration` | Docker (wp-env)              | ~2min cold, ~1s warm  |
 | Accessibility                    | `npm run test:a11y`        | Docker (wp-env) + Playwright | ~2min cold, ~15s warm |
 
 `npm test` runs the first two and **never touches Docker** — that is deliberate, and worth
@@ -208,16 +208,16 @@ npm run env:stop                        # when you are done
 
 ### Four tiers, and only the first is a list anyone maintains
 
-| Tier         | What it audits                                       | Where the list comes from      |
-| ------------ | ---------------------------------------------------- | ------------------------------ |
-| **Routes**   | One page per template, plus search-with-no-results   | Written out in `seed.php`      |
-| **Blocks**   | Custom blocks no pattern or template already renders | Written out in `seed.php`      |
-| **Patterns** | One page per pattern, in isolation                   | `WP_Block_Patterns_Registry`   |
-| **Variants** | One page per registered block style                  | `WP_Block_Styles_Registry`     |
+| Tier         | What it audits                                       | Where the list comes from    |
+| ------------ | ---------------------------------------------------- | ---------------------------- |
+| **Routes**   | One page per template, plus search-with-no-results   | Written out in `seed.php`    |
+| **Blocks**   | Custom blocks no pattern or template already renders | Written out in `seed.php`    |
+| **Patterns** | One page per pattern, in isolation                   | `WP_Block_Patterns_Registry` |
+| **Variants** | One page per registered block style                  | `WP_Block_Styles_Registry`   |
 
 The bottom two read WordPress's own registries at seed time, so **a new pattern or block style
 is audited on the next run with nothing to add here** — the same property the markup sweep has.
-A new *block* is the one case needing a decision, and `seed.php` fails the seed rather than
+A new _block_ is the one case needing a decision, and `seed.php` fails the seed rather than
 letting it slide: it checks every top-level block in `src/blocks/` renders on some page the
 suite visits, counting templates and patterns as coverage.
 
@@ -244,7 +244,7 @@ version of its failure is indistinguishable from a clean site:
     the `.htaccess` note below.
 -   **A variant page must carry its `is-style-*` class.** The sample markup in `seed.php` is
     hand-written, so a future WordPress could change what a block's `save()` emits and leave
-    it stale. A stale page still renders — in its *default* colors — and passes.
+    it stale. A stale page still renders — in its _default_ colors — and passes.
 -   **The tabs page must have built a tablist** above 768px and must not below it.
     `src/blocks/tabs/view.js` adds the tab roles at runtime; if it fails to load, the plain
     stack it leaves behind is valid markup that passes axe at every viewport.
@@ -264,7 +264,7 @@ conflates the two and produces a false positive on every hero.
 then — `functions.php` loaded for whatever theme was active, `init` fired, patterns and block
 styles registered — so the switch writes an option and changes nothing else in that process.
 
-The failure mode is the interesting part, because it is invisible locally. The switch *does*
+The failure mode is the interesting part, because it is invisible locally. The switch _does_
 take effect for the **next** process, so the seed fails on a clean environment and passes on
 every run after it: green on any machine that has run it once, red on every CI runner. It
 shipped exactly that way, and no amount of local re-running would have shown it.
@@ -276,7 +276,7 @@ attempt. `tests/integration/bootstrap.php` solves the same problem from the othe
 
 ### wp-env will not write `.htaccess`, and the symptom is misleading
 
-`flush_rules( true )` guards its write behind `got_mod_rewrite()`, which asks the *current*
+`flush_rules( true )` guards its write behind `got_mod_rewrite()`, which asks the _current_
 server whether mod_rewrite is loaded. The current server is PHP-CLI in the `cli` container,
 which has no Apache and says no; the container actually serving port 8888 does have it and is
 never asked. `wp rewrite flush --hard` fails identically.
@@ -288,7 +288,7 @@ bare "Not Found" page, so the suite audits a document with no `<html lang>` and 
 ### Judging a finding
 
 Not every violation on a variant page is a defect in the theme, and getting this wrong wastes
-a designer's afternoon. `is-style-on-dark` is the worked example: it supplies the *treatment*
+a designer's afternoon. `is-style-on-dark` is the worked example: it supplies the _treatment_
 only — the `--brand-*` roles the helper classes read — and deliberately sets no background and
 no base color, both of which come from the block's own controls. Audited on a bare page it
 produces five guaranteed failures that are the fixture's fault, not the theme's. So

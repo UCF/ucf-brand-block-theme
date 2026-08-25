@@ -26,6 +26,21 @@ registerBlockType( 'ucf-brand/section-nav', {
 	save: () => null,
 } );
 
+function SearchSubsectionsEdit() {
+	return (
+		<div { ...useBlockProps() }>
+			<Placeholder
+				icon="search"
+				label={ __( 'Matching sections', 'ucf-brand-block-theme' ) }
+				instructions={ __(
+					'Renders on the search results page only, beneath each result.',
+					'ucf-brand-block-theme'
+				) }
+			/>
+		</div>
+	);
+}
+
 // Unlike section-nav this one gets a static placeholder rather than a ServerSideRender
 // preview: it renders per result row, from the live search query, so outside a search
 // there is nothing for it to draw and the preview would only ever report itself empty.
@@ -39,17 +54,6 @@ registerBlockType( 'ucf-brand/search-subsections', {
 	category: 'theme',
 	icon: 'search',
 	supports: { html: false, inserter: false, reusable: false },
-	edit: () => (
-		<div { ...useBlockProps() }>
-			<Placeholder
-				icon="search"
-				label={ __( 'Matching sections', 'ucf-brand-block-theme' ) }
-				instructions={ __(
-					'Renders on the search results page only, beneath each result.',
-					'ucf-brand-block-theme'
-				) }
-			/>
-		</div>
-	),
+	edit: SearchSubsectionsEdit,
 	save: () => null,
 } );

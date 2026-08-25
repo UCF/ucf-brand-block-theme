@@ -18,6 +18,7 @@ Skim this index; go read the section before you touch the area it covers.
 | PHP lives in `includes/`                                | One topic per file; `functions.php` is a loader only             |
 | JavaScript is one pipeline                              | `src/` → `build/`, generated `.asset.php` dependency lists       |
 | Build and content                                       | What `npm run build` does; block CSS belongs in `src/scss/`      |
+| Formatting and linting                                  | Which formatter owns which file type, and why stylelint defers   |
 | H2s are structural                                      | `includes/headings.php` owns every anchor id                     |
 | Gotchas that have already bitten                        | The list not to "clean up"                                       |
 
@@ -33,13 +34,13 @@ them — it covers what each suite is for and the non-obvious parts of the setup
 **New code ships with its test.** What you have to write depends on what you added, and most
 of it is already automatic:
 
-| You added                   | You write                                                                                             |
-| --------------------------- | ----------------------------------------------------------------------------------------------------- |
-| A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
+| You added                   | You write                                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you                                                   |
 | A block in `src/blocks/`    | An entry in `tests/js/helpers/register-blocks.js`, and — if no pattern or template renders it — a page in `tests/a11y/seed.php`. Both fail until you do |
-| A pattern in `patterns/`    | Nothing. The markup sweep and the a11y suite both read the directory — just run them                  |
-| A template part in `parts/` | Nothing. Same sweep                                                                                   |
-| A `register_block_style()`  | Nothing, unless it is on a block type `tests/a11y/seed.php` has no sample for — then the seed fails until you add one |
+| A pattern in `patterns/`    | Nothing. The markup sweep and the a11y suite both read the directory — just run them                                                                    |
+| A template part in `parts/` | Nothing. Same sweep                                                                                                                                     |
+| A `register_block_style()`  | Nothing, unless it is on a block type `tests/a11y/seed.php` has no sample for — then the seed fails until you add one                                   |
 
 -   **A new function in `includes/` needs a unit test.** Put it with the tests for the file
     that owns the topic. If the function genuinely needs WordPress — a meta query,
@@ -71,7 +72,7 @@ of it is already automatic:
     `ucf_brand_a11y_wrap_in_context()` in `tests/a11y/seed.php` is where that gets corrected.
 -   **An axe assertion on the wrong page passes.** The suite therefore checks the HTTP status,
     the expected `is-style-*` class and (for tabs) that the runtime enhancement actually ran,
-    all *before* trusting the audit. Keep that habit for anything added: the green version of
+    all _before_ trusting the audit. Keep that habit for anything added: the green version of
     each of those failures is indistinguishable from a clean site.
 -   **Prove a new test can fail.** Break the code it covers, watch it go red, then restore.
     This is not ceremony: two tests written in this repo passed against nothing at all — one
@@ -121,7 +122,7 @@ cap what that kind is worth.
 
 **Every prose comment opens with a tag.** The tag says what kind of reason follows, so a reader skimming for "what will break if I touch this" can tell in one word. (Structural dividers / file-title banners like `// ── … ──` are allowed untagged.)
 
-| Tag         | Use when                                                        |
+| Tag         | Use when                                                         |
 | ----------- | ---------------------------------------------------------------- |
 | `WHY:`      | Someone would reasonably delete or "simplify" this               |
 | `FIX:`      | This shipped broken once and the rule is what stops it recurring |
@@ -151,7 +152,7 @@ Four rules:
 The domain tags earn their slot by being rare, so keep their tests narrow. `A11Y:` is not for
 any code that touches ARIA — `role="tab"` in a tablist is just the implementation. `SAFETY:`
 is not for a routine `esc_html()` on output; it is for `ucf_brand_highlight_terms()` in
-`includes/search.php`, where escaping each run *before* joining is what makes `<mark>`
+`includes/search.php`, where escaping each run _before_ joining is what makes `<mark>`
 survive, and the obvious order is silently wrong.
 
 `SYNC:` is the one worth grepping. `grep -rn "SYNC:" src/ includes/` returns every

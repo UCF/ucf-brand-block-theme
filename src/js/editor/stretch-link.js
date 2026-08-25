@@ -67,7 +67,11 @@ const withStretchToggle = createHigherOrderComponent(
 	},
 	'withStretchToggle'
 );
-addFilter( 'editor.BlockEdit', 'ucf-brand/stretch-link-toggle', withStretchToggle );
+addFilter(
+	'editor.BlockEdit',
+	'ucf-brand/stretch-link-toggle',
+	withStretchToggle
+);
 
 addFilter(
 	'blocks.getSaveContent.extraProps',

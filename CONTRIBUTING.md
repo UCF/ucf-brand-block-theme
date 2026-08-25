@@ -112,13 +112,13 @@ lint:version` fails if they drift.
 New code ships with its test. Two of the four cases are automatic, so this is less work than
 it sounds:
 
-| You added                   | You write                                                                                             |
-| --------------------------- | ----------------------------------------------------------------------------------------------------- |
-| A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you |
+| You added                   | You write                                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A function in `includes/`   | A case in `tests/php/`, or `tests/integration/` if it needs WordPress — nothing enforces this for you                                                   |
 | A block in `src/blocks/`    | An entry in `tests/js/helpers/register-blocks.js`, and — if no pattern or template renders it — a page in `tests/a11y/seed.php`. Both fail until you do |
-| A pattern in `patterns/`    | Nothing. The markup sweep and the accessibility suite both read the directory — just run them          |
-| A template part in `parts/` | Nothing. Same sweep                                                                                   |
-| A `register_block_style()`  | Nothing, unless it is on a block type the accessibility seeder has no sample markup for — then the seed fails until you add one |
+| A pattern in `patterns/`    | Nothing. The markup sweep and the accessibility suite both read the directory — just run them                                                           |
+| A template part in `parts/` | Nothing. Same sweep                                                                                                                                     |
+| A `register_block_style()`  | Nothing, unless it is on a block type the accessibility seeder has no sample markup for — then the seed fails until you add one                         |
 
 Anything that genuinely needs WordPress — a meta query, the `render_block` filter, a real
 `WP_Query` — goes in `tests/integration/`, which runs against a real WordPress under wp-env.

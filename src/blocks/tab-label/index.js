@@ -14,8 +14,6 @@
  * Static block: `save` emits the real markup. view.js promotes the wrapper to
  * `role="tab"` at runtime (above the tabs breakpoint only). The heading is an H3 on
  * purpose — H2 is structural and drives the drawer (see CLAUDE.md).
- *
- * @package ucf-brand-block-theme
  */
 
 import { registerBlockType } from '@wordpress/blocks';
@@ -23,50 +21,47 @@ import { useBlockProps, RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import metadata from './block.json';
 
-registerBlockType( metadata.name, {
-	edit( { attributes, setAttributes } ) {
-		const { badge, heading, description } = attributes;
-		const blockProps = useBlockProps( { className: 'ucf-tabs__label' } );
+function Edit( { attributes, setAttributes } ) {
+	const { badge, heading, description } = attributes;
+	const blockProps = useBlockProps( { className: 'ucf-tabs__label' } );
 
-		return (
-			<div { ...blockProps }>
-				<RichText
-					tagName="span"
-					className="ucf-tabs__badge"
-					value={ badge }
-					allowedFormats={ [] }
-					placeholder={ __( 'Badge', 'ucf-brand-block-theme' ) }
-					onChange={ ( value ) => setAttributes( { badge: value } ) }
-				/>
-				<RichText
-					tagName="h3"
-					className="ucf-tabs__heading"
-					value={ heading }
-					allowedFormats={ [] }
-					placeholder={ __(
-						'Tab heading',
-						'ucf-brand-block-theme'
-					) }
-					onChange={ ( value ) =>
-						setAttributes( { heading: value } )
-					}
-				/>
-				<RichText
-					tagName="p"
-					className="ucf-tabs__description"
-					value={ description }
-					allowedFormats={ [] }
-					placeholder={ __(
-						'Supporting copy (optional)',
-						'ucf-brand-block-theme'
-					) }
-					onChange={ ( value ) =>
-						setAttributes( { description: value } )
-					}
-				/>
-			</div>
-		);
-	},
+	return (
+		<div { ...blockProps }>
+			<RichText
+				tagName="span"
+				className="ucf-tabs__badge"
+				value={ badge }
+				allowedFormats={ [] }
+				placeholder={ __( 'Badge', 'ucf-brand-block-theme' ) }
+				onChange={ ( value ) => setAttributes( { badge: value } ) }
+			/>
+			<RichText
+				tagName="h3"
+				className="ucf-tabs__heading"
+				value={ heading }
+				allowedFormats={ [] }
+				placeholder={ __( 'Tab heading', 'ucf-brand-block-theme' ) }
+				onChange={ ( value ) => setAttributes( { heading: value } ) }
+			/>
+			<RichText
+				tagName="p"
+				className="ucf-tabs__description"
+				value={ description }
+				allowedFormats={ [] }
+				placeholder={ __(
+					'Supporting copy (optional)',
+					'ucf-brand-block-theme'
+				) }
+				onChange={ ( value ) =>
+					setAttributes( { description: value } )
+				}
+			/>
+		</div>
+	);
+}
+
+registerBlockType( metadata.name, {
+	edit: Edit,
 
 	save( { attributes } ) {
 		const { badge, heading, description } = attributes;

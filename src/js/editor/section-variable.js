@@ -32,18 +32,23 @@ function BrandSectionVariable() {
 	useEffect( () => {
 		// Non-iframed canvases (the mobile editor) keep the wrapper in the main document.
 		const canvas =
-			document.querySelector( CANVAS_IFRAME )?.contentDocument ?? document;
+			document.querySelector( CANVAS_IFRAME )?.contentDocument ??
+			document;
 
 		// Written on the same element the PHP rule targets, so the inline style wins.
 		// `initial` is the guaranteed-invalid value: it makes the badge's `content`
 		// invalid and hides it, matching a page with no Brand order.
-		canvas.querySelector( CANVAS_ROOT )?.style.setProperty(
-			'--brand-section',
-			section ? `"${ section }."` : 'initial'
-		);
+		canvas
+			.querySelector( CANVAS_ROOT )
+			?.style.setProperty(
+				'--brand-section',
+				section ? `"${ section }."` : 'initial'
+			);
 	}, [ section ] );
 
 	return null;
 }
 
-registerPlugin( 'ucf-brand-section-variable', { render: BrandSectionVariable } );
+registerPlugin( 'ucf-brand-section-variable', {
+	render: BrandSectionVariable,
+} );
