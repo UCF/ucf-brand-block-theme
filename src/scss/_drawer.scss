@@ -221,6 +221,34 @@
 	padding: map.get($space, "40") 1.3rem map.get($space, "50");
 }
 
+// WHY: white with a rule under it, not the dark field's blue-tint `link` role. These sit
+// directly under the nav as chrome, and the role color read as a third accent competing
+// with the gold org line below it.
+// A11Y: gold on hover and focus, matching every other interactive state on black.
+.brand-sidebar__footer a {
+	color: map.get($color, "white");
+	text-decoration: underline;
+	text-underline-offset: 0.25em;
+
+	&:hover,
+	&:focus-visible {
+		color: map.get($color, "gold");
+	}
+}
+
+// WHY: the group's blockGap keeps the two utility links paired; the org line opens a new
+// tier and needs the gap the gap cannot give it without splitting the links apart.
+.brand-sidebar__footer .is-style-eyebrow {
+	margin-block-start: map.get($space, "40");
+}
+
+// SPEC: wider tracking than `.is-style-meta`, and uppercased here rather than typed that
+// way so the version string stays sentence case in the template part.
+.brand-sidebar__version {
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
 // ── Primary navigation (ucf-brand/section-nav, one level deep) ───────────────
 //
 // WHY: markup is server-rendered from the ordered section list — see
