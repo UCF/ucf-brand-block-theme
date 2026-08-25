@@ -91,4 +91,14 @@
 	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
 		<exclude-pattern>/tests/php/stubs/</exclude-pattern>
 	</rule>
+
+	<!--
+	This sniff exists to stop a theme hand-printing a <script> tag instead of enqueueing
+	it. UniversityHeaderTest builds those tags as fixtures — they are the *input* to the
+	`script_loader_tag` filter under test — so it is reading strings the theme never emits.
+	-->
+	<rule ref="WordPress.WP.EnqueuedResources">
+		<exclude-pattern>/tests/php/</exclude-pattern>
+		<exclude-pattern>/tests/integration/</exclude-pattern>
+	</rule>
 </ruleset>

@@ -63,15 +63,19 @@ $text-on-dark: var(--wp--custom--text-on-dark);
 $accordion-heading: var(--wp--custom--accordion-heading);
 
 $sidebar-width: var(--wp--custom--sidebar-width);
-$header-height: var(--wp--custom--header-height);
 $wrap: var(--wp--custom--wrap);
+
+// SYNC: the mobile bar is the only sticky chrome above the content now that the site
+// header is the University Header, which scrolls away. _base.scss offsets anchors by it.
+$mobile-bar-height: var(--wp--custom--mobile-bar-height);
 
 // SPEC: where the drawer becomes off-canvas. Mirrors the prototype.
 $breakpoint-drawer: 960px;
 
-// SPEC: where the wordmark and the MyUCF action stop fitting on one line — measured
-// against "University of Central Florida" at its tracking, not picked off a device list.
-$breakpoint-header: 600px;
+// SPEC: phone. Only _sections.scss reads it, to stack the swatch band — measured against
+// the mono value lines wrapping mid-number, not picked off a device list. It used to be
+// $breakpoint-header and outlived the header bar it was named for.
+$breakpoint-phone: 600px;
 
 // SYNC: TABS_QUERY in src/blocks/tabs/view.js — the grid and the script must agree on
 // where tabs engage. Deliberately below $breakpoint-drawer so tabs persist through tablet.

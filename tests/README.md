@@ -21,8 +21,8 @@ test tests the mock.
 
 PHPUnit with [Brain Monkey](https://brain-wp.github.io/BrainMonkey/), **no WordPress, no
 database, no Docker**. What is covered is the theme's pure logic: heading slugs, section
-numbering, search term parsing, highlighting, snippet windowing, ranking, and the two markup
-builders (`site-mark`, `section-nav`).
+numbering, search term parsing, highlighting, snippet windowing, ranking, the `section-nav`
+markup builder, and the University Header's script tag and placeholder.
 
 That boundary is deliberate. WordPress functions the covered code calls are defined in
 `tests/php/stubs/wp-escaping.php` — shared with the pattern renderer so the two cannot drift —

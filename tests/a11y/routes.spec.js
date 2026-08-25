@@ -5,9 +5,10 @@
  * without results, and 404 — the six templates in `templates/`, plus the empty-results case,
  * which renders a different tree from a populated one and is the version nobody looks at.
  *
- * These are the pages that carry the theme's chrome: the header bar, the drawer and its
- * derived sub-nav, the mobile bar, the search form and the footer. Everything the pattern and
- * variant tiers audit sits inside that chrome too, so a problem here shows up everywhere.
+ * These are the pages that carry the theme's chrome: the drawer and its derived sub-nav, the
+ * mobile bar, the search form and the footer. Everything the pattern and variant tiers audit
+ * sits inside that chrome too, so a problem here shows up everywhere. The University Header
+ * above it is excluded from the audit — see the exclusion list in `axe.js` for why.
  */
 const { test } = require( '@playwright/test' );
 const { auditPage } = require( './axe' );

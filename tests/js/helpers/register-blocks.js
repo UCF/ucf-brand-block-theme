@@ -58,10 +58,10 @@ export function registerThemeBlocks() {
 }
 
 /**
- * Register the theme's three server-rendered blocks.
+ * Register the theme's two server-rendered blocks.
  *
- * `section-nav`, `search-subsections` and `site-mark` render in PHP and have no entry in
- * src/blocks/, so `registerThemeBlocks()` above does not cover them. The editor registers
+ * `section-nav` and `search-subsections` render in PHP and have no entry in src/blocks/, so
+ * `registerThemeBlocks()` above does not cover them. The editor registers
  * them from src/js/editor/dynamic-blocks.js purely so the Site Editor has something to draw,
  * and that same module is imported here rather than hand-rolling stand-ins: a registration
  * dropped from it is a real bug (the Site Editor falls back to an "unsupported block"

@@ -107,17 +107,10 @@ discovers them by globbing for `block.json` rather than from a hand-maintained l
 -   `ucf-news-block-theme` uses `render.php` server rendering. That is **not** a precedent
     for this theme.
 
-The theme _does_ have three server-rendered blocks — `ucf-brand/section-nav`,
-`ucf-brand/search-subsections` and `ucf-brand/site-mark` — but they are theme glue, not
-distributable design blocks, and they live in `includes/` with the data they render rather
-than in `src/blocks/`. See the next section.
-
-`site-mark` is the reason the header logo is swappable: the mark is a file at
-`assets/images/`, reached through `ucf_brand_site_mark_src()`. Replacing it is dropping a
-new SVG at that path or filtering that hook — no template-part edit, no rebuild, and no
-absolute URL baked into `parts/header.html`, which is static HTML and could not hold a
-theme-relative one. `core/site-logo` was the alternative and would need SVG uploads
-enabled, which is a security decision rather than a theme one.
+The theme _does_ have two server-rendered blocks — `ucf-brand/section-nav` and
+`ucf-brand/search-subsections` — but they are theme glue, not distributable design blocks,
+and they live in `includes/` with the data they render rather than in `src/blocks/`. See the
+next section.
 
 ### Hand-writing block markup in patterns
 
@@ -146,7 +139,7 @@ file added to that array — never appended to `functions.php`.
 | `blocks.php`             | Static custom block registration                              |
 | `block-styles.php`       | Every `register_block_style()`                                |
 | `pattern-categories.php` | The pattern category ladder                                   |
-| `branding.php`           | The header lockup block and the logo asset it points at       |
+| `university-header.php`  | The UCF University Header: its script tag and its placeholder |
 | `meta.php`               | Per-page fields                                               |
 | `sections.php`           | Section numbering, ordering, the number binding               |
 | `section-nav.php`        | The drawer's server-rendered block                            |
