@@ -75,6 +75,12 @@
 	margin-block: 0;
 }
 
+// SPEC: the comp opens the title-to-rule pair wider than the band's shared gap. Only this
+// one pair moves; the rest of the stack stays on the single distance `.brand-hero` declares.
+.brand-hero .wp-block-separator {
+	margin-block-start: map.get($space, "30");
+}
+
 // FIX: half-leading is the other half of that distance — the eyebrow's line box is taller
 // than its caps, so the gap measured from empty space. At 0.72rem it is one line anyway.
 .brand-hero .is-style-eyebrow {
