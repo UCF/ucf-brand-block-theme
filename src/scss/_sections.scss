@@ -197,6 +197,9 @@
 	font-family: map.get($font, "display");
 	font-size: 1.05rem;
 	font-weight: 700;
+	// SYNC: 0.01em is the theme's display-face tracking — the `heading` element in theme.json
+	// sets it, and every Oswald run outside a heading repeats it.
+	letter-spacing: 0.01em;
 	margin: 0 0 0.2rem;
 	text-transform: uppercase;
 }
@@ -364,7 +367,8 @@
 	font-family: map.get($font, "display");
 	font-size: 1rem;
 	font-weight: 700;
-	letter-spacing: 0.04em;
+	// SYNC: the theme's display-face tracking, matching theme.json's `heading` element.
+	letter-spacing: 0.01em;
 	margin: 0;
 	padding: 0.6rem map.get($space, "30");
 	text-transform: uppercase;
