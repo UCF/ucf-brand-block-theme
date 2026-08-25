@@ -386,7 +386,10 @@
 	pointer-events: none;
 	position: fixed;
 	transition: opacity 0.25s;
-	z-index: 1400;
+
+	// FIX: above the University Header. At 1400 the bar painted over the scrim and the
+	// drawer, burying the close button — see $z-university-header in _variables.scss.
+	z-index: $z-university-header + 1;
 
 	&.is-open {
 		opacity: 1;
@@ -451,21 +454,34 @@
 		transform: translateX(-100%);
 		transition: transform 0.25s ease;
 		width: min(86vw, 320px);
-		z-index: 1500;
+
+		// FIX: one above the scrim, both above the University Header. The drawer is an
+		// overlay, so it covers the bar while open — the bar itself is untouched.
+		z-index: $z-university-header + 2;
 
 		&.is-open {
 			transform: translateX(0);
 		}
 	}
 
+	// UPSTREAM: a <button> does not inherit the page font, so each engine fell back to its
+	// own UA default — Arial on Chromium, -apple-system on Firefox, system-ui on WebKit —
+	// and "×" sits at a different size and optical centre in every one of them. Naming the
+	// face pins it: the latin subset covers U+00D7, so the glyph comes from the self-hosted
+	// file rather than whatever the device happens to have installed.
+	// FIX: `line-height: 1` for the same reason — `normal` is font-dependent, so it shifted
+	// the glyph inside the 44px grid box even once the family matched.
 	.brand-sidebar__close {
+		appearance: none;
 		background: none;
 		border: 0;
 		color: map.get($color, "white");
 		cursor: pointer;
 		display: grid;
+		font-family: map.get($font, "body");
 		font-size: 1.3rem;
 		height: 44px;
+		line-height: 1;
 		place-items: center;
 		position: absolute;
 		right: 0.5rem;
