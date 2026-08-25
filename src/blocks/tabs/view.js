@@ -17,11 +17,11 @@
 
 	// Mirrors $breakpoint-tabs in src/scss/_variables.scss. Kept in sync by hand: the
 	// grid layout and this script must agree on where tabs engage.
-	var TABS_QUERY = '(min-width: 768px)';
+	const TABS_QUERY = '(min-width: 768px)';
 
-	var mql = window.matchMedia( TABS_QUERY );
-	var instances = [];
-	var uid = 0;
+	const mql = window.matchMedia( TABS_QUERY );
+	const instances = [];
+	let uid = 0;
 
 	/**
 	 * Give an element a stable, unique id, preserving one the author already set.
@@ -34,7 +34,7 @@
 		if ( el.id ) {
 			return el.id;
 		}
-		var candidate = fallback;
+		let candidate = fallback;
 		while ( document.getElementById( candidate ) ) {
 			uid += 1;
 			candidate = fallback + '-' + uid;
@@ -50,12 +50,12 @@
 	 * @return {?Object} Instance descriptor, or null if it has no complete pairs.
 	 */
 	function collect( root ) {
-		var labels = Array.prototype.slice.call(
+		const labels = Array.prototype.slice.call(
 			root.querySelectorAll(
 				':scope > .ucf-tabs__set > .ucf-tabs__label'
 			)
 		);
-		var panels = Array.prototype.slice.call(
+		const panels = Array.prototype.slice.call(
 			root.querySelectorAll(
 				':scope > .ucf-tabs__set > .ucf-tabs__panel'
 			)
@@ -74,20 +74,20 @@
 		// Drives the grid columns, so save() never has to count children.
 		root.style.setProperty( '--tab-count', String( labels.length ) );
 
-		return { root: root, labels: labels, panels: panels, active: 0 };
+		return { root, labels, panels, active: 0 };
 	}
 
 	/**
 	 * Reflect the active index into ARIA state and panel visibility (tabs mode).
 	 *
-	 * @param {Object} inst  Instance descriptor.
-	 * @param {number} index Index to activate.
+	 * @param {Object}  inst  Instance descriptor.
+	 * @param {number}  index Index to activate.
 	 * @param {boolean} focus Whether to move focus to the new tab.
 	 */
 	function activate( inst, index, focus ) {
 		inst.active = index;
 		inst.labels.forEach( function ( label, i ) {
-			var selected = i === index;
+			const selected = i === index;
 			label.setAttribute( 'aria-selected', selected ? 'true' : 'false' );
 			label.tabIndex = selected ? 0 : -1;
 			inst.panels[ i ].hidden = ! selected;
@@ -104,8 +104,8 @@
 	 * @param {KeyboardEvent} event Key event on a tab.
 	 */
 	function onKeydown( inst, event ) {
-		var last = inst.labels.length - 1;
-		var next = null;
+		const last = inst.labels.length - 1;
+		let next = null;
 
 		switch ( event.key ) {
 			case 'ArrowRight':
@@ -198,7 +198,7 @@
 
 		inst.labels.forEach( function ( label, i ) {
 			// Back into its own `.ucf-tabs__set`, ahead of its panel — the saved order.
-			var set = inst.panels[ i ].parentNode;
+			const set = inst.panels[ i ].parentNode;
 			if ( label.parentNode !== set ) {
 				set.insertBefore( label, inst.panels[ i ] );
 			}
@@ -232,10 +232,10 @@
 	}
 
 	function init() {
-		var roots = document.querySelectorAll( '.ucf-tabs' );
+		const roots = document.querySelectorAll( '.ucf-tabs' );
 
 		Array.prototype.forEach.call( roots, function ( root ) {
-			var inst = collect( root );
+			const inst = collect( root );
 			if ( inst ) {
 				instances.push( inst );
 			}

@@ -2,8 +2,6 @@
  * Color Swatches — the grid container.
  *
  * Static block: `save` emits real markup, so nothing is rendered on the server.
- *
- * @package ucf-brand-block-theme
  */
 
 import { registerBlockType } from '@wordpress/blocks';
@@ -24,17 +22,19 @@ const TEMPLATE = [
 	[ 'ucf-brand/color-swatch', { colorSlug: 'gold', name: 'Bold Gold' } ],
 ];
 
-registerBlockType( metadata.name, {
-	edit() {
-		const blockProps = useBlockProps( { className: 'brand-swatches' } );
-		const innerProps = useInnerBlocksProps( blockProps, {
-			allowedBlocks: ALLOWED,
-			template: TEMPLATE,
-			renderAppender: InnerBlocks.ButtonBlockAppender,
-		} );
+function Edit() {
+	const blockProps = useBlockProps( { className: 'brand-swatches' } );
+	const innerProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED,
+		template: TEMPLATE,
+		renderAppender: InnerBlocks.ButtonBlockAppender,
+	} );
 
-		return <div { ...innerProps } />;
-	},
+	return <div { ...innerProps } />;
+}
+
+registerBlockType( metadata.name, {
+	edit: Edit,
 
 	save() {
 		const blockProps = useBlockProps.save( {

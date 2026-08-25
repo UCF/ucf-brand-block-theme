@@ -7,8 +7,6 @@
  * and panel become direct grid items — every label in the top row, panels stacked in a
  * shared cell below. In the editor and the mobile view the wrapper stays a real box, so
  * the whole tab is easy to select and remove.
- *
- * @package ucf-brand-block-theme
  */
 
 import { registerBlockType } from '@wordpress/blocks';
@@ -26,34 +24,33 @@ import metadata from './block.json';
 // Both regions always present, and the pair can't be added to, removed, or reordered.
 const TEMPLATE = [ [ 'ucf-brand/tab-label' ], [ 'ucf-brand/tab-panel' ] ];
 
-registerBlockType( metadata.name, {
-	edit( { clientId } ) {
-		const blockProps = useBlockProps( { className: 'ucf-tabs__set' } );
-		const innerProps = useInnerBlocksProps( blockProps, {
-			template: TEMPLATE,
-			templateLock: 'all',
-			renderAppender: false,
-		} );
-		const { removeBlock } = useDispatch( blockEditorStore );
+function Edit( { clientId } ) {
+	const blockProps = useBlockProps( { className: 'ucf-tabs__set' } );
+	const innerProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+		templateLock: 'all',
+		renderAppender: false,
+	} );
+	const { removeBlock } = useDispatch( blockEditorStore );
 
-		return (
-			<>
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							icon="trash"
-							label={ __(
-								'Remove tab',
-								'ucf-brand-block-theme'
-							) }
-							onClick={ () => removeBlock( clientId ) }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-				<div { ...innerProps } />
-			</>
-		);
-	},
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						icon="trash"
+						label={ __( 'Remove tab', 'ucf-brand-block-theme' ) }
+						onClick={ () => removeBlock( clientId ) }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+			<div { ...innerProps } />
+		</>
+	);
+}
+
+registerBlockType( metadata.name, {
+	edit: Edit,
 
 	save() {
 		const blockProps = useBlockProps.save( { className: 'ucf-tabs__set' } );

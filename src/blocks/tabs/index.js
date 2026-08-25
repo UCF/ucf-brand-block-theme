@@ -6,8 +6,6 @@
  * (ARIA roles, keyboard, panel show/hide) is added at runtime by view.js, and only
  * above the tabs breakpoint. Below it, and with no JS at all, the stack *is* the mobile
  * layout: each label reads as a section heading with its panel beneath it.
- *
- * @package ucf-brand-block-theme
  */
 
 import { registerBlockType } from '@wordpress/blocks';
@@ -23,17 +21,19 @@ const ALLOWED = [ 'ucf-brand/tab' ];
 // A starting pair, not a fixed set — the appender lets an author add or remove tabs.
 const TEMPLATE = [ [ 'ucf-brand/tab' ], [ 'ucf-brand/tab' ] ];
 
-registerBlockType( metadata.name, {
-	edit() {
-		const blockProps = useBlockProps( { className: 'ucf-tabs' } );
-		const innerProps = useInnerBlocksProps( blockProps, {
-			allowedBlocks: ALLOWED,
-			template: TEMPLATE,
-			renderAppender: InnerBlocks.ButtonBlockAppender,
-		} );
+function Edit() {
+	const blockProps = useBlockProps( { className: 'ucf-tabs' } );
+	const innerProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED,
+		template: TEMPLATE,
+		renderAppender: InnerBlocks.ButtonBlockAppender,
+	} );
 
-		return <div { ...innerProps } />;
-	},
+	return <div { ...innerProps } />;
+}
+
+registerBlockType( metadata.name, {
+	edit: Edit,
 
 	save() {
 		const blockProps = useBlockProps.save( { className: 'ucf-tabs' } );

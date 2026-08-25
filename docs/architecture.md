@@ -100,6 +100,10 @@ registered by the loop in `ucf_brand_register_blocks()` (`includes/blocks.php`),
 discovers them by globbing for `block.json` rather than from a hand-maintained list.
 
 -   **Static only.** `save()` must emit real markup. No `render.php`, no `render_callback`.
+-   **`edit` is a named, capitalized component**, declared above the registration and passed
+    as `edit: Edit`. An inline `edit()` method calls hooks in a function neither React nor
+    `react-hooks/rules-of-hooks` recognizes as a component. `save()` stays a method — it is
+    not a component and must not grow into one.
 -   Take colors by palette **slug** and apply core's `has-{slug}-background-color` /
     `has-{slug}-color` classes — never write an inline hex into `save()`.
 -   Don't reference theme functions or paths from block sources; they must lift into a
