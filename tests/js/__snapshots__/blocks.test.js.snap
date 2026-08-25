@@ -20,7 +20,7 @@ exports[`ucf-brand/tabs produces stable save() markup 1`] = `
 "<!-- wp:ucf-brand/tabs -->
 <div class="wp-block-ucf-brand-tabs ucf-tabs"><!-- wp:ucf-brand/tab -->
 <div class="wp-block-ucf-brand-tab ucf-tabs__set"><!-- wp:ucf-brand/tab-label -->
-<div class="wp-block-ucf-brand-tab-label ucf-tabs__label"><span class="ucf-tabs__badge">Do</span><h3 class="ucf-tabs__heading">Use the primary mark</h3><p class="ucf-tabs__description">The full lockup, on a field with room to breathe.</p></div>
+<div class="wp-block-ucf-brand-tab-label ucf-tabs__label"><h3 class="ucf-tabs__heading">Use the primary mark</h3><p class="ucf-tabs__description">The full lockup, on a field with room to breathe.</p></div>
 <!-- /wp:ucf-brand/tab-label -->
 
 <!-- wp:ucf-brand/tab-panel -->

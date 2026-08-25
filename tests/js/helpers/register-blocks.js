@@ -100,7 +100,6 @@ export const BLOCK_FIXTURES = [
 					{
 						name: 'ucf-brand/tab-label',
 						attributes: {
-							badge: 'Do',
 							heading: 'Use the primary mark',
 							description:
 								'The full lockup, on a field with room to breathe.',

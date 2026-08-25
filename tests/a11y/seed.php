@@ -394,8 +394,8 @@ function ucf_brand_a11y_seed_blocks() {
 	// nor the arrow-key handling, and `collect()` in view.js bails on an incomplete pair.
 	$tabs = '<!-- wp:ucf-brand/tabs -->' . "\n"
 		. '<div class="wp-block-ucf-brand-tabs ucf-tabs">'
-		. ucf_brand_a11y_tab( 'Do', 'Use the primary mark', 'Clear space around the mark is measured from the pegasus.' )
-		. ucf_brand_a11y_tab( 'Don’t', 'Recolor the mark', 'The mark is gold or black. Nothing else is approved.' )
+		. ucf_brand_a11y_tab( 'Use the primary mark', 'Clear space around the mark is measured from the pegasus.' )
+		. ucf_brand_a11y_tab( 'Recolor the mark', 'The mark is gold or black. Nothing else is approved.' )
 		. '</div>' . "\n"
 		. '<!-- /wp:ucf-brand/tabs -->';
 
@@ -419,19 +419,17 @@ function ucf_brand_a11y_seed_blocks() {
  * One `ucf-brand/tab`, with its label and panel.
  *
  * The markup mirrors `tests/js/__snapshots__/blocks.test.js.snap`, which is the committed
- * record of what `save()` emits. `badge` and `heading` are sourced out of the markup rather
- * than stored as JSON, which is why the label block carries no attributes.
+ * record of what `save()` emits. `heading` is sourced out of the markup rather than
+ * stored as JSON, which is why the label block carries no attributes.
  *
- * @param string $badge   Badge text ("Do" / "Don't").
  * @param string $heading Tab heading.
  * @param string $copy    Panel copy.
  * @return string Block markup.
  */
-function ucf_brand_a11y_tab( $badge, $heading, $copy ) {
+function ucf_brand_a11y_tab( $heading, $copy ) {
 	return '<!-- wp:ucf-brand/tab -->' . "\n"
 		. '<div class="wp-block-ucf-brand-tab ucf-tabs__set"><!-- wp:ucf-brand/tab-label -->' . "\n"
 		. '<div class="wp-block-ucf-brand-tab-label ucf-tabs__label">'
-		. '<span class="ucf-tabs__badge">' . esc_html( $badge ) . '</span>'
 		. '<h3 class="ucf-tabs__heading">' . esc_html( $heading ) . '</h3></div>' . "\n"
 		. '<!-- /wp:ucf-brand/tab-label -->' . "\n\n"
 		. '<!-- wp:ucf-brand/tab-panel -->' . "\n"

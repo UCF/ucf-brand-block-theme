@@ -12,7 +12,6 @@
  *   page-hero-editable     Keeps the hero editable while a page is open.
  *   section-number-binding The client half of the `ucf-brand/section-number` binding.
  *   stretch-link           A `stretchLink` toggle added to core/button.
- *   hide-on-mobile         A "Hide on mobile" toggle on every block's Inspector.
  *   dynamic-blocks         Editor stand-ins for the two PHP-rendered blocks.
  *
  * Order is not significant — every module registers against a hook or a store and none
@@ -24,5 +23,4 @@ import './section-variable';
 import './page-hero-editable';
 import './section-number-binding';
 import './stretch-link';
-import './hide-on-mobile';
 import './dynamic-blocks';

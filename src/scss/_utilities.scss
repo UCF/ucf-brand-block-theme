@@ -11,7 +11,6 @@
 // WHY: color only. Width, side, padding and size stay with the block's own controls.
 
 @use "compositions";
-@use "variables" as *;
 
 // A11Y: always paired — a background without a legible text color is the bug.
 .accent-fill {
@@ -27,23 +26,4 @@
 // width will paint.
 .hairline {
 	border-color: var(--brand-line, #{compositions.role-default("line")});
-}
-
-// ── Responsive visibility ────────────────────────────────────────────────────
-//
-// WHY: a plain class, not a registered block style. Styles are single-select, so a "hide
-// on mobile" entry would compete for the slot the composition already occupies on a Group
-// — and visibility is orthogonal to how a block looks. Editors apply it from the block's
-// Advanced panel, under Additional CSS class(es).
-
-// A11Y: `display: none` hides from assistive tech as well as from view, which is right
-// only for content a phone user genuinely does not need. Anything they still need must
-// stay in the accessibility tree — use `.brand-visually-hidden` in _base.scss instead.
-// UPSTREAM: doubled class. Core sets `display` on the layout classes through
-// `:root :where(.is-layout-flex)`, which is (0,1,0), so a single class would win on source
-// order alone. Same reason as `.brand-shell.brand-shell` in _drawer.scss.
-@media (max-width: $breakpoint-drawer) {
-	.hide-on-mobile.hide-on-mobile {
-		display: none;
-	}
 }
