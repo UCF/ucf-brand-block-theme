@@ -238,7 +238,16 @@
 
 // WHY: the group's blockGap keeps the two utility links paired; the org line opens a new
 // tier and needs the gap the gap cannot give it without splitting the links apart.
+// SPEC: the comp draws this line below the type scale and far tighter than the eyebrow
+// style — 33 characters have to reach the "//" on line one inside a 245px rail, and no
+// preset size does that at a tracking worth keeping. `meta` at 0.08em fits by one pixel,
+// which is a coincidence rather than a design.
+// WHY: scoped to the drawer footer, so `is-style-eyebrow` is untouched everywhere else.
+// The class still supplies the mono face, the weight and the `--brand-eyebrow` role, so
+// the color still follows the composition rather than naming gold here.
 .brand-sidebar__footer .is-style-eyebrow {
+	font-size: 0.62rem;
+	letter-spacing: 0.12em;
 	margin-block-start: map.get($space, "40");
 }
 
