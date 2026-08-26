@@ -24,9 +24,15 @@
 
 // WHY: real links and controls must sit above the overlay to stay clickable — native
 // form controls too, or the overlay swallows them.
-.wp-block-group:has(.wp-block-button.has-stretch-link)
+// FIX: `:has(> .wp-block-buttons …)` keeps this to the card that holds the button, which is what
+// the overlay covers. A bare descendant `:has()` matched every ancestor group — `main.brand-shell`
+// included — so one stretch card gave every control on the page `position: relative`, unhiding the
+// search block's `.screen-reader-text` label in the sidebar. Cannot nest `:has()` inside `:has()`.
+// A11Y: `.screen-reader-text` is excluded outright — positioning it is what makes it visible.
+.wp-block-group:has(> .wp-block-buttons .wp-block-button.has-stretch-link > a)
 	:where(a, button, input, select, textarea, label, summary):not(
-		.wp-block-button.has-stretch-link > a
+		.wp-block-button.has-stretch-link > a,
+		.screen-reader-text
 	) {
 	position: relative;
 	z-index: 2;

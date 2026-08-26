@@ -17,6 +17,9 @@ use WP_UnitTestCase;
 /**
  * @covers ::ucf_brand_limit_main_search_to_pages
  * @covers ::ucf_brand_render_search_subsections
+ * @covers ::ucf_brand_search_query_title
+ * @covers ::ucf_brand_search_excerpt_from_deck
+ * @covers ::ucf_brand_hide_results_without_sections
  */
 final class SearchTest extends WP_UnitTestCase {
 
@@ -48,7 +51,9 @@ final class SearchTest extends WP_UnitTestCase {
 				'post_type'    => 'page',
 				'post_status'  => 'publish',
 				'post_title'   => 'Pegasus Page',
-				'post_content' => 'About the pegasus.',
+				// The page needs a section that matches, or ucf_brand_hide_results_without_sections()
+				// drops it and this test fails for a reason that has nothing to do with post types.
+				'post_content' => self::PAGE_CONTENT,
 			)
 		);
 		self::factory()->post->create(
@@ -185,7 +190,7 @@ final class SearchTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_renders_nothing_when_only_the_title_matched() {
-		self::factory()->post->create(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
 				'post_status'  => 'publish',
@@ -195,10 +200,21 @@ final class SearchTest extends WP_UnitTestCase {
 		);
 
 		$this->go_to( home_url( '/?s=zebra' ) );
-		$this->assertTrue( have_posts() );
-		the_post();
+
+		// The main loop is empty now — ucf_brand_hide_results_without_sections() drops exactly
+		// this page. The block's own guard still has to hold for any other caller, so the post
+		// is reached through a secondary loop, which is also what sets the post global.
+		$loop = new \WP_Query(
+			array(
+				'p'         => $post_id,
+				'post_type' => 'page',
+			)
+		);
+		$loop->the_post();
 
 		$this->assertSame( '', do_blocks( '<!-- wp:ucf-brand/search-subsections /-->' ) );
+
+		wp_reset_postdata();
 	}
 
 	/**
@@ -220,5 +236,222 @@ final class SearchTest extends WP_UnitTestCase {
 		the_post();
 
 		$this->assertSame( '', do_blocks( '<!-- wp:ucf-brand/search-subsections /-->' ) );
+	}
+
+	/**
+	 * The comp reads "Results for: logo", so core's longer wording is swapped in the
+	 * rendered query-title block. Rendering the real block is the point of the test: the
+	 * filter matches core's own string, and a core rewording must show up as a failure here
+	 * rather than as a mangled title on the page.
+	 *
+	 * @return void
+	 */
+	public function test_the_search_title_uses_the_comps_wording() {
+		self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'post_title'  => 'Logo Usage',
+			)
+		);
+
+		$this->go_to( home_url( '/?s=logo' ) );
+
+		$html = do_blocks( '<!-- wp:query-title {"type":"search"} /-->' );
+
+		$this->assertStringContainsString( 'Results for: logo', $html );
+		$this->assertStringNotContainsString( 'Search results for', $html );
+	}
+
+	/**
+	 * The filter is keyed to the search request, not just to the block's type. Off a search,
+	 * even the search variant of the block must come through as core wrote it.
+	 *
+	 * @return void
+	 */
+	public function test_a_non_search_request_is_untouched() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Logo Usage',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+
+		$this->go_to( get_permalink( $post_id ) );
+
+		$this->assertStringNotContainsString(
+			'Results for:',
+			do_blocks( '<!-- wp:query-title {"type":"search"} /-->' )
+		);
+	}
+
+	/**
+	 * A page's deck is what introduces it, so it is what a result row shows. The generated
+	 * excerpt on these pages is the opening of a section index, not prose.
+	 *
+	 * @return void
+	 */
+	public function test_the_deck_becomes_the_search_excerpt() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Logo Usage',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+		update_post_meta( $post_id, 'ucf_brand_deck', 'The mark, and the room it needs.' );
+
+		$this->go_to( home_url( '/?s=pegasus' ) );
+
+		$this->assertSame( 'The mark, and the room it needs.', get_the_excerpt( $post_id ) );
+	}
+
+	/**
+	 * Without a deck the row keeps whatever excerpt it had. Blanking it would leave a result
+	 * as a bare title — the front page has no deck.
+	 *
+	 * @return void
+	 */
+	public function test_a_page_without_a_deck_keeps_its_excerpt() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Logo Usage',
+				'post_excerpt' => 'Hand-written excerpt.',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+
+		$this->go_to( home_url( '/?s=pegasus' ) );
+
+		$this->assertSame( 'Hand-written excerpt.', get_the_excerpt( $post_id ) );
+	}
+
+	/**
+	 * Off a search the deck must not displace the excerpt anywhere else on the site.
+	 *
+	 * @return void
+	 */
+	public function test_the_deck_is_not_used_outside_a_search() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Logo Usage',
+				'post_excerpt' => 'Hand-written excerpt.',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+		update_post_meta( $post_id, 'ucf_brand_deck', 'The mark, and the room it needs.' );
+
+		$this->go_to( get_permalink( $post_id ) );
+
+		$this->assertSame( 'Hand-written excerpt.', get_the_excerpt( $post_id ) );
+	}
+
+	/**
+	 * A deck may hold a link — decks are stored through wp_kses_post. The row is itself a
+	 * link, and core trims the excerpt to a word count, so the markup is flattened first.
+	 *
+	 * @return void
+	 */
+	public function test_markup_in_a_deck_is_flattened() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Logo Usage',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+		update_post_meta( $post_id, 'ucf_brand_deck', 'See the <a href="/writing/">writing rules</a> first.' );
+
+		$this->go_to( home_url( '/?s=pegasus' ) );
+
+		$this->assertSame( 'See the writing rules first.', get_the_excerpt( $post_id ) );
+	}
+
+	/**
+	 * A page matching only in prose under no matching heading has nothing to click into, so
+	 * it is not a result. PAGE_CONTENT's sections mention "pegasus" and "pixels"; a term that
+	 * appears only in the title matches the page but no section within it.
+	 *
+	 * @return void
+	 */
+	public function test_a_page_with_no_matching_section_is_dropped() {
+		self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Zebra Crossing',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+
+		$this->go_to( home_url( '/?s=zebra' ) );
+
+		$this->assertSame( 0, $GLOBALS['wp_query']->post_count );
+		$this->assertSame( 0, $GLOBALS['wp_query']->found_posts );
+	}
+
+	/**
+	 * The page whose section matches stays, and the count reflects what is on the page.
+	 *
+	 * @return void
+	 */
+	public function test_a_page_with_a_matching_section_is_kept() {
+		self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Logo Usage',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+		self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Pegasus Mentioned In The Title Only',
+				'post_content' => '<!-- wp:paragraph --><p>Nothing here.</p><!-- /wp:paragraph -->',
+			)
+		);
+
+		$this->go_to( home_url( '/?s=pegasus' ) );
+
+		$this->assertSame( 1, $GLOBALS['wp_query']->post_count );
+		$this->assertSame( 1, $GLOBALS['wp_query']->found_posts );
+		$this->assertSame( 'Logo Usage', $GLOBALS['wp_query']->posts[0]->post_title );
+	}
+
+	/**
+	 * A secondary query is not the search results list and must keep every post it asked for.
+	 *
+	 * @return void
+	 */
+	public function test_a_secondary_query_keeps_results_without_sections() {
+		self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Zebra Crossing',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+
+		$this->go_to( home_url( '/?s=zebra' ) );
+
+		$secondary = new \WP_Query(
+			array(
+				's'         => 'zebra',
+				'post_type' => 'page',
+			)
+		);
+
+		$this->assertSame( 1, $secondary->post_count );
 	}
 }

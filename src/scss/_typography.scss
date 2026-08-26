@@ -103,18 +103,11 @@ h6 {
 	}
 }
 
-// WHY: Large on mobile, Extra Large from tablet up. Three rem under a heading is a proportion
-// of a wide column; in a phone's measure it is most of a screen.
+// WHY: Large at every width. This stepped up to Extra Large from tablet, but three rem under a
+// heading read as a gap rather than a pairing — the H2 belongs to the copy beneath it.
 .wp-block-post-content h2:not(:last-child),
 .is-root-container h2:not(:last-child) {
 	margin-block-end: map.get($space, "40");
-}
-
-@media (min-width: $breakpoint-tabs) {
-	.wp-block-post-content h2:not(:last-child),
-	.is-root-container h2:not(:last-child) {
-		margin-block-end: map.get($space, "50");
-	}
 }
 
 // WHY: H2 opens a subsection, so it takes Extra Large — the largest step meant for type.
