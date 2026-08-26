@@ -23,6 +23,10 @@
 @property --brand-h2-size {
 	syntax: "<length>";
 	inherits: true;
+	// WHY: `0px`, not `0`. This is an `@property` initial value, which has to parse as the
+	// registered syntax — a bare `0` is a <number> here, and a registration that fails to
+	// parse is dropped whole, taking the badge's cap-band offset with it.
+	// stylelint-disable-next-line length-zero-no-unit
 	initial-value: 0px;
 }
 

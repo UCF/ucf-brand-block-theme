@@ -201,11 +201,16 @@ final class SearchTest extends WP_UnitTestCase {
 
 		$this->go_to( home_url( '/?s=zebra' ) );
 
-		// The loop is empty now — ucf_brand_hide_results_without_sections() drops exactly this
-		// page. The block's own guard still has to hold for any other caller, so the post is
-		// set up by hand rather than walked to through the loop.
-		$GLOBALS['post'] = get_post( $post_id );
-		setup_postdata( $GLOBALS['post'] );
+		// The main loop is empty now — ucf_brand_hide_results_without_sections() drops exactly
+		// this page. The block's own guard still has to hold for any other caller, so the post
+		// is reached through a secondary loop, which is also what sets the post global.
+		$loop = new \WP_Query(
+			array(
+				'p'         => $post_id,
+				'post_type' => 'page',
+			)
+		);
+		$loop->the_post();
 
 		$this->assertSame( '', do_blocks( '<!-- wp:ucf-brand/search-subsections /-->' ) );
 

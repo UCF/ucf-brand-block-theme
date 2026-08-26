@@ -415,9 +415,12 @@ function ucf_brand_search_query_title( $content, $block ) {
 
 	// UPSTREAM: matched against core's own string in query-title.php, curly quotes and all.
 	// A translation or a core rewording makes this a no-op rather than a mangled title.
+	// WHY: the `default` domain. The string being matched is core's, so it has to be looked up
+	// in core's textdomain — the theme's would return it untranslated and the match would fail
+	// on any localized site.
 	$core = sprintf(
 		/* translators: %s is the search term. Core's wording, matched to replace it. */
-		__( 'Search results for: &#8220;%s&#8221;' ),
+		__( 'Search results for: &#8220;%s&#8221;', 'default' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- core's string, so core's domain.
 		get_search_query()
 	);
 

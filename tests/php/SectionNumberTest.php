@@ -45,22 +45,22 @@ final class SectionNumberTest extends TestCase {
 	public static function numberCases() {
 		return array(
 			// SPEC: unpadded — the guide numbers sections "1", "2", "3", not "01".
-			'single digit'             => array( 1, '1' ),
-			'nine'                     => array( 9, '9' ),
-			'ten'                      => array( 10, '10' ),
-			'three digits'             => array( 100, '100' ),
+			'single digit'          => array( 1, '1' ),
+			'nine'                  => array( 9, '9' ),
+			'ten'                   => array( 10, '10' ),
+			'three digits'          => array( 100, '100' ),
 
 			// Meta comes back from the database as a string.
-			'numeric string'           => array( '7', '7' ),
+			'numeric string'        => array( '7', '7' ),
 
 			// Everything below means "unnumbered", and must render as an empty label —
 			// `.brand-page-number:empty` is what hides the element. A "0" here would
 			// print a badge on every unnumbered page.
-			'zero is unset'            => array( 0, '' ),
-			'negative is unset'        => array( -3, '' ),
-			'empty string is unset'    => array( '', '' ),
-			'non-numeric is unset'     => array( 'abc', '' ),
-			'null is unset'            => array( null, '' ),
+			'zero is unset'         => array( 0, '' ),
+			'negative is unset'     => array( -3, '' ),
+			'empty string is unset' => array( '', '' ),
+			'non-numeric is unset'  => array( 'abc', '' ),
+			'null is unset'         => array( null, '' ),
 		);
 	}
 

@@ -20,7 +20,9 @@
 		content: "";
 		display: block;
 		height: 5px;
-		margin-top: map.get($space, "20");
+		// SYNC: the gap the hero's accent rule sits at — `.is-style-accent-rule` in _hero.scss
+		// takes it from the separator's own Large margin, and the two read as one element.
+		margin-top: map.get($space, "40");
 		width: 6rem;
 	}
 }
