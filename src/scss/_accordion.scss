@@ -125,4 +125,14 @@
 		border-left: 3px solid transparent;
 		padding: 0 map.get($space, "30") map.get($space, "30");
 	}
+
+	// FIX: a closed row showed a strip of empty panel — this rule's own padding, with nothing in it.
+	// UPSTREAM: WP 7.1 swapped the panel's `inert` for `hidden="until-found"` so find-in-page reaches
+	// closed panels (Gutenberg #74744). The UA sheet styles that `content-visibility: hidden`: contents
+	// skipped, box and padding still laid out. Core has no panel padding, so it zeroes the margin only.
+	// WHY: not `display: none`, which would defeat the find-in-page reveal `until-found` exists for.
+	.wp-block-accordion-panel[hidden] {
+		margin-block-start: 0;
+		padding: 0;
+	}
 }
