@@ -10,34 +10,25 @@
 // WHY: colors go through `--brand-*` roles, not palette tokens, so a result list dropped
 // on a dark or paper field re-reads that field instead of inheriting the enclosing one.
 
-.brand-search__sections {
-	margin-top: map.get($space, "10");
+// SPEC: the comp sets the results heading off with a short gold rule and a full Extra Large
+// step before the first result — the heading reads as the page's own title, not a list label.
+.brand-content .wp-block-query-title {
+	margin-bottom: map.get($space, "50");
+
+	&::after {
+		background: var(--brand-accent, #{compositions.role-default("accent")});
+		content: "";
+		display: block;
+		height: 5px;
+		margin-top: map.get($space, "20");
+		width: 6rem;
+	}
 }
 
-.brand-search__list {
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.brand-search__item {
-	margin: 0;
-}
-
-// WHY: the `.meta` idiom — these are wayfinding labels, not body copy. The marker is the
-// only colored element at rest, so the row reads secondary until hovered.
-.brand-search__link {
-	align-items: baseline;
-	color: var(--brand-meta, #{compositions.role-default("meta")});
-	display: inline-flex;
-	font-family: map.get($font, "mono");
-	font-size: map.get($size, "meta");
-	gap: 0.5rem;
-	letter-spacing: 0.03em;
-	line-height: 1.6;
+// SPEC: the page title is ink in the comp, not a link blue — the whole row is scannable as a
+// heading and the link affordance arrives on hover.
+.brand-search__result .wp-block-post-title a {
+	color: var(--brand-heading, #{compositions.role-default("heading")});
 	text-decoration: none;
 
 	&:hover,
@@ -48,20 +39,59 @@
 	}
 }
 
-.brand-search__marker {
-	color: var(--brand-accent, #{compositions.role-default("accent")});
-	flex: none;
-	font-weight: 700;
+// SPEC: the section list is indented under the page's intro, which is what makes it read as
+// belonging to the result above rather than as a sibling of it.
+.brand-search__sections {
+	margin-top: map.get($space, "30");
+	padding-left: map.get($space, "40");
 }
 
-// WHY: indented under the heading text rather than the `#`, so it reads as a caption on
-// the link above. Approximates the marker's width plus the link's gap.
+// SPEC: a full step between blocks. The pairing only reads if the gap around a block clearly
+// beats the gap inside it — at 1rem against the label's own leading the two were near enough
+// that three sections ran together as one grey field.
+.brand-search__list {
+	display: flex;
+	flex-direction: column;
+	gap: map.get($space, "40");
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.brand-search__item {
+	margin: 0;
+}
+
+// WHY: the `.meta` idiom — these are wayfinding labels, not body copy, so the row reads
+// secondary until hovered.
+// SPEC: uppercase. The comp shows the section's own H2, which the page sets in caps.
+.brand-search__link {
+	color: var(--brand-meta, #{compositions.role-default("meta")});
+	display: inline-block;
+	font-family: map.get($font, "mono");
+	font-size: map.get($size, "eyebrow");
+	letter-spacing: 0.06em;
+	// WHY: tight. The label's leading is part of the gap the reader sees under it, so a body
+	// line-height here pushes the snippet visually away from the label it belongs to.
+	line-height: 1.3;
+	text-decoration: none;
+	text-transform: uppercase;
+
+	&:hover,
+	&:focus-visible {
+		color: var(--brand-link, #{compositions.role-default("link")});
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+}
+
+// SPEC: flush with the label above it, not indented again — the comp aligns the two into one
+// block, and the size step between them is what separates label from prose.
 .brand-search__snippet {
 	color: var(--brand-body-muted, #{compositions.role-default("body-muted")});
-	font-size: map.get($size, "meta");
+	font-size: map.get($size, "ui");
 	line-height: 1.65;
-	margin: 0.15rem 0 0;
-	padding-left: 1.15rem;
+	margin: 0.2rem 0 0;
 }
 
 // WHY: scoped, not a bare `mark` rule — restyling every mark sitewide is a bigger

@@ -16,9 +16,20 @@ also what puts them on the page, so the two cannot disagree.
    `ucf-brand/search-subsections` block renders once per result row, scores that page's
    sections against the query, and emits up to `UCF_BRAND_MAX_SUBSECTIONS` (3)
    `/page/#heading` links with highlighted snippets beneath the result.
+3. **A page with no matching section is not a result.** It matched on prose sitting under no
+   heading the reader typed, so the row would offer a title and a deck with nothing to click
+   into. `ucf_brand_hide_results_without_sections()` drops it from the main query and corrects
+   `found_posts` to match.
+4. **The row's summary is the page's deck**, not a generated excerpt — these pages tend to
+   open with a section index, so the first 28 words of content read as a table of contents.
+   `ucf_brand_search_excerpt_from_deck()` falls back to the excerpt where no deck is set.
 
 Everything is resolved at render time from `post_content`. Nothing is stored, so nothing
 can go stale and no reindex is needed when a page is edited.
+
+Search is not paginated. Results are filtered after the query runs, so a paginated list would
+show short pages and a total that disagrees with what is on screen; `UCF_BRAND_MAX_SEARCH_RESULTS`
+(50) is set well above the size of the guide instead.
 
 **Relevanssi is optional.** With it, pages rank better. Without it, core's search picks the
 pages and the subsection logic behaves identically.

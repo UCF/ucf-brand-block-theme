@@ -29,6 +29,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 const UCF_BRAND_MAX_SUBSECTIONS = 3;
 
 /**
+ * Most results to show on one page.
+ *
+ * Results are filtered after the query to those with a matching section, so a paginated
+ * search would show short pages and a total that never matches what is on screen. The guide
+ * is a dozen pages; one page of results is both accurate and how it already renders.
+ */
+const UCF_BRAND_MAX_SEARCH_RESULTS = 50;
+
+/**
  * Keep guide search results focused on section pages.
  *
  * The sidebar Search block already posts `post_type=page`, but a hand-typed or shared
@@ -45,6 +54,7 @@ function ucf_brand_limit_main_search_to_pages( $query ) {
 	}
 
 	$query->set( 'post_type', 'page' );
+	$query->set( 'posts_per_page', UCF_BRAND_MAX_SEARCH_RESULTS );
 }
 add_action( 'pre_get_posts', 'ucf_brand_limit_main_search_to_pages' );
 
@@ -373,7 +383,7 @@ function ucf_brand_render_search_subsections() {
 		// link's accessible name and every result would announce as a paragraph of prose.
 		// Both values arrive escaped from ucf_brand_highlight_terms().
 		$items .= sprintf(
-			'<li class="brand-search__item"><a class="brand-search__link" href="%1$s"><span class="brand-search__marker" aria-hidden="true">#</span><span class="brand-search__text">%2$s</span></a>%3$s</li>',
+			'<li class="brand-search__item"><a class="brand-search__link" href="%1$s"><span class="brand-search__text">%2$s</span></a>%3$s</li>',
 			esc_url( $permalink . '#' . $section['id'] ),
 			ucf_brand_highlight_terms( $section['title'], $terms ),
 			'' === $snippet ? '' : '<p class="brand-search__snippet">' . $snippet . '</p>'
@@ -387,3 +397,113 @@ function ucf_brand_render_search_subsections() {
 		$items
 	);
 }
+
+/**
+ * Shorten core's search title to the comp's wording.
+ *
+ * The comp reads "Results for: logo". Core's query-title block has no attribute for the
+ * prefix, so the rendered string is swapped after the fact.
+ *
+ * @param string $content Rendered block markup.
+ * @param array  $block   Parsed block, including its attributes.
+ * @return string Markup with the title reworded, or unchanged if core's string is not found.
+ */
+function ucf_brand_search_query_title( $content, $block ) {
+	if ( ! is_search() || 'search' !== ( $block['attrs']['type'] ?? '' ) ) {
+		return $content;
+	}
+
+	// UPSTREAM: matched against core's own string in query-title.php, curly quotes and all.
+	// A translation or a core rewording makes this a no-op rather than a mangled title.
+	$core = sprintf(
+		/* translators: %s is the search term. Core's wording, matched to replace it. */
+		__( 'Search results for: &#8220;%s&#8221;' ),
+		get_search_query()
+	);
+
+	// SAFETY: get_search_query() escapes, and it is the same call core makes — so the
+	// replacement carries exactly the escaping the string it replaces did.
+	$ours = sprintf(
+		/* translators: %s is the search term. */
+		__( 'Results for: %s', 'ucf-brand-block-theme' ),
+		get_search_query()
+	);
+
+	return str_replace( $core, $ours, $content );
+}
+add_filter( 'render_block_core/query-title', 'ucf_brand_search_query_title', 10, 2 );
+
+/**
+ * Use a page's hero deck as its excerpt in search results.
+ *
+ * The deck is the one line written to introduce the page. An auto-generated excerpt is the
+ * first words of whatever block opens it, which on these pages is often a section index —
+ * "UCF's Logo and Identity System Includes: 5.1 Primary Logos…" rather than prose.
+ *
+ * @param string  $excerpt Excerpt so far.
+ * @param WP_Post $post    Post the excerpt belongs to.
+ * @return string The deck when the page has one, otherwise the excerpt unchanged.
+ */
+function ucf_brand_search_excerpt_from_deck( $excerpt, $post ) {
+	if ( ! is_search() || ! $post instanceof WP_Post ) {
+		return $excerpt;
+	}
+
+	$deck = get_post_meta( $post->ID, 'ucf_brand_deck', true );
+
+	// WHY: fall through to the excerpt rather than blanking the result. The front page has no
+	// deck, and neither does a page whose author has not written one yet.
+	if ( ! is_string( $deck ) || '' === trim( $deck ) ) {
+		return $excerpt;
+	}
+
+	// SAFETY: the deck is stored through wp_kses_post, so it can hold a link — and the result
+	// row is itself a link. Flatten it; core trims to a word count and would cut mid-tag.
+	return wp_strip_all_tags( $deck );
+}
+// WHY: before wp_trim_excerpt at 10. That generates from post_content only when the text it
+// receives is empty, so filling it here is what stops the generated version being built.
+add_filter( 'get_the_excerpt', 'ucf_brand_search_excerpt_from_deck', 5, 2 );
+
+/**
+ * Drop results whose page has no matching section.
+ *
+ * A page can match on prose that lives under no heading the reader typed — the result then
+ * renders as a title and a deck with nothing to click into, which is the row that reads as
+ * noise. What the guide answers is "which section of which page", so a result with no
+ * section is not one.
+ *
+ * @param WP_Post[] $posts Posts the query found.
+ * @param WP_Query  $query The query itself.
+ * @return WP_Post[] Posts that have at least one matching section.
+ */
+function ucf_brand_hide_results_without_sections( $posts, $query ) {
+	if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() ) {
+		return $posts;
+	}
+
+	// WHY: the query's own term, not get_search_query(). This runs inside WP_Query::get_posts(),
+	// and reading the global there is a dependency on assignment order that need not exist.
+	$terms = ucf_brand_search_terms( $query->get( 's' ) );
+
+	if ( empty( $terms ) ) {
+		return $posts;
+	}
+
+	$kept = array_values(
+		array_filter(
+			$posts,
+			static function ( $post ) use ( $terms ) {
+				return array() !== ucf_brand_find_matching_sections( $post, $terms );
+			}
+		)
+	);
+
+	// WHY: the count is what the pagination block and any "N results" copy read. Leaving it
+	// at the SQL total would advertise results that are no longer on the page.
+	$query->found_posts   = count( $kept );
+	$query->max_num_pages = 1;
+
+	return $kept;
+}
+add_filter( 'the_posts', 'ucf_brand_hide_results_without_sections', 10, 2 );
