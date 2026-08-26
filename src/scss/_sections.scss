@@ -18,9 +18,41 @@
 	counter-reset: brand-subsection;
 }
 
+// WHY: registered, so `1em` computes to an absolute length at the H2 and inherits that px value
+// down. Unregistered, a bare `em` inside ::before would mean the badge's own 0.68rem instead.
+@property --brand-h2-size {
+	syntax: "<length>";
+	inherits: true;
+	// WHY: `0px`, not `0`. This is an `@property` initial value, which has to parse as the
+	// registered syntax — a bare `0` is a <number> here, and a registration that fails to
+	// parse is dropped whole, taking the badge's cap-band offset with it.
+	// stylelint-disable-next-line length-zero-no-unit
+	initial-value: 0px;
+}
+
+// FIX: the badge read low against the heading. That is `vertical-align: middle`'s definition —
+// the box's midpoint meets the baseline plus half an x-height, which in uppercase display type
+// sits well under the caps' optical center. Flex centering instead, as in _accordion.scss.
 .wp-block-post-content h2,
 .is-root-container h2 {
+	--brand-h2-size: 1em;
+
+	align-items: center;
 	counter-increment: brand-subsection;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+// FIX: a flex container places its items by `justify-content`, not `text-align` — without
+// these an author-centered heading pinned left the moment the badge made the H2 a flex box.
+.wp-block-post-content h2.has-text-align-center,
+.is-root-container h2.has-text-align-center {
+	justify-content: center;
+}
+
+.wp-block-post-content h2.has-text-align-right,
+.is-root-container h2.has-text-align-right {
+	justify-content: flex-end;
 }
 
 .wp-block-post-content h2::before,
@@ -39,14 +71,29 @@
 	line-height: 1;
 	margin-right: 0.7rem;
 	padding: 0.75em 0.8em;
-	vertical-align: middle;
+	// SPEC: centered on the cap band, not the line box. Oswald's ascender towers over its
+	// descender (1193 / -289, cap 810 per 1000 upem), putting the caps' center (A-D)/2 - cap/2
+	// = 0.047em of the heading's size *below* the box center. Line-height cancels out, so this
+	// holds at every step of the clamp and on a wrapped heading.
+	transform: translateY(calc(var(--brand-h2-size) * 0.047));
 }
 
 @media (max-width: $breakpoint-drawer) {
+	// WHY: the badge stacks above the heading here, so the H2 goes back to normal flow — the
+	// centering above has nothing to center, and `display: block` keeps `width: fit-content`
+	// meaningful (a flex item would stretch to the row instead).
+	.wp-block-post-content h2,
+	.is-root-container h2 {
+		display: block;
+	}
+
 	.wp-block-post-content h2::before,
 	.is-root-container h2::before {
 		display: block;
 		margin: 0 0 0.5rem;
+		// WHY: nothing is being centered once the badge stacks, so the cap-band nudge above
+		// would just push it off its own row.
+		transform: none;
 		width: fit-content;
 	}
 }
@@ -197,6 +244,9 @@
 	font-family: map.get($font, "display");
 	font-size: 1.05rem;
 	font-weight: 700;
+	// SYNC: 0.01em is the theme's display-face tracking — the `heading` element in theme.json
+	// sets it, and every Oswald run outside a heading repeats it.
+	letter-spacing: 0.01em;
 	margin: 0 0 0.2rem;
 	text-transform: uppercase;
 }
@@ -364,7 +414,8 @@
 	font-family: map.get($font, "display");
 	font-size: 1rem;
 	font-weight: 700;
-	letter-spacing: 0.04em;
+	// SYNC: the theme's display-face tracking, matching theme.json's `heading` element.
+	letter-spacing: 0.01em;
 	margin: 0;
 	padding: 0.6rem map.get($space, "30");
 	text-transform: uppercase;

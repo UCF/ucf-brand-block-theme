@@ -43,9 +43,9 @@
 	// but reads as a control, not a heading of its own weight.
 	font-size: map.get($size, "heading-4");
 	font-weight: 700;
-	// SPEC: a hairline of tracking to open up the condensed caps. In px, not em, so it holds
-	// as the heading scales through the strip's clamp — an optical correction, not a ratio.
-	letter-spacing: 0.35px;
+	// SYNC: the theme's display-face tracking, matching theme.json's `heading` element. It was
+	// a flat 0.35px here; the ratio is what every other Oswald run uses.
+	letter-spacing: 0.01em;
 	line-height: 1.05;
 	margin: 0;
 	text-transform: uppercase;

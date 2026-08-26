@@ -37,8 +37,8 @@
 		<div class="wp-block-columns are-vertically-aligned-top">
 			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
 			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:10%">
-				<!-- wp:paragraph {"fontFamily":"display","fontSize":"heading-3","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
-				<p class="has-display-font-family has-heading-3-font-size" style="margin-top:0;margin-bottom:0;font-weight:700;line-height:1.2">01</p>
+				<!-- wp:paragraph {"fontFamily":"display","fontSize":"heading-3","style":{"typography":{"fontWeight":"700","letterSpacing":"0.01em","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+				<p class="has-display-font-family has-heading-3-font-size" style="margin-top:0;margin-bottom:0;font-weight:700;letter-spacing:0.01em;line-height:1.2">01</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:column -->
@@ -65,8 +65,8 @@
 		<div class="wp-block-columns are-vertically-aligned-top">
 			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
 			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:10%">
-				<!-- wp:paragraph {"fontFamily":"display","fontSize":"heading-3","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
-				<p class="has-display-font-family has-heading-3-font-size" style="margin-top:0;margin-bottom:0;font-weight:700;line-height:1.2">02</p>
+				<!-- wp:paragraph {"fontFamily":"display","fontSize":"heading-3","style":{"typography":{"fontWeight":"700","letterSpacing":"0.01em","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+				<p class="has-display-font-family has-heading-3-font-size" style="margin-top:0;margin-bottom:0;font-weight:700;letter-spacing:0.01em;line-height:1.2">02</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:column -->
@@ -93,8 +93,8 @@
 		<div class="wp-block-columns are-vertically-aligned-top">
 			<!-- wp:column {"verticalAlignment":"top","width":"10%"} -->
 			<div class="wp-block-column is-vertically-aligned-top" style="flex-basis:10%">
-				<!-- wp:paragraph {"fontFamily":"display","fontSize":"heading-3","style":{"typography":{"fontWeight":"700","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
-				<p class="has-display-font-family has-heading-3-font-size" style="margin-top:0;margin-bottom:0;font-weight:700;line-height:1.2">03</p>
+				<!-- wp:paragraph {"fontFamily":"display","fontSize":"heading-3","style":{"typography":{"fontWeight":"700","letterSpacing":"0.01em","lineHeight":"1.2"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+				<p class="has-display-font-family has-heading-3-font-size" style="margin-top:0;margin-bottom:0;font-weight:700;letter-spacing:0.01em;line-height:1.2">03</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:column -->

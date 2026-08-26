@@ -285,7 +285,7 @@
 					"slug": "heading-4"
 				},
 				{
-					"size": "clamp(1.3rem, 2.6vw, 1.9rem)",
+					"size": "clamp(1.45rem, 2.6vw, 1.6rem)",
 					"name": "Heading 3",
 					"slug": "heading-3"
 				},
@@ -338,8 +338,7 @@
 			},
 			"h2": {
 				"typography": {
-					"fontSize": "var(--wp--preset--font-size--heading-2)",
-					"letterSpacing": "0.005em"
+					"fontSize": "var(--wp--preset--font-size--heading-2)"
 				}
 			},
 			"h3": {
