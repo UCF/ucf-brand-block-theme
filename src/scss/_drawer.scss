@@ -238,10 +238,9 @@
 
 // WHY: the group's blockGap keeps the two utility links paired; the org line opens a new
 // tier and needs the gap the gap cannot give it without splitting the links apart.
-// SPEC: the comp draws this line below the type scale and far tighter than the eyebrow
-// style — 33 characters have to reach the "//" on line one inside a 245px rail, and no
-// preset size does that at a tracking worth keeping. `meta` at 0.08em fits by one pixel,
-// which is a coincidence rather than a design.
+// SPEC: the comp draws these lines below the type scale and far tighter than the eyebrow
+// style — the longer of the two org names has to hold one line inside a 245px rail, and no
+// preset size does that at a tracking worth keeping.
 // WHY: scoped to the drawer footer, so `is-style-eyebrow` is untouched everywhere else.
 // The class still supplies the mono face, the weight and the `--brand-eyebrow` role, so
 // the color still follows the composition rather than naming gold here.
@@ -249,6 +248,23 @@
 	font-size: 0.62rem;
 	letter-spacing: 0.12em;
 	margin-block-start: map.get($space, "40");
+}
+
+// SPEC: a hairline divides the two organizations, replacing the "//" they were joined by.
+// WHY: the tier gap belongs above the pair, not between them — the two lines close up around
+// the rule so they still read as one block.
+// FIX: the gap above the rule is the *first* line's bottom margin, not the second's top one.
+// Adjacent margins collapse to the larger, so setting `margin-block-start` on the second did
+// nothing at all: the paragraph rhythm's 1rem won, and the rule sat 16px below one line and
+// 8px above the other.
+.brand-sidebar__footer .is-style-eyebrow:has(+ .is-style-eyebrow) {
+	margin-block-end: map.get($space, "20");
+}
+
+.brand-sidebar__footer .is-style-eyebrow + .is-style-eyebrow {
+	border-block-start: 1px solid map.get($color, "line-dark");
+	margin-block-start: 0;
+	padding-block-start: map.get($space, "20");
 }
 
 // SPEC: wider tracking than `.is-style-meta`, and uppercased here rather than typed that
