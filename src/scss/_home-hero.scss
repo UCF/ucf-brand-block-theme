@@ -84,9 +84,15 @@
 }
 
 // FIX: the video is hidden below the breakpoint, not merely covered. Core's cover paints
-// the embed over the band's own fill, so without this the mobile hero is the video playing
+// the video over the band's own fill, so without this the mobile hero is the video playing
 // behind the copy — the image above it and the stacked layout, with the wrong backdrop.
-.brand-home-hero__band .wp-block-cover__embed-background {
+//
+// FIX: both classes, deliberately. Core renders a URL background as an iframe in
+// `__embed-background` and a media-library upload as a `<video>` in `__video-background`;
+// this rule keyed on the embed only, so swapping the hero to an uploaded file left the
+// video playing on mobile with nothing matching it.
+.brand-home-hero__band .wp-block-cover__embed-background,
+.brand-home-hero__band .wp-block-cover__video-background {
 	display: none;
 }
 
@@ -100,6 +106,10 @@
 	}
 
 	.brand-home-hero__band .wp-block-cover__embed-background {
+		display: block;
+	}
+
+	.brand-home-hero__band .wp-block-cover__video-background {
 		display: block;
 	}
 }
