@@ -45,6 +45,7 @@ is in `build/`, and `assets/` holds only static files that are neither.**
 | `sections.php`           | Section numbering, drawer ordering, the number binding        |
 | `section-nav.php`        | The drawer's server-rendered navigation block                 |
 | `headings.php`           | H2 anchor ids and section extraction                          |
+| `section-index.php`      | The on-page index block, built from those H2s                 |
 | `search.php`             | Search scoping and subsection deep links                      |
 
 ## Getting started
@@ -178,6 +179,12 @@ each entry as its heading passes through the upper third of the viewport.
 **This makes H2s structurally significant.** An H2 is a sub-nav entry; use H3 for anything
 that shouldn't appear in the drawer.
 
+**The same list can also render into the page.** Insert the `ucf-brand/section-index` block
+and each H2 becomes a numbered jump link, using the same anchors and the same "3.1" numbering
+the H2 badges print. Nothing about the list is
+authored — only the short description beside each entry, which is stored on the block keyed
+by heading text. Rename a heading and its description is orphaned, by design.
+
 **The anchor ids come from the server, not the browser.** `includes/headings.php` assigns
 an `id` to every H2 during `render_block`, so it is already in the HTML that arrives. That
 matters because search emits `/page/#heading` links from PHP: when the browser and the
@@ -302,17 +309,19 @@ loop in `includes/blocks.php`.
 
 ### Theme glue that is _not_ in `src/blocks/`
 
-Two blocks are server-rendered and stay in `includes/`, with the data they render:
+Three blocks are server-rendered and stay in `includes/`, with the data they render:
 
-| Block                          | Renders                                                |
-| ------------------------------ | ------------------------------------------------------ |
-| `ucf-brand/section-nav`        | The drawer menu, from each page's Brand order.         |
-| `ucf-brand/search-subsections` | The matching-H2 deep links beneath each search result. |
+| Block                          | Renders                                                    |
+| ------------------------------ | ---------------------------------------------------------- |
+| `ucf-brand/section-nav`        | The drawer menu, from each page's Brand order.             |
+| `ucf-brand/search-subsections` | The matching-H2 deep links beneath each search result.     |
+| `ucf-brand/section-index`      | An on-page jump list of that page's H2s — the Index block. |
 
 They are theme glue rather than distributable design blocks, which is why the static-only
-rule applies to `src/blocks/` and not to them. Each has a client-side stand-in in
+rule applies to `src/blocks/` and not to them. The first two have a client-side stand-in in
 `src/js/editor/dynamic-blocks.js` so the Site Editor draws them instead of an
-"unsupported block" placeholder.
+"unsupported block" placeholder; `section-index` has a real editor half in
+`src/js/editor/section-index.js`, because its per-entry descriptions are edited in place.
 
 ### Patterns (`patterns/`)
 
@@ -325,7 +334,6 @@ bands) → `ucf-brand-pages` (whole-page layouts).
 | `ucf-brand/detail-card`    | units    | Core Group. Accent header bar over an open body drop zone.    |
 | `ucf-brand/list-card`      | units    | Core Group + Columns. Numbered rows divided by a bottom rule. |
 | `ucf-brand/color-swatches` | groups   | The two blocks above, pre-filled with the six core colors.    |
-| `ucf-brand/index`          | groups   | Core Columns + Separator. A numbered index of a section.      |
 | `ucf-brand/type-specimens` | groups   | Core Group + Paragraph. One row per typeface.                 |
 | `ucf-brand/type-scale`     | groups   | Core Group + Paragraph, generated from a PHP array.           |
 | `ucf-brand/section`        | sections | Core Group (`section`, alignfull). H2, intro, drop zone.      |

@@ -1,0 +1,118 @@
+@use "sass:map";
+@use "compositions";
+@use "variables" as *;
+
+// ── Section index ────────────────────────────────────────────────────────────
+//
+// CONTEXT: the jump list ucf-brand/section-index renders from the page's H2s — see
+// includes/section-index.php. Layout only: the number reuses `is-style-meta` and the
+// description `is-style-muted`, so both take their color from the enclosing composition
+// and the index inverts correctly when it is dropped into a dark group.
+//
+// SPEC: the shares are the section pages' own, taken from the hand-built index they replace —
+// 25/75 outer, and 10/40/50 across a row. The row's three cells become two boxes here, since
+// the number and the title share one anchor, so the anchor is the 50% those two add up to.
+
+.brand-index {
+	display: grid;
+	gap: map.get($space, "40");
+	grid-template-columns: 25fr 75fr;
+}
+
+.brand-index__title {
+	font-family: map.get($font, "display");
+	font-size: map.get($size, "heading-3");
+	font-weight: 700;
+	line-height: 1.05;
+	margin: 0;
+	text-transform: uppercase;
+}
+
+.brand-index__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+// SPEC: a rule under every entry, the last one included — the pattern closed its list with a
+// separator, and the index reads as a table that ends rather than as a list that stops.
+.brand-index__item {
+	border-bottom: 1px solid
+		var(--brand-line, #{compositions.role-default("line")});
+	display: grid;
+	gap: map.get($space, "10");
+	grid-template-columns: 1fr 1fr;
+	padding-block: map.get($space, "30");
+}
+
+// WHY: the anchor is the number and the title only. The description is a sibling so it stays
+// out of the link's accessible name — see includes/section-index.php.
+.brand-index__link {
+	align-items: baseline;
+	display: flex;
+	gap: map.get($space, "10");
+	text-decoration: none;
+}
+
+// SPEC: a fifth of the anchor, which is the 10 of 10/40 the hand-built rows gave the number.
+.brand-index__num {
+	flex: 0 0 20%;
+	font-weight: 700;
+}
+
+.brand-index__label {
+	color: var(--brand-heading, #{compositions.role-default("heading")});
+	font-family: map.get($font, "display");
+	font-size: map.get($size, "heading-4");
+	font-weight: 700;
+	line-height: 1.1;
+	text-transform: uppercase;
+}
+
+// SPEC: the affordance arrives on hover, as it does on a search result — the whole row is
+// scannable as a list of headings first.
+.brand-index__link:hover .brand-index__label,
+.brand-index__link:focus-visible .brand-index__label {
+	color: var(--brand-link, #{compositions.role-default("link")});
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.brand-index__desc {
+	font-size: map.get($size, "ui");
+	margin: 0;
+}
+
+// WHY: one column below the phone breakpoint — the outer split leaves the lead-in heading
+// four characters wide at ~335px, and the row's split wraps a two-word title per line.
+//
+// SPEC: the anchor stacks with them. The number sits on its own line above the title, as it
+// does on the printed index; kept as a row it takes a fifth of a phone's width and leaves the
+// title wrapping beside a mostly empty column.
+@media (max-width: $breakpoint-phone) {
+	.brand-index,
+	.brand-index__item {
+		grid-template-columns: 1fr;
+	}
+
+	.brand-index__item {
+		gap: map.get($space, "20");
+	}
+
+	// SPEC: the row's top padding answers to the rule above it, and the first row stacked
+	// under the lead-in heading has none — leaving it in put a full 1.5rem gap and 1rem of
+	// padding between the heading and the first number, which read as a break in the block.
+	.brand-index__item:first-child {
+		padding-top: 0;
+	}
+
+	.brand-index__link {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: map.get($space, "10");
+	}
+
+	.brand-index__num {
+		flex-basis: auto;
+	}
+}

@@ -252,6 +252,15 @@ function ucf_brand_a11y_reset() {
  * @return int The new post ID.
  */
 function ucf_brand_a11y_insert( array $args, array $meta = array() ) {
+	// UPSTREAM: wp_insert_post() unslashes what it is given, which eats the backslashes JSON
+	// uses to escape a quote inside a block comment's attributes — the attrs then parse as
+	// null and the block renders with none of them, looking merely empty. Anything seeded
+	// here that carries markup inside an attribute (the index block's descriptions do) needs
+	// the content slashed on the way in, exactly as the editor's REST save slashes it.
+	if ( isset( $args['post_content'] ) ) {
+		$args['post_content'] = wp_slash( $args['post_content'] );
+	}
+
 	$id = wp_insert_post(
 		array_merge(
 			array(
@@ -376,9 +385,15 @@ function ucf_brand_a11y_seed_routes() {
 /**
  * A page per custom block that no pattern or template already renders.
  *
- * Only `ucf-brand/tabs` is in that position today — `page-hero` is in `templates/page.html`
+ * `tabs` and `section-index` are in that position — `page-hero` is in `templates/page.html`
  * and `color-swatches` is in a pattern, so both are already on pages the suite visits.
  * `ucf_brand_a11y_assert_blocks_covered()` is what tells you when that stops being true.
+ *
+ * `section-index` is inserted into page content by hand, so no pattern or template carries
+ * it and this page is its only coverage. It needs real H2s to index and a Brand number to
+ * number them with — on a page with neither the block correctly renders nothing, and
+ * auditing an empty element is the green-for-the-wrong-reason case this suite exists to
+ * avoid. The manifest's `class` check is what refuses to audit if it rendered nothing.
  *
  * Tabs is also the block with the most to check. Its saved markup is a role-free stack of
  * label/panel pairs; `src/blocks/tabs/view.js` adds the `tablist`/`tab`/`tabpanel` roles and
@@ -407,10 +422,31 @@ function ucf_brand_a11y_seed_blocks() {
 		)
 	);
 
+	ucf_brand_a11y_insert(
+		array(
+			'post_title'   => 'Block: Section index',
+			'post_name'    => 'a11y-block-section-index',
+			// One description carries inline markup and one does not: the field is rich text,
+			// and a link inside the muted grey is its own contrast pair for axe to measure.
+			'post_content' => '<!-- wp:ucf-brand/section-index {"heading":"This section covers:","descriptions":'
+				. '{"Using the wordmark":"Where it goes, and <a href=\"/a11y-section-logos/\">how much room</a> it needs.",'
+				. '"What to avoid with the wordmark":"The cases that come up most often."}} /-->'
+				. "\n\n" . ucf_brand_a11y_section_content( 'the wordmark' ),
+		),
+		// The number is what gives each entry its "3.1" label; without it the block renders
+		// the list with no number column and the mono treatment goes unaudited.
+		array( 'ucf_brand_number' => 3 )
+	);
+
 	return array(
 		array(
 			'name' => 'ucf-brand/tabs',
 			'path' => '/a11y-block-tabs/',
+		),
+		array(
+			'name'  => 'ucf-brand/section-index',
+			'path'  => '/a11y-block-section-index/',
+			'class' => 'brand-index',
 		),
 	);
 }

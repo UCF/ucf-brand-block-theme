@@ -12,7 +12,8 @@
  *   page-hero-editable     Keeps the hero editable while a page is open.
  *   section-number-binding The client half of the `ucf-brand/section-number` binding.
  *   stretch-link           A `stretchLink` toggle added to core/button.
- *   dynamic-blocks         Editor stand-ins for the two PHP-rendered blocks.
+ *   dynamic-blocks         Editor stand-ins for the two PHP-rendered blocks with no UI.
+ *   section-index          The third PHP-rendered block, whose descriptions are editable.
  *
  * Order is not significant — every module registers against a hook or a store and none
  * depends on another's side effects. The shared `section-number` helper is imported by
@@ -24,3 +25,4 @@ import './page-hero-editable';
 import './section-number-binding';
 import './stretch-link';
 import './dynamic-blocks';
+import './section-index';

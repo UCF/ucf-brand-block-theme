@@ -62,7 +62,8 @@ A `backgroundColor` / `textColor` / `borderColor` attribute, or a `var:preset|co
 
 Because preset classes carry `!important`, opting out silently wins — `is-style-meta`
 combined with `textColor: "text-secondary"` looks fine on white and stays grey-on-black
-inside a Dark group. That exact pairing shipped in `section-index.php`. Set the width, the
+inside a Dark group. That exact pairing shipped in the Index pattern, since
+replaced by the `ucf-brand/section-index` block. Set the width, the
 side and the size through core's controls; let the class supply the color.
 
 The one legitimate exception is a pattern whose subject _is_ a color — the swatch patterns
@@ -111,10 +112,10 @@ discovers them by globbing for `block.json` rather than from a hand-maintained l
 -   `ucf-news-block-theme` uses `render.php` server rendering. That is **not** a precedent
     for this theme.
 
-The theme _does_ have two server-rendered blocks — `ucf-brand/section-nav` and
-`ucf-brand/search-subsections` — but they are theme glue, not distributable design blocks,
-and they live in `includes/` with the data they render rather than in `src/blocks/`. See the
-next section.
+The theme _does_ have three server-rendered blocks — `ucf-brand/section-nav`,
+`ucf-brand/search-subsections` and `ucf-brand/section-index` — but they are theme glue, not
+distributable design blocks, and they live in `includes/` with the data they render rather
+than in `src/blocks/`. See the next section.
 
 ### Hand-writing block markup in patterns
 
@@ -148,13 +149,15 @@ file added to that array — never appended to `functions.php`.
 | `sections.php`           | Section numbering, ordering, the number binding               |
 | `section-nav.php`        | The drawer's server-rendered block                            |
 | `headings.php`           | H2 anchor ids and section extraction                          |
+| `section-index.php`      | The on-page index block, built from those H2s                 |
 | `search.php`             | Search scoping and subsection deep links                      |
 
 Two conventions hold this together:
 
 -   **A dynamic block lives in the file that owns the data it renders.** `section-nav` sits
-    with `ucf_brand_get_ordered_sections()`; `search-subsections` sits inside `search.php`.
-    `blocks.php` is therefore about static blocks only.
+    with `ucf_brand_get_ordered_sections()`; `search-subsections` sits inside `search.php`;
+    `section-index` sits beside `headings.php`, whose `ucf_brand_get_post_sections()` is the
+    list it renders. `blocks.php` is therefore about static blocks only.
 -   **Every `register_block_style()` is in `block-styles.php`,** and each carries a comment
     naming the `src/scss/` partial that defines it. A style registered but not defined is an
     editor offering that paints nothing.
@@ -245,8 +248,10 @@ things follow from the split, and all three are easy to undo by accident:
 
 ## H2s are structural
 
-Sub-navigation is generated from each page's `<h2>` elements. An H2 is a drawer entry.
-Use H3 for anything that should not appear in the drawer.
+Sub-navigation is generated from each page's `<h2>` elements. An H2 is a drawer entry, and
+— wherever the page carries one — an entry in the `ucf-brand/section-index` block, which is
+the same list rendered into the page instead of the rail. Use H3 for anything that should
+appear in neither.
 
 **`includes/headings.php` owns the anchor id.** Ids are assigned during `render_block`, so
 they are in the HTML the server sends. Don't derive them anywhere else. `brand-nav.js` used

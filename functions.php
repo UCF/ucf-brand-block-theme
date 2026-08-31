@@ -32,6 +32,7 @@ $ucf_brand_includes = array(
 	'sections',           // Section numbering, ordering and the number binding.
 	'section-nav',        // The drawer's server-rendered navigation block.
 	'headings',           // H2 anchor ids and section extraction.
+	'section-index',      // The on-page index block, built from those H2s.
 	'search',             // Search scoping and subsection deep links.
 );
 
