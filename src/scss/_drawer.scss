@@ -130,6 +130,8 @@
 	min-width: 0;
 	// FIX: no bottom inset. It used to stack on the vertical rhythm the last block
 	// already had, reading as a stray strip of page background above the footer.
+	// CONTEXT: templates/search.html sets its own, because a result list ends on a hairline
+	// rather than on a content block's rhythm and so has nothing to stack onto.
 	padding-block: map.get($space, "50") 0;
 	padding-inline: var(--brand-gutter);
 }
