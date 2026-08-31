@@ -137,7 +137,7 @@ Four rules are worth knowing before you write anything:
     `#[DataProvider]`.
 -   **Don't check markup with a block's `isValid`.** `parse()` recovers mismatched markup by
     migrating it through the block's `deprecated` array and then reports `isValid: true` — the
-    exact bug this theme once shipped in `section-index.php` passes that check. Use
+    exact bug this theme once shipped in the Index pattern passes that check. Use
     `isValidBlockContent()` instead.
 -   **An accessibility audit of the wrong page passes.** A seeded page that 404s renders the
     (perfectly accessible) 404 template; a variant page whose sample markup went stale renders

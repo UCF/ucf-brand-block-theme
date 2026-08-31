@@ -75,7 +75,7 @@ place once.
 ## Markup validity sweep — `tests/js/markup-validity.test.js`
 
 Every block in every template part and pattern must be markup the current `save()` would
-produce. `docs/architecture.md` records that `section-index.php` shipped a violation of this
+produce. `docs/architecture.md` records that the Index pattern shipped a violation of this
 once — a paragraph carrying a `textColor` attribute with no matching class, which looked fine
 on white and stayed grey-on-black inside a Dark group.
 
@@ -89,7 +89,7 @@ hands back the result. **That is why this suite needs a PHP binary**, unlike `bl
 `deprecated` array for an older `save()` that _does_ match, and on a hit it migrates the block
 and reports `isValid: true`. Core blocks carry many deprecations — `core/heading` has six.
 
-This was measured, not assumed. **Reproducing the exact `section-index.php` bug leaves every
+This was measured, not assumed. **Reproducing that exact bug leaves every
 block `isValid: true`**; core silently recovers it and logs "Updated Block: core/paragraph".
 A sweep asserting on `isValid` would have shipped that bug a second time.
 

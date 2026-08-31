@@ -2,10 +2,11 @@
  * Every block in every template, template part and pattern must parse as valid.
  *
  * `docs/architecture.md` states the rule this enforces: "Pattern PHP must serialize exactly
- * what `save()` would produce or the editor flags the block invalid," and records that
- * `section-index.php` shipped a violation — an `is-style-meta` paragraph that also carried a
+ * what `save()` would produce or the editor flags the block invalid," and records that the
+ * Index pattern shipped a violation — an `is-style-meta` paragraph that also carried a
  * `textColor` attribute, which looked correct on white and stayed grey-on-black inside a Dark
- * group. Nothing caught it, because **invalid blocks still render on the front end**. A page
+ * group. (That pattern is gone; the `ucf-brand/section-index` block replaced it. The bug it
+ * shipped is the reason this file reads the way it does.) Nothing caught it, because **invalid blocks still render on the front end**. A page
  * render is not a check; this is.
  *
  * Three sources, two of them read the same way:
@@ -137,7 +138,7 @@ function describe_( block ) {
  * `isValid` passes on almost anything.
  *
  * That was measured, not assumed. Reproducing the exact bug `docs/architecture.md` records
- * against `section-index.php` — a paragraph carrying a `textColor` attribute with no
+ * against that pattern — a paragraph carrying a `textColor` attribute with no
  * matching `has-*-color` class on the element — leaves every block `isValid: true`. Core
  * quietly recovers it and logs "Updated Block: core/paragraph". An `isValid` sweep would
  * have shipped that bug a second time.

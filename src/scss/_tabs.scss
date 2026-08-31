@@ -16,6 +16,15 @@
 // SYNC: $breakpoint-tabs against TABS_QUERY in src/blocks/tabs/view.js.
 // WHY: the editor never runs view.js, so authors always see the stacked base layout.
 
+// SPEC: the stacked layout's rhythm is 8 / 16 / 48 — heading to its description, label to the
+// panel it opens, and pair to pair. Each step has to clearly beat the one inside it or the
+// grouping does not read, which is the same rule _search.scss records for its result list.
+// The middle step is the smallest that does: the panel's first line brings its own leading, so
+// 24px there measured as a break between the label and the body it belongs to.
+//
+// FIX: it used to run 16 / 8 / 24, which inverted the pairing: a description sat further from
+// its own heading than from the panel below it, and 24px between pairs lost to a paragraph's
+// own leading, so a screenful of tabs read as one undifferentiated grey run.
 .ucf-tabs__label {
 	// FIX: a long word in the condensed uppercase face overflowed its column rather than
 	// breaking, and the next tab's background painted over the overhang.
@@ -23,8 +32,15 @@
 
 	display: flex;
 	flex-direction: column;
-	gap: map.get($space, "30");
-	margin-top: map.get($space, "40");
+	gap: map.get($space, "20");
+	margin-top: 0;
+}
+
+// WHY: on the set, not on the label — a margin between pairs has to sit outside the pair, or
+// it collapses against the panel's own spacing and the two steps become one. `display: contents`
+// at tablet drops the box from the box tree, so this cannot reach the enhanced strip.
+.ucf-tabs__set + .ucf-tabs__set {
+	margin-top: map.get($space, "50");
 }
 
 // TODO: transitional. The `badge` attribute is gone from src/blocks/tab-label, but its
@@ -70,8 +86,10 @@
 }
 
 .ucf-tabs__panel {
-	margin-bottom: map.get($space, "40");
-	margin-top: map.get($space, "20");
+	// WHY: no bottom margin. The gap after the last pair is the block's own block-gap, and a
+	// margin here would add to the between-pair step above rather than replace it.
+	margin-bottom: 0;
+	margin-top: map.get($space, "30");
 }
 
 // UPSTREAM: core's `:where(.wp-block-columns){margin-bottom:1.75em}` adds dead space under a
@@ -120,6 +138,10 @@
 		background: map.get($color, "black");
 		border-top: 3px solid map.get($color, "line");
 		cursor: pointer;
+		// SYNC: the base gap is the stacked layout's 8px pairing. Here the description is
+		// pushed to the bottom by `margin-top: auto` below, so this only shows on a label with
+		// no free space left — where the strip's spacing is the comp's 16px.
+		gap: map.get($space, "30");
 		margin: 0;
 		min-height: 4rem;
 		padding: map.get($space, "30");

@@ -10,7 +10,7 @@
  */
 
 /*
- * Same row idiom as the Index pattern (ucf-brand/index), boxed. The card names no colors
+ * Same row idiom as the ucf-brand/section-index block, boxed. The card names no colors
  * at all — border widths come from the block's own border controls and the `hairline`
  * class points them at the `--brand-line` role, so the outline follows whatever
  * composition the card sits in. Background and text color are likewise inherited, so it

@@ -58,25 +58,32 @@ export function registerThemeBlocks() {
 }
 
 /**
- * Register the theme's two server-rendered blocks.
+ * Register the theme's three server-rendered blocks.
  *
- * `section-nav` and `search-subsections` render in PHP and have no entry in src/blocks/, so
- * `registerThemeBlocks()` above does not cover them. The editor registers
- * them from src/js/editor/dynamic-blocks.js purely so the Site Editor has something to draw,
- * and that same module is imported here rather than hand-rolling stand-ins: a registration
- * dropped from it is a real bug (the Site Editor falls back to an "unsupported block"
- * placeholder), and a hand-rolled copy would keep passing straight through it.
+ * `section-nav`, `search-subsections` and `section-index` render in PHP and have no entry in
+ * src/blocks/, so `registerThemeBlocks()` above does not cover them. The editor registers
+ * them from src/js/editor/dynamic-blocks.js and src/js/editor/section-index.js, and those
+ * same modules are imported here rather than hand-rolling stand-ins: a registration dropped
+ * from one is a real bug (the Site Editor falls back to an "unsupported block" placeholder),
+ * and a hand-rolled copy would keep passing straight through it.
  *
- * Only the markup sweep needs these — template parts reference them, and without the
- * registration every one parses as `core/missing`. Keep it out of `registerThemeBlocks()`
- * so the "registers every block that ships in src/blocks/" test keeps comparing like with
- * like.
+ * Only the markup sweep needs these — `parts/brand-sidebar.html` carries `section-nav`, and
+ * without the registration it parses as `core/missing`. `section-index` is on the list ahead
+ * of need: nothing in patterns/, parts/ or templates/ holds one today (it is inserted into
+ * page content by hand), and the sweep reads only those three directories. Registering it
+ * costs one require and is what keeps the day someone does put it in a pattern from failing
+ * as a missing block rather than as whatever is actually wrong with the markup.
+ *
+ * Keep it out of `registerThemeBlocks()` so the "registers every block that ships in
+ * src/blocks/" test keeps comparing like with like.
  *
  * @return {void}
  */
 export function registerDynamicBlocks() {
-	// eslint-disable-next-line global-require
+	/* eslint-disable global-require */
 	require( '../../../src/js/editor/dynamic-blocks' );
+	require( '../../../src/js/editor/section-index' );
+	/* eslint-enable global-require */
 }
 
 /**

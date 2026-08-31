@@ -3,9 +3,10 @@
  * Custom block registration.
  *
  * This file owns the *static* blocks only — the ones compiled from src/blocks/ whose `save()`
- * emits real markup. The theme's two server-rendered blocks are deliberately not here: a
+ * emits real markup. The theme's three server-rendered blocks are deliberately not here: a
  * dynamic block lives in the file that owns the data it renders, so `ucf-brand/section-nav`
- * is in includes/section-nav.php and `ucf-brand/search-subsections` is in includes/search.php.
+ * is in includes/section-nav.php, `ucf-brand/search-subsections` is in includes/search.php
+ * and `ucf-brand/section-index` is in includes/section-index.php.
  *
  * @package ucf-brand-block-theme
  */

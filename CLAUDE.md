@@ -80,7 +80,7 @@ of it is already automatic:
     because an XSS payload sat outside the range being escaped. Both looked green and correct.
 -   **Never assert on a block's `isValid` to check markup.** `parse()` recovers mismatched
     markup by migrating it through the block type's `deprecated` array and then reports
-    `isValid: true`. The exact bug this theme already shipped in `section-index.php` passes an
+    `isValid: true`. The exact bug this theme already shipped in the Index pattern passes an
     `isValid` check. Use `isValidBlockContent()`, which compares against the current `save()`
     with no deprecation fallback.
 -   **Keep the fast suites fast and dependency-light.** No database and no Docker in
