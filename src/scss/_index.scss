@@ -19,6 +19,14 @@
 	grid-template-columns: 25fr 75fr;
 }
 
+// WHY: no lead-in heading, no column for one. The heading element is only rendered when the
+// attribute holds something (includes/section-index.php), so the structure is the condition —
+// a modifier class here would be a second copy of that decision to keep in step. Inserted
+// bare, the block otherwise left an empty 25% and squeezed the list into what was left.
+.brand-index:not(:has(> .brand-index__title)) {
+	grid-template-columns: 1fr;
+}
+
 .brand-index__title {
 	font-family: map.get($font, "display");
 	font-size: map.get($size, "heading-3");
