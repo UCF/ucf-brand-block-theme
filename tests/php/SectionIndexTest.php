@@ -81,10 +81,14 @@ final class SectionIndexTest extends TestCase {
 
 		$this->assertStringContainsString( 'href="#brand-voice"', $html );
 		$this->assertStringContainsString( 'href="#brand-messages"', $html );
-		$this->assertLessThan(
+		// PHPUnit's signature is assertLessThan( $expected, $actual ), so the bound comes
+		// first and the value under test second: Brand Voice, the page's first H2, must
+		// appear at a lower offset than Brand Messages. Read as (actual, expected) it looks
+		// backwards, and swapping it to match that reading is how CI went red once already.
+		$this->assertGreaterThan(
 			strpos( $html, 'brand-voice' ),
 			strpos( $html, 'brand-messages' ),
-			'Entries must render in the order the H2s appear on the page.'
+			'Entries must render in the order the H2s appear on the page, and Brand Voice is the first H2.'
 		);
 	}
 
