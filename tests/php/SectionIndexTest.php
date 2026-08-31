@@ -7,7 +7,7 @@
  * the page's own order, under the page's own anchors" is the whole behavior — a mock at that
  * boundary would assert only that the renderer loops.
  *
- * The markup assertions are not incidental: `_index.scss` styles these exact classes, and the
+ * The markup assertions are not incidental: `_section-index.scss` styles these exact classes, and the
  * anchors are what makes the block a jump list rather than a caption.
  *
  * @package ucf-brand-block-theme
