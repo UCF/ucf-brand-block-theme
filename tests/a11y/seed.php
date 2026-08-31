@@ -409,8 +409,16 @@ function ucf_brand_a11y_seed_blocks() {
 	// nor the arrow-key handling, and `collect()` in view.js bails on an incomplete pair.
 	$tabs = '<!-- wp:ucf-brand/tabs -->' . "\n"
 		. '<div class="wp-block-ucf-brand-tabs ucf-tabs">'
-		. ucf_brand_a11y_tab( 'Use the primary mark', 'Clear space around the mark is measured from the pegasus.' )
-		. ucf_brand_a11y_tab( 'Recolor the mark', 'The mark is gold or black. Nothing else is approved.' )
+		. ucf_brand_a11y_tab(
+			'Use the primary mark',
+			'The full lockup, on a field with room to breathe.',
+			'Clear space around the mark is measured from the pegasus.'
+		)
+		. ucf_brand_a11y_tab(
+			'Recolor the mark',
+			'Gold or black, and nothing else.',
+			'The mark is gold or black. Nothing else is approved.'
+		)
 		. '</div>' . "\n"
 		. '<!-- /wp:ucf-brand/tabs -->';
 
@@ -458,15 +466,21 @@ function ucf_brand_a11y_seed_blocks() {
  * record of what `save()` emits. `heading` is sourced out of the markup rather than
  * stored as JSON, which is why the label block carries no attributes.
  *
- * @param string $heading Tab heading.
- * @param string $copy    Panel copy.
+ * Both parts of the label are here on purpose. The description is the element the enhanced
+ * strip paints white on black and grey once the tab is selected — two contrast pairs axe
+ * cannot measure on a label that has only a heading, which is what this seeded for at first.
+ *
+ * @param string $heading     Tab heading.
+ * @param string $description Label description, under the heading.
+ * @param string $copy        Panel copy.
  * @return string Block markup.
  */
-function ucf_brand_a11y_tab( $heading, $copy ) {
+function ucf_brand_a11y_tab( $heading, $description, $copy ) {
 	return '<!-- wp:ucf-brand/tab -->' . "\n"
 		. '<div class="wp-block-ucf-brand-tab ucf-tabs__set"><!-- wp:ucf-brand/tab-label -->' . "\n"
 		. '<div class="wp-block-ucf-brand-tab-label ucf-tabs__label">'
-		. '<h3 class="ucf-tabs__heading">' . esc_html( $heading ) . '</h3></div>' . "\n"
+		. '<h3 class="ucf-tabs__heading">' . esc_html( $heading ) . '</h3>'
+		. '<p class="ucf-tabs__description">' . esc_html( $description ) . '</p></div>' . "\n"
 		. '<!-- /wp:ucf-brand/tab-label -->' . "\n\n"
 		. '<!-- wp:ucf-brand/tab-panel -->' . "\n"
 		. '<div class="wp-block-ucf-brand-tab-panel ucf-tabs__panel"><!-- wp:paragraph -->' . "\n"
