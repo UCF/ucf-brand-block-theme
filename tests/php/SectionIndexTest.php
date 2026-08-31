@@ -82,8 +82,8 @@ final class SectionIndexTest extends TestCase {
 		$this->assertStringContainsString( 'href="#brand-voice"', $html );
 		$this->assertStringContainsString( 'href="#brand-messages"', $html );
 		$this->assertLessThan(
-			strpos( $html, 'brand-messages' ),
 			strpos( $html, 'brand-voice' ),
+			strpos( $html, 'brand-messages' ),
 			'Entries must render in the order the H2s appear on the page.'
 		);
 	}
