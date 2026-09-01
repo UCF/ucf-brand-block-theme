@@ -27,7 +27,11 @@
 	grid-template-columns: 1fr;
 }
 
-.brand-index__title {
+// WHY: qualified by the block. Both of this block's headings are real H2/H3s now, and global
+// styles size them through `:root :where(h2)` at the same specificity a bare class has — the
+// tie would fall to stylesheet order. The parent, not the element, because the editor draws
+// the lead-in as a `PlainText` textarea and an `h2.` prefix would leave it unstyled there.
+.brand-index .brand-index__title {
 	font-family: map.get($font, "display");
 	font-size: map.get($size, "heading-3");
 	font-weight: 700;
@@ -86,13 +90,13 @@
 // SPEC: the title sets the top of the row. At line-height 1.1 its box carries 0.05em of
 // empty space above the caps, pulled off here so the caps — not the line box — sit flush
 // with the top of the cell.
-.brand-index__label {
+.brand-index .brand-index__label {
 	color: var(--brand-heading, #{compositions.role-default("heading")});
 	font-family: map.get($font, "display");
 	font-size: map.get($size, "heading-4");
 	font-weight: 700;
 	line-height: 1.1;
-	margin-top: -0.05em;
+	margin: -0.05em 0 0;
 	text-transform: uppercase;
 }
 

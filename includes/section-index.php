@@ -145,8 +145,11 @@ function ucf_brand_render_section_index( $attributes = array(), $content = '', $
 		// The description sits outside the anchor deliberately, as it does in
 		// ucf_brand_render_search_subsections(): inside, it joins the link's accessible
 		// name and every entry announces as a paragraph of prose.
+		// A11Y: the title is the entry's heading, inside the link rather than around it, so
+		// heading navigation lands on "Brand Essence" and not on "1.1 Brand Essence". An `a`
+		// takes flow content — this is the transparent content model, not a nesting bug.
 		$items .= sprintf(
-			'<li class="brand-index__item"><a class="brand-index__link" href="#%1$s">%2$s<span class="brand-index__label">%3$s</span></a>%4$s</li>',
+			'<li class="brand-index__item"><a class="brand-index__link" href="#%1$s">%2$s<h3 class="brand-index__label">%3$s</h3></a>%4$s</li>',
 			esc_attr( $section['id'] ),
 			$label,
 			esc_html( $section['title'] ),
@@ -166,10 +169,14 @@ function ucf_brand_render_section_index( $attributes = array(), $content = '', $
 		? sprintf( ' aria-label="%s"', esc_attr__( 'On this page', 'ucf-brand-block-theme' ) )
 		: sprintf( ' aria-labelledby="%s"', esc_attr( $title_id ) );
 
+	// A11Y: an H2, so the index sits in the outline as a peer of the sections it lists and
+	// its entries nest under it. SYNC: it is excluded from the badge counter (_sections.scss)
+	// and from the drawer sub-nav and copy-link anchors (src/js/brand-nav.js) by that class —
+	// it names the list, it is not a section of the page.
 	$lead = '' === $heading
 		? ''
 		: sprintf(
-			'<h3 class="brand-index__title" id="%1$s">%2$s</h3>',
+			'<h2 class="brand-index__title" id="%1$s">%2$s</h2>',
 			esc_attr( $title_id ),
 			esc_html( $heading )
 		);

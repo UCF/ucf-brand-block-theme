@@ -96,29 +96,36 @@ h6 {
 // WHY: `.is-root-container` is the editor's stand-in for `.wp-block-post-content`; both
 // selectors are what make the editor show the spacing the front end will.
 // WHY: H2 is excluded from the loop — it takes Extra Large on both sides, below.
+//
+// SYNC: `$component-heading` skips the section-index block's own two headings
+// (includes/section-index.php). They are real H2/H3s for the outline, but the block lays its
+// rows out on a grid — and these rules are (0,2,1), so a component cannot simply restate its
+// own margins and win.
+$component-heading: ":not(.brand-index__title, .brand-index__label)";
+
 @each $level in h1, h3, h4, h5, h6 {
-	.wp-block-post-content #{$level}:not(:last-child),
-	.is-root-container #{$level}:not(:last-child) {
+	.wp-block-post-content #{$level}#{$component-heading}:not(:last-child),
+	.is-root-container #{$level}#{$component-heading}:not(:last-child) {
 		margin-block-end: map.get($space, "30");
 	}
 }
 
 // WHY: Large at every width. This stepped up to Extra Large from tablet, but three rem under a
 // heading read as a gap rather than a pairing — the H2 belongs to the copy beneath it.
-.wp-block-post-content h2:not(:last-child),
-.is-root-container h2:not(:last-child) {
+.wp-block-post-content h2#{$component-heading}:not(:last-child),
+.is-root-container h2#{$component-heading}:not(:last-child) {
 	margin-block-end: map.get($space, "40");
 }
 
 // WHY: H2 opens a subsection, so it takes Extra Large — the largest step meant for type.
 // `$space.60` is the bands' own `padding-block` and is not a type scale.
-.wp-block-post-content h2:not(:first-child),
-.is-root-container h2:not(:first-child) {
+.wp-block-post-content h2#{$component-heading}:not(:first-child),
+.is-root-container h2#{$component-heading}:not(:first-child) {
 	margin-block-start: map.get($space, "50");
 }
 
-.wp-block-post-content h3:not(:first-child),
-.is-root-container h3:not(:first-child) {
+.wp-block-post-content h3#{$component-heading}:not(:first-child),
+.is-root-container h3#{$component-heading}:not(:first-child) {
 	margin-block-start: map.get($space, "40");
 }
 

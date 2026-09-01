@@ -108,7 +108,9 @@ function IndexRow( { number, title, description, onChange } ) {
 						{ number }
 					</span>
 				) }
-				<span className="brand-index__label">{ title }</span>
+				{ /* SYNC: an h3 here as on the server (includes/section-index.php) —
+				     the preview is what the styles are checked against. */ }
+				<h3 className="brand-index__label">{ title }</h3>
 			</span>
 			<RichText
 				tagName="p"

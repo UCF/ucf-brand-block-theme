@@ -33,8 +33,11 @@
 // FIX: the badge read low against the heading. That is `vertical-align: middle`'s definition —
 // the box's midpoint meets the baseline plus half an x-height, which in uppercase display type
 // sits well under the caps' optical center. Flex centering instead, as in _accordion.scss.
-.wp-block-post-content h2,
-.is-root-container h2 {
+// SYNC: the index block's lead-in heading is an H2 for the outline only — it names a list,
+// so it neither takes a badge nor advances the count the sections downpage are numbered by.
+// src/js/brand-nav.js excludes it from the sub-nav and the copy-link anchors on the same class.
+.wp-block-post-content h2:not(.brand-index__title),
+.is-root-container h2:not(.brand-index__title) {
 	--brand-h2-size: 1em;
 
 	align-items: center;
@@ -55,8 +58,8 @@
 	justify-content: flex-end;
 }
 
-.wp-block-post-content h2::before,
-.is-root-container h2::before {
+.wp-block-post-content h2:not(.brand-index__title)::before,
+.is-root-container h2:not(.brand-index__title)::before {
 	background: map.get($color, "black");
 	border-left: 3px solid map.get($color, "gold");
 	color: map.get($color, "gold");
@@ -104,7 +107,9 @@
 // copies the #id to the clipboard, confirmed by a brief bubble.
 //
 // WHY: scoped to the drawer content, which is where brand-nav.js actually wires the clicks.
-.brand-content h2 {
+// SYNC: and off the index block's lead-in, which brand-nav.js skips — `CONTENT_H2` in
+// src/js/brand-nav.js. A pointer on a heading that copies nothing is a dead affordance.
+.brand-content h2:not(.brand-index__title) {
 	cursor: pointer;
 }
 

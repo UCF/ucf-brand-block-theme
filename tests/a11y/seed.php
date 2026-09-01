@@ -435,7 +435,7 @@ function ucf_brand_a11y_seed_blocks() {
 			'post_title'   => 'Block: Section index',
 			'post_name'    => 'a11y-block-section-index',
 			// One description carries inline markup and one does not: the field is rich text,
-			// and a link inside the muted grey is its own contrast pair for axe to measure.
+			// and a link inside a description is its own contrast pair for axe to measure.
 			'post_content' => '<!-- wp:ucf-brand/section-index {"heading":"This section covers:","descriptions":'
 				. '{"Using the wordmark":"Where it goes, and <a href=\"/a11y-section-logos/\">how much room</a> it needs.",'
 				. '"What to avoid with the wordmark":"The cases that come up most often."}} /-->'
