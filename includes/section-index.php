@@ -152,7 +152,7 @@ function ucf_brand_render_section_index( $attributes = array(), $content = '', $
 			esc_html( $section['title'] ),
 			// SAFETY: already through wp_kses() above — escaping it again would print the
 			// author's own `<span class="badge">` as text.
-			'' === $description ? '' : '<p class="brand-index__desc is-style-muted">' . $description . '</p>'
+			'' === $description ? '' : '<p class="brand-index__desc">' . $description . '</p>'
 		);
 	}
 

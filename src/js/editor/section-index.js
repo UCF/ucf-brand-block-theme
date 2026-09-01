@@ -42,6 +42,30 @@ function headingTitle( content ) {
 }
 
 /**
+ * Whether a block is hidden, itself or by an ancestor.
+ *
+ * UPSTREAM: `metadata.blockVisibility === false` is core's hide-block flag, and it hides
+ * the subtree — `render_block` returns '' for the whole group, so a heading inside one is
+ * not on the page. Only boolean false hides; the viewport form is an array and still
+ * renders.
+ *
+ * SYNC: `ucf_brand_strip_hidden_blocks()` in includes/headings.php is the same rule applied
+ * to stored markup, and it is what the saved block renders from. A heading dropped in one
+ * and kept in the other is an entry that appears in the editor and not on the page.
+ *
+ * @param {Object} blockEditor The core/block-editor store's selectors.
+ * @param {string} clientId    Block to test.
+ * @return {boolean} True when the block does not render.
+ */
+export function isHiddenBlock( blockEditor, clientId ) {
+	return [ clientId, ...blockEditor.getBlockParents( clientId ) ].some(
+		( id ) =>
+			false ===
+			blockEditor.getBlockAttributes( id )?.metadata?.blockVisibility
+	);
+}
+
+/**
  * What the description field offers: inline formatting, nothing structural.
  *
  * SYNC: `ucf_brand_section_index_allowed_html()` in includes/section-index.php is the
@@ -88,7 +112,7 @@ function IndexRow( { number, title, description, onChange } ) {
 			</span>
 			<RichText
 				tagName="p"
-				className="brand-index__desc is-style-muted"
+				className="brand-index__desc"
 				value={ description }
 				onChange={ onChange }
 				allowedFormats={ DESCRIPTION_FORMATS }
@@ -126,6 +150,7 @@ function SectionIndexEdit( { attributes, setAttributes } ) {
 		// server reads them out of post_content.
 		const headings = blockEditor
 			.getBlocksByName( 'core/heading' )
+			.filter( ( clientId ) => ! isHiddenBlock( blockEditor, clientId ) )
 			.map( ( clientId ) => blockEditor.getBlockAttributes( clientId ) )
 			.filter( ( attrs ) => attrs && 2 === ( attrs.level ?? 2 ) )
 			.map( ( attrs ) => headingTitle( attrs.content ) )
