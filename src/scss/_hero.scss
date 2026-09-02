@@ -164,8 +164,8 @@
 }
 
 // ── Accent rule ──────────────────────────────────────────────────────────────
-// CONTEXT: core Separator with the block style from functions.php — short, heavy, left-anchored;
-// reads `--brand-accent` so no pattern needs to name a color.
+// CONTEXT: core Separator with the block style from includes/block-styles.php — short, heavy,
+// left-anchored; reads `--brand-accent` so no pattern needs to name a color.
 // UPSTREAM: core sets `100px` at (0,3,0) through its own `:not()` chain, which a plain
 // `.is-style-accent-rule` at (0,2,0) loses to. Mirroring that chain lifts this to (0,4,0).
 // UPSTREAM: the constrained layout centers every child with `margin-inline: auto

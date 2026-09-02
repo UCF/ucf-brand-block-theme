@@ -21,9 +21,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * The treatments a page may choose between.
  *
- * SYNC: `register_block_style()` in includes/block-styles.php offers exactly these two on
- * the hero, and the sanitize callback on the meta in includes/meta.php allows exactly these.
- * A third composition means a row in all three places, plus its CSS in src/scss/.
+ * SYNC: four places. templates/page.html ships one of these as the `is-style-*` class on the
+ * hero wrapper, the meta's sanitize callback in includes/meta.php allows exactly these, the
+ * sidebar offers them in src/js/editor/hero-treatment.js, and src/scss/_hero.scss paints both
+ * spellings — the template's `is-style-*` and the canvas's `is-hero-treatment-*`.
  *
  * @return string[] Treatment slugs.
  */
