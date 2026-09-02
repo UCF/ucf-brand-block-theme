@@ -24,12 +24,12 @@ final class HeroTreatmentTest extends WP_UnitTestCase {
 	/**
 	 * The hero as templates/page.html ships it: the wrapper, carrying the site-wide default.
 	 *
-	 * @param string $class Composition class on the wrapper.
+	 * @param string $treatment_class Composition class on the wrapper.
 	 * @return string Block markup.
 	 */
-	private function hero( $class = 'is-style-dark' ) {
-		return '<!-- wp:ucf-brand/page-hero {"align":"full","className":"' . $class . '"} -->'
-			. '<div class="wp-block-ucf-brand-page-hero alignfull brand-hero ' . $class . '">'
+	private function hero( $treatment_class = 'is-style-dark' ) {
+		return '<!-- wp:ucf-brand/page-hero {"align":"full","className":"' . $treatment_class . '"} -->'
+			. '<div class="wp-block-ucf-brand-page-hero alignfull brand-hero ' . $treatment_class . '">'
 			. '<!-- wp:paragraph --><p>Hero copy.</p><!-- /wp:paragraph -->'
 			. '</div>'
 			. '<!-- /wp:ucf-brand/page-hero -->';
@@ -41,16 +41,16 @@ final class HeroTreatmentTest extends WP_UnitTestCase {
 	 * The filter reads `get_the_ID()`, so the global post has to be set up as a real render
 	 * would leave it.
 	 *
-	 * @param string $treatment Value for the `ucf_brand_hero_treatment` meta, or ''.
-	 * @param string $class     Composition class the template ships.
+	 * @param string $treatment       Value for the `ucf_brand_hero_treatment` meta, or ''.
+	 * @param string $treatment_class Composition class the template ships.
 	 * @return string Rendered HTML.
 	 */
-	private function render_hero( $treatment, $class = 'is-style-dark' ) {
+	private function render_hero( $treatment, $treatment_class = 'is-style-dark' ) {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
 				'post_status'  => 'publish',
-				'post_content' => $this->hero( $class ),
+				'post_content' => $this->hero( $treatment_class ),
 			)
 		);
 
