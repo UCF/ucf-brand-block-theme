@@ -102,16 +102,18 @@ const DESCRIPTION_FORMATS = [
 function IndexRow( { number, title, description, onChange } ) {
 	return (
 		<li className="brand-index__item">
-			<span className="brand-index__link">
+			{ /* SYNC: an h3 as on the server (includes/section-index.php) — the preview is
+			     what the styles are checked against. A `div`, not the `span` this was: an
+			     `a` takes a heading through its transparent content model and a `span`
+			     cannot, and the row is a flex box either way. */ }
+			<div className="brand-index__link">
 				{ number && (
 					<span className="brand-index__num is-style-meta">
 						{ number }
 					</span>
 				) }
-				{ /* SYNC: an h3 here as on the server (includes/section-index.php) —
-				     the preview is what the styles are checked against. */ }
 				<h3 className="brand-index__label">{ title }</h3>
-			</span>
+			</div>
 			<RichText
 				tagName="p"
 				className="brand-index__desc"
