@@ -204,4 +204,89 @@ final class PostSectionsTest extends TestCase {
 		$this->assertCount( 1, $sections );
 		$this->assertStringContainsString( 'Subheading', $sections[0]['text'] );
 	}
+	/**
+	 * A section the editor has hidden does not render, so it is not a section.
+	 *
+	 * @return void
+	 */
+	public function test_hidden_block_takes_its_headings_with_it() {
+		$sections = ucf_brand_get_post_sections(
+			$this->post(
+				'<!-- wp:group --><div class="wp-block-group">'
+				. '<!-- wp:heading --><h2 class="wp-block-heading">Visible</h2><!-- /wp:heading -->'
+				. '<!-- /wp:group -->'
+				. '<!-- wp:group {"metadata":{"blockVisibility":false},"align":"full"} --><div class="wp-block-group">'
+				. '<!-- wp:heading --><h2 class="wp-block-heading">Hidden</h2><!-- /wp:heading -->'
+				. '<!-- wp:paragraph --><p>Hidden body.</p><!-- /wp:paragraph -->'
+				. '<!-- /wp:group -->'
+			)
+		);
+
+		$this->assertCount( 1, $sections );
+		$this->assertSame( 'Visible', $sections[0]['title'] );
+		$this->assertStringNotContainsString( 'Hidden body', $sections[0]['text'] );
+	}
+
+	/**
+	 * The closer that ends a hidden block is its own, not the first one after it — a hidden
+	 * group otherwise took only its first child and left the rest of the subtree behind.
+	 *
+	 * @return void
+	 */
+	public function test_hidden_block_removes_its_whole_subtree() {
+		$sections = ucf_brand_get_post_sections(
+			$this->post(
+				'<!-- wp:group {"metadata":{"blockVisibility":false}} --><div class="wp-block-group">'
+				. '<!-- wp:columns --><div class="wp-block-columns">'
+				. '<!-- wp:column --><div class="wp-block-column">'
+				. '<!-- wp:heading --><h2 class="wp-block-heading">Nested</h2><!-- /wp:heading -->'
+				. '<!-- /wp:column --></div><!-- /wp:columns -->'
+				. '<!-- /wp:group -->'
+				. '<!-- wp:heading --><h2 class="wp-block-heading">After</h2><!-- /wp:heading -->'
+			)
+		);
+
+		$this->assertCount( 1, $sections );
+		$this->assertSame( 'After', $sections[0]['title'] );
+	}
+
+	/**
+	 * A hidden self-closing block ends at its own delimiter. Treated as an opener it hunts
+	 * for a closer that never comes, and every hidden block after it stops being removed.
+	 *
+	 * @return void
+	 */
+	public function test_hidden_void_block_does_not_swallow_what_follows() {
+		$sections = ucf_brand_get_post_sections(
+			$this->post(
+				'<!-- wp:spacer {"metadata":{"blockVisibility":false}} /-->'
+				. '<!-- wp:heading --><h2 class="wp-block-heading">Kept</h2><!-- /wp:heading -->'
+				. '<!-- wp:group {"metadata":{"blockVisibility":false}} --><div class="wp-block-group">'
+				. '<!-- wp:heading --><h2 class="wp-block-heading">Hidden</h2><!-- /wp:heading -->'
+				. '<!-- /wp:group -->'
+			)
+		);
+
+		$this->assertCount( 1, $sections );
+		$this->assertSame( 'Kept', $sections[0]['title'] );
+	}
+
+	/**
+	 * UPSTREAM: the viewport form hides with a media query and still renders, so the heading
+	 * is on the page at some width and keeps its entry. Only boolean false removes a block.
+	 *
+	 * @return void
+	 */
+	public function test_viewport_visibility_is_not_a_hidden_block() {
+		$sections = ucf_brand_get_post_sections(
+			$this->post(
+				'<!-- wp:group {"metadata":{"blockVisibility":{"viewport":{"mobile":false}}}} --><div class="wp-block-group">'
+				. '<!-- wp:heading --><h2 class="wp-block-heading">Desktop Only</h2><!-- /wp:heading -->'
+				. '<!-- /wp:group -->'
+			)
+		);
+
+		$this->assertCount( 1, $sections );
+		$this->assertSame( 'Desktop Only', $sections[0]['title'] );
+	}
 }

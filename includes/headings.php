@@ -129,6 +129,101 @@ function ucf_brand_add_heading_anchor( $block_content, $block ) {
 add_filter( 'render_block', 'ucf_brand_add_heading_anchor', 10, 2 );
 
 /**
+ * Drop the blocks the editor has hidden from stored markup.
+ *
+ * UPSTREAM: `metadata.blockVisibility === false` is core's hide-block flag (WP 6.9,
+ * wp-includes/block-supports/block-visibility.php). `render_block` returns '' for such a
+ * block, so an H2 inside one never reaches the page — the drawer sub-nav, built from the
+ * rendered DOM, drops it for free. Anything reading `post_content` instead has to honor the
+ * flag itself or it offers deep links to headings that are not there.
+ *
+ * WHY: the delimiters are scanned rather than `parse_blocks()`ed. Search runs this over every
+ * result row, and this file deliberately never renders or reserializes content.
+ *
+ * The viewport form — `blockVisibility: { viewport: ... }` — is left alone on purpose: those
+ * blocks do render, hidden by a media query, so the heading is on the page at some width.
+ *
+ * @param string $content Stored block markup.
+ * @return string The same markup with every hidden block, and its contents, removed.
+ */
+function ucf_brand_strip_hidden_blocks( $content ) {
+	// PERF: the flag is rare, and the scan below is not worth running on the pages without it.
+	if ( false === strpos( $content, 'blockVisibility' ) ) {
+		return $content;
+	}
+
+	// The attribute JSON is non-greedy but anchored on the delimiter's own ` -->`, which is
+	// what makes it span the nested braces of `{"metadata":{...},"align":"full"}`.
+	$delimiter = '#<!--\s+(?P<closer>/)?wp:[a-z][a-z0-9_-]*(?:/[a-z][a-z0-9_-]*)?\s*(?P<attrs>\{.*?\})?\s*(?P<void>/)?-->#is';
+
+	if ( ! preg_match_all( $delimiter, $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER ) ) {
+		return $content;
+	}
+
+	$cuts  = array();
+	$start = null;
+	$depth = 0;
+
+	foreach ( $matches as $match ) {
+		$offset    = $match[0][1];
+		$length    = strlen( $match[0][0] );
+		$is_closer = isset( $match['closer'] ) && '' !== $match['closer'][0];
+		$is_void   = isset( $match['void'] ) && '' !== $match['void'][0];
+
+		// Inside a hidden block: count delimiters until its own closer, so a hidden group
+		// takes the whole subtree with it rather than ending at the first nested `/wp:`.
+		if ( null !== $start ) {
+			if ( $is_void ) {
+				continue;
+			}
+
+			if ( ! $is_closer ) {
+				++$depth;
+				continue;
+			}
+
+			--$depth;
+
+			if ( 0 === $depth ) {
+				$cuts[] = array( $start, $offset + $length - $start );
+				$start  = null;
+			}
+
+			continue;
+		}
+
+		if ( $is_closer ) {
+			continue;
+		}
+
+		$attrs = isset( $match['attrs'] ) && '' !== $match['attrs'][0]
+			? json_decode( $match['attrs'][0], true )
+			: null;
+
+		// Identity, not truthiness: only boolean false hides a block. The viewport form is
+		// an array, and core ignores every other value.
+		if ( ! is_array( $attrs ) || false !== ( $attrs['metadata']['blockVisibility'] ?? null ) ) {
+			continue;
+		}
+
+		if ( $is_void ) {
+			$cuts[] = array( $offset, $length );
+			continue;
+		}
+
+		$start = $offset;
+		$depth = 1;
+	}
+
+	// Back to front, so each offset still points where it did when it was recorded.
+	foreach ( array_reverse( $cuts ) as $cut ) {
+		$content = substr_replace( $content, '', $cut[0], $cut[1] );
+	}
+
+	return $content;
+}
+
+/**
  * Split a page's stored content into its H2 sections.
  *
  * Reads `post_content` directly rather than rendering it: `core/heading` is a static
@@ -137,7 +232,8 @@ add_filter( 'render_block', 'ucf_brand_add_heading_anchor', 10, 2 );
  * `ucf_brand_add_heading_anchor()` and reusing its two slug helpers is what keeps the
  * anchors this returns identical to the ones on the page itself.
  *
- * Content that precedes the first H2 is not a section and is skipped.
+ * Content that precedes the first H2 is not a section and is skipped, and so is every
+ * heading inside a block the editor has hidden — see ucf_brand_strip_hidden_blocks().
  *
  * @param WP_Post $post Post to read.
  * @return array[] Sections, each with `id`, `title` and `text` (tags stripped).
@@ -149,7 +245,7 @@ function ucf_brand_get_post_sections( $post ) {
 
 	$chunks = preg_split(
 		'#<h2\b([^>]*)>(.*?)</h2>#is',
-		$post->post_content,
+		ucf_brand_strip_hidden_blocks( $post->post_content ),
 		-1,
 		PREG_SPLIT_DELIM_CAPTURE
 	);

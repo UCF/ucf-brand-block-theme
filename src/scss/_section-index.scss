@@ -6,28 +6,32 @@
 //
 // CONTEXT: the jump list ucf-brand/section-index renders from the page's H2s — see
 // includes/section-index.php. Layout only: the number reuses `is-style-meta` and the
-// description `is-style-muted`, so both take their color from the enclosing composition
+// description is plain body copy, so both take their color from the enclosing composition
 // and the index inverts correctly when it is dropped into a dark group.
 //
 // SPEC: the shares are the section pages' own, taken from the hand-built index they replace —
-// 25/75 outer, and 10/40/50 across a row. The row's three cells become two boxes here, since
+// 28/72 outer, and 10/40/50 across a row. The row's three cells become two boxes here, since
 // the number and the title share one anchor, so the anchor is the 50% those two add up to.
 
 .brand-index {
 	display: grid;
-	gap: map.get($space, "40");
-	grid-template-columns: 25fr 75fr;
+	gap: map.get($space, "30");
+	grid-template-columns: 28fr 72fr;
 }
 
 // WHY: no lead-in heading, no column for one. The heading element is only rendered when the
 // attribute holds something (includes/section-index.php), so the structure is the condition —
 // a modifier class here would be a second copy of that decision to keep in step. Inserted
-// bare, the block otherwise left an empty 25% and squeezed the list into what was left.
+// bare, the block otherwise left an empty 28% and squeezed the list into what was left.
 .brand-index:not(:has(> .brand-index__title)) {
 	grid-template-columns: 1fr;
 }
 
-.brand-index__title {
+// WHY: qualified by the block. Both of this block's headings are real H2/H3s now, and global
+// styles size them through `:root :where(h2)` at the same specificity a bare class has — the
+// tie would fall to stylesheet order. The parent, not the element, because the editor draws
+// the lead-in as a `PlainText` textarea and an `h2.` prefix would leave it unstyled there.
+.brand-index .brand-index__title {
 	font-family: map.get($font, "display");
 	font-size: map.get($size, "heading-3");
 	font-weight: 700;
@@ -45,6 +49,7 @@
 // SPEC: a rule under every entry, the last one included — the pattern closed its list with a
 // separator, and the index reads as a table that ends rather than as a list that stops.
 .brand-index__item {
+	align-items: start;
 	border-bottom: 1px solid
 		var(--brand-line, #{compositions.role-default("line")});
 	display: grid;
@@ -53,27 +58,45 @@
 	padding-block: map.get($space, "30");
 }
 
+// SPEC: the first row opens flush with the top of the block — the padding answers to the
+// rule above an entry, and the first entry has none. Left in, it dropped the first title
+// half a step below the lead-in heading beside it.
+.brand-index__item:first-child {
+	padding-top: 0;
+}
+
 // WHY: the anchor is the number and the title only. The description is a sibling so it stays
 // out of the link's accessible name — see includes/section-index.php.
 .brand-index__link {
-	align-items: baseline;
+	align-items: flex-start;
 	display: flex;
 	gap: map.get($space, "10");
 	text-decoration: none;
 }
 
 // SPEC: a fifth of the anchor, which is the 10 of 10/40 the hand-built rows gave the number.
+//
+// FIX: `.is-style-meta` carries `line-height: 1.9`, which pushed the number most of a line
+// below the title it numbers once the row stopped aligning on the baseline. Trimmed to 1
+// and nudged back down by a hair — set flush, the smaller digits read as sitting high
+// against the display caps beside them.
 .brand-index__num {
 	flex: 0 0 20%;
 	font-weight: 700;
+	line-height: 1;
+	padding-top: 0.2em;
 }
 
-.brand-index__label {
+// SPEC: the title sets the top of the row. At line-height 1.1 its box carries 0.05em of
+// empty space above the caps, pulled off here so the caps — not the line box — sit flush
+// with the top of the cell.
+.brand-index .brand-index__label {
 	color: var(--brand-heading, #{compositions.role-default("heading")});
 	font-family: map.get($font, "display");
 	font-size: map.get($size, "heading-4");
 	font-weight: 700;
 	line-height: 1.1;
+	margin: -0.05em 0 0;
 	text-transform: uppercase;
 }
 
@@ -107,20 +130,16 @@
 		gap: map.get($space, "20");
 	}
 
-	// SPEC: the row's top padding answers to the rule above it, and the first row stacked
-	// under the lead-in heading has none — leaving it in put a full 1.5rem gap and 1rem of
-	// padding between the heading and the first number, which read as a break in the block.
-	.brand-index__item:first-child {
-		padding-top: 0;
-	}
-
 	.brand-index__link {
 		align-items: flex-start;
 		flex-direction: column;
 		gap: map.get($space, "10");
 	}
 
+	// WHY: stacked, the number is above the title rather than beside it, so the optical
+	// nudge that kept the two apart on one line has nothing to correct for.
 	.brand-index__num {
 		flex-basis: auto;
+		padding-top: 0;
 	}
 }

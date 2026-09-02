@@ -27,6 +27,11 @@
 		'(prefers-reduced-motion: reduce)'
 	).matches;
 
+	// SYNC: `.brand-index__title` is the index block's lead-in heading
+	// (includes/section-index.php). It is an H2 for the outline, but it names a list rather
+	// than opening a section — no sub-nav entry, no copy-link anchor, no badge (_sections.scss).
+	const CONTENT_H2 = 'h2:not(.brand-index__title)';
+
 	// Link glyph appended to each H2. aria-hidden — the anchor carries its own label.
 	const LINK_ICON =
 		'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">' +
@@ -138,7 +143,7 @@
 	 */
 	function buildSubnav() {
 		const headings = Array.prototype.slice.call(
-			content.querySelectorAll( 'h2' )
+			content.querySelectorAll( CONTENT_H2 )
 		);
 
 		if ( ! headings.length ) {
@@ -438,7 +443,7 @@
 	 */
 	function initHeadingLinks() {
 		const headings = Array.prototype.slice.call(
-			content.querySelectorAll( 'h2' )
+			content.querySelectorAll( CONTENT_H2 )
 		);
 
 		if ( ! headings.length ) {
@@ -500,7 +505,7 @@
 				return;
 			}
 
-			const heading = event.target.closest( 'h2' );
+			const heading = event.target.closest( CONTENT_H2 );
 
 			if ( ! heading || ! content.contains( heading ) ) {
 				return;

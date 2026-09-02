@@ -141,11 +141,11 @@ final class SectionIndexTest extends TestCase {
 		);
 
 		$this->assertMatchesRegularExpression(
-			'#Brand Messages</span></a><p[^>]*>Key phrases that highlight our impact\.#',
+			'#Brand Messages</h3></a><p[^>]*>Key phrases that highlight our impact\.#',
 			$html
 		);
 		$this->assertMatchesRegularExpression(
-			'#Brand Voice</span></a><p[^>]*>The characteristics of how we sound\.#',
+			'#Brand Voice</h3></a><p[^>]*>The characteristics of how we sound\.#',
 			$html
 		);
 	}
@@ -188,7 +188,7 @@ final class SectionIndexTest extends TestCase {
 		$html = ucf_brand_render_section_index();
 
 		$this->assertStringContainsString( 'aria-label="On this page"', $html );
-		$this->assertStringNotContainsString( '<h3', $html );
+		$this->assertStringNotContainsString( 'brand-index__title', $html );
 	}
 
 	/**
@@ -235,6 +235,26 @@ final class SectionIndexTest extends TestCase {
 		$html = ucf_brand_render_section_index();
 
 		$this->assertStringNotContainsString( '<script', $html );
-		$this->assertStringContainsString( '>Logo</span>', $html );
+		$this->assertStringContainsString( '>Logo</h3>', $html );
+	}
+
+	/**
+	 * The outline: the lead-in names the list as a peer of the sections, and each entry nests
+	 * under it. Both are real headings so the block is navigable by heading, and the entry
+	 * title sits inside its link so heading navigation reads it without the number.
+	 *
+	 * @return void
+	 */
+	public function test_renders_the_lead_in_as_an_h2_and_entries_as_h3s() {
+		$this->seedPage( $this->twoSections() );
+
+		$html = ucf_brand_render_section_index( array( 'heading' => 'Writing Elements' ) );
+
+		$this->assertMatchesRegularExpression(
+			'#<h2 class="brand-index__title"[^>]*>Writing Elements</h2>#',
+			$html
+		);
+		$this->assertSame( 2, substr_count( $html, '<h3 class="brand-index__label">' ) );
+		$this->assertStringContainsString( '<h3 class="brand-index__label">Brand Voice</h3></a>', $html );
 	}
 }

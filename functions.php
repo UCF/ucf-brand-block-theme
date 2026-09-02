@@ -29,6 +29,7 @@ $ucf_brand_includes = array(
 	'pattern-categories', // The units → groups → sections → pages ladder.
 	'university-header',  // The UCF University Header: its script tag and placeholder.
 	'meta',               // Per-page fields: brand number, hero deck and note.
+	'hero',               // The hero's per-page light/dark treatment.
 	'sections',           // Section numbering, ordering and the number binding.
 	'section-nav',        // The drawer's server-rendered navigation block.
 	'headings',           // H2 anchor ids and section extraction.

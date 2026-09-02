@@ -435,7 +435,7 @@ function ucf_brand_a11y_seed_blocks() {
 			'post_title'   => 'Block: Section index',
 			'post_name'    => 'a11y-block-section-index',
 			// One description carries inline markup and one does not: the field is rich text,
-			// and a link inside the muted grey is its own contrast pair for axe to measure.
+			// and a link inside a description is its own contrast pair for axe to measure.
 			'post_content' => '<!-- wp:ucf-brand/section-index {"heading":"This section covers:","descriptions":'
 				. '{"Using the wordmark":"Where it goes, and <a href=\"/a11y-section-logos/\">how much room</a> it needs.",'
 				. '"What to avoid with the wordmark":"The cases that come up most often."}} /-->'
@@ -446,10 +446,38 @@ function ucf_brand_a11y_seed_blocks() {
 		array( 'ucf_brand_number' => 3 )
 	);
 
+	/*
+	 * The hero's Light treatment, which is a page-level field rather than a block style
+	 * (includes/hero.php) and so is invisible to the variants tier that reads the style
+	 * registry. Dark needs no page of its own: the hero is in templates/page.html, so every
+	 * other seeded page already audits it. The deck and the note are set because the light
+	 * band is white — the copy on it is the pair axe has to measure.
+	 */
+	ucf_brand_a11y_insert(
+		array(
+			'post_title'   => 'Hero: Light treatment',
+			'post_name'    => 'a11y-hero-light',
+			'post_content' => ucf_brand_a11y_section_content( 'the light hero' ),
+		),
+		array(
+			'ucf_brand_number'         => 4,
+			'ucf_brand_hero_treatment' => 'light',
+			'ucf_brand_deck'           => 'The deck under the title, on the light band.',
+			'ucf_brand_hero_note'      => 'The closing note, which is body copy.',
+		)
+	);
+
 	return array(
 		array(
 			'name' => 'ucf-brand/tabs',
 			'path' => '/a11y-block-tabs/',
+		),
+		array(
+			// The class is the assertion: it is only on the page if the render filter ran, and
+			// a hero audited in the template's own Dark is a green result for the wrong band.
+			'name'  => 'ucf-brand/page-hero',
+			'path'  => '/a11y-hero-light/',
+			'class' => 'is-style-light',
 		),
 		array(
 			'name'  => 'ucf-brand/section-index',

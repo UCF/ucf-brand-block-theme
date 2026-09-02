@@ -10,6 +10,7 @@
  *   brand-order-panel      The "Brand" number field on the Page document sidebar.
  *   section-variable       Mirrors that number into the canvas as `--brand-section`.
  *   page-hero-editable     Keeps the hero editable while a page is open.
+ *   hero-treatment         The per-page light/dark hero field, and its canvas preview.
  *   section-number-binding The client half of the `ucf-brand/section-number` binding.
  *   stretch-link           A `stretchLink` toggle added to core/button.
  *   dynamic-blocks         Editor stand-ins for the two PHP-rendered blocks with no UI.
@@ -22,6 +23,7 @@
 import './brand-order-panel';
 import './section-variable';
 import './page-hero-editable';
+import './hero-treatment';
 import './section-number-binding';
 import './stretch-link';
 import './dynamic-blocks';
