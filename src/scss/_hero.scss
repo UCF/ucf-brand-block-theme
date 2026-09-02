@@ -87,6 +87,76 @@
 	line-height: 1;
 }
 
+// ── Treatments ───────────────────────────────────────────────────────────────
+//
+// CONTEXT: two ways in, one pair of mixins. `is-style-*` is the class templates/page.html
+// ships, which is the site-wide default; `is-hero-treatment-*` is one page overriding it.
+// The front end only ever carries one — `ucf_brand_apply_hero_treatment()` in includes/hero.php
+// swaps the class outright — but the editor canvas carries both, because the field cannot
+// rewrite a block that belongs to the template. Hence the override selectors last: same
+// specificity as the template's, and later, so a page's choice is what paints.
+
+@mixin hero-dark {
+	@include compositions.treatment("dark");
+
+	background-color: map.get($color, "black");
+	color: map.get($color, "white");
+}
+
+// A11Y: the Light treatment inverts the scrim with the copy. The dark gradient is a preset
+// on the featured image in templates/page.html and is the whole reason white copy clears
+// 4.5:1 over a photograph; black copy over that same dark wash is the toggle's failure mode.
+@mixin hero-light {
+	@include compositions.treatment("light");
+
+	background-color: map.get($color, "white");
+	color: map.get($color, "text-body");
+
+	// UPSTREAM: core prints preset gradient classes with `!important`, so the overlay's own
+	// background cannot be replaced. It is faded out instead — nothing there paints `opacity` —
+	// and the light wash is painted by the figure itself, which core leaves alone.
+	.wp-block-post-featured-image__overlay {
+		opacity: 0;
+	}
+
+	// SPEC: #B4B4B4, not white and not a palette color — the light band's wash over a
+	// photograph is its own value, and lighter than the `scrim` preset it mirrors the shape of.
+	// A11Y: the copy sits over the bottom two stops, as it does on the dark band. Over a black
+	// photograph — the worst case — body copy is 6.1:1 at 0.85 and 4.8:1 at 0.75. Little spare.
+	> .wp-block-post-featured-image::after {
+		background: linear-gradient(
+			to top,
+			rgb(180 180 180 / 85%) 0%,
+			rgb(180 180 180 / 75%) 45%,
+			rgb(180 180 180 / 45%) 75%,
+			rgb(180 180 180 / 20%) 100%
+		);
+		content: "";
+		inset: 0;
+		position: absolute;
+	}
+}
+
+// FIX: dark is the default in CSS and not only in the template — a hero reaching the page
+// with no class at all would otherwise take the light values every role falls back to.
+.brand-hero:not(.is-style-light) {
+	@include hero-dark;
+}
+
+.brand-hero.is-style-light {
+	@include hero-light;
+}
+
+// SYNC: the two classes src/js/editor/hero-treatment.js puts on the hero in the canvas, and
+// nothing else — the front end gets its treatment as a composition class from PHP.
+.brand-hero.is-hero-treatment-dark {
+	@include hero-dark;
+}
+
+.brand-hero.is-hero-treatment-light {
+	@include hero-light;
+}
+
 // WHY: the closing note answers the deck rather than continuing it, so it gets the one
 // larger step in the band.
 .brand-hero > p:last-child {
