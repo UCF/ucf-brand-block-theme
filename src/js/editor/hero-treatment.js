@@ -32,7 +32,10 @@ export const TREATMENT_KEY = 'ucf_brand_hero_treatment';
  * @type {Array<{label: string, value: string}>}
  */
 const TREATMENTS = [
-	{ label: __( 'Use the template default', 'ucf-brand-block-theme' ), value: '' },
+	{
+		label: __( 'Use the template default', 'ucf-brand-block-theme' ),
+		value: '',
+	},
 	{ label: __( 'Dark', 'ucf-brand-block-theme' ), value: 'dark' },
 	{ label: __( 'Light', 'ucf-brand-block-theme' ), value: 'light' },
 ];
@@ -128,7 +131,9 @@ const withHeroTreatment = createHigherOrderComponent(
 		const className = [
 			...String( props.className || '' )
 				.split( ' ' )
-				.filter( ( name ) => name && ! TREATMENT_CLASSES.includes( name ) ),
+				.filter(
+					( name ) => name && ! TREATMENT_CLASSES.includes( name )
+				),
 			treatmentClass( treatment ),
 		].join( ' ' );
 
