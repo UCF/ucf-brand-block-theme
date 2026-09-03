@@ -53,11 +53,22 @@
 .brand-hero > .wp-block-post-featured-image {
 	inset: 0;
 	margin: 0;
+	// WHY: the figure does its own clipping. The hero cannot — it is `overflow-x: clip` with
+	// the vertical axis left visible on purpose (sticky descendants), so anything taller than
+	// the band would spill over the section below it.
+	overflow: hidden;
 	position: absolute;
 
+	// SPEC: the art meets the band's width and whatever is taller than the band hangs off the
+	// bottom. It was `object-fit: cover`, which fills both axes and center-crops the
+	// difference: a 1600x800 composition lost 31% of its height at 1920px and 51% at 2560px,
+	// so a wide screen saw the middle of the artwork and none of its edges.
+	//
+	// CONTEXT: this fixes the crop, not the resolution. The source is 1600px wide and carries
+	// no srcset, so a band wider than that still enlarges it — 1.42x at 2560px — and only a
+	// wider export changes that number.
 	img {
-		height: 100%;
-		object-fit: cover;
+		height: auto;
 		width: 100%;
 	}
 }
@@ -96,6 +107,13 @@
 // rewrite a block that belongs to the template. Hence the override selectors last: same
 // specificity as the template's, and later, so a page's choice is what paints.
 
+// WHY: `color-mix` against the preset rather than the literal #F4F3F0. A gradient stop needs
+// the alpha baked in, which a bare `var()` cannot carry, and spelling the hex here would be a
+// second copy of a palette value to keep in step with theme.json.
+@function wash($alpha) {
+	@return color-mix(in srgb, #{map.get($color, "paper-alt")} $alpha, transparent);
+}
+
 @mixin hero-dark {
 	@include compositions.treatment("dark");
 
@@ -119,17 +137,19 @@
 		opacity: 0;
 	}
 
-	// SPEC: #B4B4B4, not white and not a palette color — the light band's wash over a
-	// photograph is its own value, and lighter than the `scrim` preset it mirrors the shape of.
-	// A11Y: the copy sits over the bottom two stops, as it does on the dark band. Over a black
-	// photograph — the worst case — body copy is 6.1:1 at 0.85 and 4.8:1 at 0.75. Little spare.
+	// SPEC: the wash is `paper-alt`, the band reading as the guide's own paper with the
+	// photograph faint behind it. It was #B4B4B4, a value of its own, which composited to a
+	// flat grey band — visibly darker than the comp — once it reached 85% at the foot.
+	// A11Y: the copy sits over the bottom two stops, as it does on the dark band. Lighter is
+	// safer here, not riskier: black copy over a black photograph — the worst case — goes from
+	// 6.1:1 to 11.1:1 at 0.85, and from 4.8:1 to 8.6:1 at 0.75.
 	> .wp-block-post-featured-image::after {
 		background: linear-gradient(
 			to top,
-			rgb(180 180 180 / 85%) 0%,
-			rgb(180 180 180 / 75%) 45%,
-			rgb(180 180 180 / 45%) 75%,
-			rgb(180 180 180 / 20%) 100%
+			#{wash(85%)} 0%,
+			#{wash(75%)} 45%,
+			#{wash(45%)} 75%,
+			#{wash(20%)} 100%
 		);
 		content: "";
 		inset: 0;
