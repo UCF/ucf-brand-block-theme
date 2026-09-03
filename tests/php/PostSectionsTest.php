@@ -192,6 +192,35 @@ final class PostSectionsTest extends TestCase {
 	}
 
 	/**
+	 * SYNC: `headingTitle()` in src/js/editor/section-index.js trims in JavaScript, whose
+	 * `String.trim()` drops U+00A0 and the other Unicode spaces that PHP's does not. The
+	 * section index keys descriptions by this title, so the two have to agree byte for byte.
+	 *
+	 * @return void
+	 */
+	public function test_title_trims_unicode_whitespace_as_javascript_does() {
+		$sections = ucf_brand_get_post_sections(
+			$this->post( '<h2>&nbsp;Photography Standards&nbsp;</h2><p>Copy.</p>' )
+		);
+
+		$this->assertSame( 'Photography Standards', $sections[0]['title'] );
+	}
+
+	/**
+	 * Interior spacing is left exactly as authored: JS trims the edges only, and collapsing
+	 * more here would orphan the descriptions whose keys currently match.
+	 *
+	 * @return void
+	 */
+	public function test_title_keeps_interior_whitespace_untouched() {
+		$sections = ucf_brand_get_post_sections(
+			$this->post( '<h2>Photography&nbsp;Standards</h2><p>Copy.</p>' )
+		);
+
+		$this->assertSame( "Photography\xc2\xa0Standards", $sections[0]['title'] );
+	}
+
+	/**
 	 * H3s are not structural — only H2s drive the drawer and the deep links.
 	 *
 	 * @return void

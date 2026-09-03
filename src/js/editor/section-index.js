@@ -29,6 +29,8 @@ import { META_KEY, formatSectionNumber } from './section-number';
  * SYNC: `ucf_brand_get_post_sections()` in includes/headings.php produces this same string
  * — tags stripped, entities decoded, trimmed — and looks a description up by it. Two
  * spellings of one key means a description that saves under one and renders under neither.
+ * The trim is the half that already diverged: `String.trim()` drops U+00A0 and PHP's
+ * `trim()` does not, so the server matches it through `ucf_brand_trim_heading_text()`.
  *
  * @param {string} content Raw heading content, which may carry inline markup.
  * @return {string} Comparable title.

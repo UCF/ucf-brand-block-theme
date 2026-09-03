@@ -151,6 +151,65 @@ final class SectionIndexTest extends TestCase {
 	}
 
 	/**
+	 * FIX: an author-pasted `&nbsp;` on the end of a heading is invisible on the page but
+	 * survived PHP's ASCII-only `trim()`, so the key the editor saved under no longer
+	 * matched the one the server read — the description vanished on prod.
+	 *
+	 * @return void
+	 */
+	public function test_matches_a_description_across_a_trailing_nbsp_in_the_heading() {
+		$this->seedPage(
+			'<!-- wp:heading --><h2>Photography Standards&nbsp;</h2><!-- /wp:heading --><p>Copy.</p>'
+		);
+
+		$html = ucf_brand_render_section_index(
+			array(
+				'descriptions' => array(
+					'Photography Standards' => 'From composition and lighting to appropriate editing.',
+				),
+			)
+		);
+
+		$this->assertStringContainsString( 'From composition and lighting to appropriate editing.', $html );
+	}
+
+	/**
+	 * FIX: a trailing non-breaking space is 5.45px the line has to fit and cannot be dropped
+	 * at a line end, so a description that clears its cell wrapped anyway. Both spellings:
+	 * the editor writes the character, `wp_kses()` keeps the entity.
+	 *
+	 * @dataProvider provide_padded_descriptions
+	 *
+	 * @param string $stored The description as authored.
+	 * @return void
+	 */
+	public function test_strips_edge_nbsp_from_a_description( $stored ) {
+		$this->seedPage( '<!-- wp:heading --><h2>Mediagraph</h2><!-- /wp:heading --><p>Copy.</p>' );
+
+		$html = ucf_brand_render_section_index(
+			array( 'descriptions' => array( 'Mediagraph' => $stored ) )
+		);
+
+		$this->assertStringContainsString(
+			'<p class="brand-index__desc">Including drone usage and model releases</p>',
+			$html
+		);
+	}
+
+	/**
+	 * @return array<string, string[]>
+	 */
+	public function provide_padded_descriptions() {
+		return array(
+			'literal character' => array( "Including drone usage and model releases\xc2\xa0" ),
+			'entity'            => array( 'Including drone usage and model releases&nbsp;' ),
+			'numeric entity'    => array( 'Including drone usage and model releases&#160;' ),
+			'entity then space' => array( 'Including drone usage and model releases&nbsp; ' ),
+			'both ends'         => array( "\xc2\xa0&nbsp;Including drone usage and model releases&nbsp;\xc2\xa0" ),
+		);
+	}
+
+	/**
 	 * @return void
 	 */
 	public function test_renders_an_entry_with_no_description() {
