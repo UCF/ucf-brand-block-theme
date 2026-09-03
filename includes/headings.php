@@ -224,6 +224,30 @@ function ucf_brand_strip_hidden_blocks( $content ) {
 }
 
 /**
+ * Strip leading and trailing whitespace the way JavaScript's `String.trim()` does.
+ *
+ * FIX: PHP's `trim()` is ASCII-only, so a heading pasted with a trailing `&nbsp;` kept
+ * that character in its title, while `headingTitle()` in src/js/editor/section-index.js
+ * dropped it — the section index saved a description under "Photography Standards" and
+ * then looked one up under "Photography Standards\u{00A0}", so the entry rendered with no
+ * description at all.
+ *
+ * SYNC: that JS half has to reduce a heading to the same string this does. Edges only:
+ * JS leaves interior spaces alone, and collapsing them here would break the keys that
+ * already match.
+ *
+ * @param string $text Decoded heading text.
+ * @return string The same text without edge whitespace, Unicode included.
+ */
+function ucf_brand_trim_heading_text( $text ) {
+	$space   = '[\s\x{00A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}]';
+	$trimmed = preg_replace( '/^' . $space . '+|' . $space . '+$/u', '', $text );
+
+	// The /u pattern returns null on invalid UTF-8; ASCII trimming is still better than none.
+	return null === $trimmed ? trim( $text ) : $trimmed;
+}
+
+/**
  * Split a page's stored content into its H2 sections.
  *
  * Reads `post_content` directly rather than rendering it: `core/heading` is a static
@@ -265,7 +289,7 @@ function ucf_brand_get_post_sections( $post ) {
 		$inner = $chunks[ $i + 1 ];
 		$body  = isset( $chunks[ $i + 2 ] ) ? $chunks[ $i + 2 ] : '';
 
-		$title = trim( html_entity_decode( wp_strip_all_tags( $inner ), ENT_QUOTES, 'UTF-8' ) );
+		$title = ucf_brand_trim_heading_text( html_entity_decode( wp_strip_all_tags( $inner ), ENT_QUOTES, 'UTF-8' ) );
 
 		if ( '' === $title ) {
 			continue;

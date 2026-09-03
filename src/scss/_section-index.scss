@@ -9,10 +9,16 @@
 // description is plain body copy, so both take their color from the enclosing composition
 // and the index inverts correctly when it is dropped into a dark group.
 //
-// SPEC: the shares are the section pages' own, taken from the hand-built index they replace —
-// 28/72 outer, and 10/40/50 across a row. The row's three cells become two boxes here, since
-// the number and the title share one anchor, so the anchor is the 50% those two add up to.
-
+// SPEC: the shares are the hand-built index's own — 28/72 outer, 10/40/50 across a row, one
+// 16px gap between every pair. CONTEXT: the pages disagree about the outer split; the index
+// still authored on web-and-digital uses 25/75. 28/72 is what the pages this block replaced
+// were built at, and one component cannot have both.
+//
+// FIX: the row's three cells were folded into two boxes on the theory that equal shares over
+// unequal gaps land in the same place. They do not — two 16px gaps became one 4px gap, and
+// every cell came out wrong: the number 0.3px over, the title 7.2px over, the description
+// 14px over, so titles and descriptions broke on different words than the index beside them.
+// Three tracks, and the anchor spans two of them.
 .brand-index {
 	display: grid;
 	gap: map.get($space, "30");
@@ -53,8 +59,8 @@
 	border-bottom: 1px solid
 		var(--brand-line, #{compositions.role-default("line")});
 	display: grid;
-	gap: map.get($space, "10");
-	grid-template-columns: 1fr 1fr;
+	gap: map.get($space, "30");
+	grid-template-columns: 10fr 40fr 50fr;
 	padding-block: map.get($space, "30");
 }
 
@@ -67,21 +73,23 @@
 
 // WHY: the anchor is the number and the title only. The description is a sibling so it stays
 // out of the link's accessible name — see includes/section-index.php.
+//
+// WHY: `subgrid` rather than a nested flex box. Wrapping two of the row's three cells in the
+// anchor is what made their widths guesswork; inheriting the row's own tracks means the
+// number and title sit where the hand-built index put them, with the row's gap between them.
 .brand-index__link {
-	align-items: flex-start;
-	display: flex;
-	gap: map.get($space, "10");
+	align-items: start;
+	display: grid;
+	grid-column: 1 / 3;
+	grid-template-columns: subgrid;
 	text-decoration: none;
 }
 
-// SPEC: a fifth of the anchor, which is the 10 of 10/40 the hand-built rows gave the number.
-//
 // FIX: `.is-style-meta` carries `line-height: 1.9`, which pushed the number most of a line
 // below the title it numbers once the row stopped aligning on the baseline. Trimmed to 1
 // and nudged back down by a hair — set flush, the smaller digits read as sitting high
 // against the display caps beside them.
 .brand-index__num {
-	flex: 0 0 20%;
 	font-weight: 700;
 	line-height: 1;
 	padding-top: 0.2em;
@@ -126,20 +134,37 @@
 		grid-template-columns: 1fr;
 	}
 
+	// SPEC: 24px under the lead-in, the gap the hand-built index used once its columns
+	// stacked. Side by side the two never had a vertical relationship, so the 16px the
+	// track gap supplied was never a chosen value — and against entries set 32px apart it
+	// read as though the heading belonged to the first one.
+	.brand-index {
+		gap: map.get($space, "40");
+	}
+
 	.brand-index__item {
 		gap: map.get($space, "20");
 	}
 
+	// FIX: the span and the inherited tracks are both undone, not just overridden. Left in
+	// place against a one-column row, `grid-column: 1 / 3` makes grid generate the second
+	// column it names, and the stacked entry is back to a title squeezed beside the number.
 	.brand-index__link {
-		align-items: flex-start;
-		flex-direction: column;
-		gap: map.get($space, "10");
+		grid-column: 1 / 2;
+		grid-template-columns: 1fr;
+		row-gap: map.get($space, "20");
 	}
 
-	// WHY: stacked, the number is above the title rather than beside it, so the optical
-	// nudge that kept the two apart on one line has nothing to correct for.
+	// WHY: stacked, the number is above the title rather than beside it, so both optical
+	// nudges that kept the two apart on one line have nothing left to correct for — and
+	// they answer in the wrong axis now, spending the row gap set above rather than the
+	// 8px of air the number needs to read as its own label. The pattern's 4px, kept, put
+	// the digits against the display caps.
 	.brand-index__num {
-		flex-basis: auto;
 		padding-top: 0;
+	}
+
+	.brand-index .brand-index__label {
+		margin-top: 0;
 	}
 }

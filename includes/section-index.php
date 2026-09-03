@@ -93,6 +93,33 @@ function ucf_brand_section_index_allowed_html() {
 }
 
 /**
+ * Trim a description the way the title beside it is trimmed.
+ *
+ * FIX: a trailing non-breaking space cannot be dropped at a line end, so it is 5.45px the
+ * line has to fit — enough to wrap "Including drone usage and model releases" onto a second
+ * line in a cell the text clears by itself. Authors paste them in from Word by the dozen.
+ *
+ * WHY: a loop over both spellings rather than one pattern. This runs on rich text, where
+ * `wp_kses()` leaves `&nbsp;` as an entity while the editor writes the character itself, and
+ * "text&nbsp; " needs the space gone before the entity is on the end. The whitespace class
+ * stays in `ucf_brand_trim_heading_text()` (includes/headings.php) as the one copy.
+ *
+ * @param string $html Sanitized description markup.
+ * @return string The same markup with no edge whitespace in either spelling.
+ */
+function ucf_brand_trim_description( $html ) {
+	$entities = '/^(?:&nbsp;|&#0*160;|&#[xX]0*[aA]0;)+|(?:&nbsp;|&#0*160;|&#[xX]0*[aA]0;)+$/';
+
+	do {
+		$before = $html;
+		$html   = ucf_brand_trim_heading_text( $html );
+		$html   = preg_replace( $entities, '', $html );
+	} while ( $html !== $before );
+
+	return $html;
+}
+
+/**
  * Render the index from the current page's H2s.
  *
  * @param array         $attributes Block attributes.
@@ -139,7 +166,7 @@ function ucf_brand_render_section_index( $attributes = array(), $content = '', $
 			);
 
 		$description = isset( $descriptions[ $section['title'] ] )
-			? trim( wp_kses( (string) $descriptions[ $section['title'] ], ucf_brand_section_index_allowed_html() ) )
+			? ucf_brand_trim_description( wp_kses( (string) $descriptions[ $section['title'] ], ucf_brand_section_index_allowed_html() ) )
 			: '';
 
 		// The description sits outside the anchor deliberately, as it does in
