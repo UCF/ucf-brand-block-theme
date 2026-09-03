@@ -111,7 +111,11 @@
 // the alpha baked in, which a bare `var()` cannot carry, and spelling the hex here would be a
 // second copy of a palette value to keep in step with theme.json.
 @function wash($alpha) {
-	@return color-mix(in srgb, #{map.get($color, "paper-alt")} $alpha, transparent);
+	@return color-mix(
+		in srgb,
+		#{map.get($color, "paper-alt")} $alpha,
+		transparent
+	);
 }
 
 @mixin hero-dark {
