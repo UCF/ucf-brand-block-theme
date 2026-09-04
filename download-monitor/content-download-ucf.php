@@ -17,8 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // No direct access.
 }
 
+// UPSTREAM: DLM passes `false` here when a shortcode names no download or a deleted one
+// (TemplateHandler::get_template_part), so this guard is what stops ->the_title() fataling
+// on a boolean. The plugin's own template returns a "No download found" string, but the
+// handler `include`s the file and discards the result, so that string can never reach the
+// page — returning nothing says what actually happens and keeps a dead entry out of the
+// translation catalogue.
 if ( ! isset( $dlm_download ) || ! $dlm_download ) {
-	return esc_html__( 'No download found', 'ucf-brand-block-theme' );
+	return;
 }
 
 $ucf_brand_template = __FILE__;
