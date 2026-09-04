@@ -58,6 +58,10 @@
 
 	// SYNC: DLM renders the accept control as a bare checkbox and label inside this id
 	// (class-dlm-tc-modal.php). It has no wrapper of its own, so alignment comes from here.
+	//
+	// UPSTREAM: snake_case is the plugin's spelling, so the id pattern rule cannot be met
+	// without giving up the selector.
+	// stylelint-disable-next-line selector-id-pattern
 	#dlm_terms_conditions_form {
 		border-top: 1px solid map.get($color, "line");
 		margin-top: map.get($space, "40");
