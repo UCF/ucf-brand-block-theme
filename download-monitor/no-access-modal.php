@@ -25,8 +25,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="dlm-no-access-modal-overlay ucf-gate__overlay"></div>
 
 	<div class="dlm-no-access-modal-window ucf-gate__window">
-		<div class="ucf-gate__panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-			<?php if ( ! empty( $title ) ) : ?>
+		<?php
+		// A11Y: aria-labelledby may only reference an element that exists. DLM's modal
+		// defaults leave $title empty, so pointing at #modal-title unconditionally gives the
+		// dialog a dangling accessible name. Labelling the element directly is the fallback —
+		// inventing a heading would be wrong for the members-lock and error modals this same
+		// template serves.
+		$ucf_gate_has_title = ! empty( $title );
+		?>
+		<div class="ucf-gate__panel" role="dialog" aria-modal="true"
+			<?php if ( $ucf_gate_has_title ) : ?>
+				aria-labelledby="modal-title"
+			<?php else : ?>
+				aria-label="<?php esc_attr_e( 'Download', 'ucf-brand-block-theme' ); ?>"
+			<?php endif; ?>
+		>
+			<?php if ( $ucf_gate_has_title ) : ?>
 				<h2 id="modal-title" class="ucf-gate__title"><?php echo esc_html( $title ); ?></h2>
 			<?php endif; ?>
 
