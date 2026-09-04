@@ -47,7 +47,7 @@ function ucf_brand_download_fallback() {
 	return sprintf(
 		'<p class="ucf-download-missing"><strong>%s</strong> %s</p>',
 		esc_html__( 'Download unavailable.', 'ucf-brand-block-theme' ),
-		esc_html__( 'The Download Manager plugin is not active, so this file cannot be shown.', 'ucf-brand-block-theme' )
+		esc_html__( 'The Download Monitor plugin is not active, so this file cannot be shown.', 'ucf-brand-block-theme' )
 	);
 }
 
