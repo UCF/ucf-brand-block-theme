@@ -95,16 +95,21 @@
 	padding-top: 0.2em;
 }
 
-// SPEC: the title sets the top of the row. At line-height 1.1 its box carries 0.05em of
-// empty space above the caps, pulled off here so the caps — not the line box — sit flush
-// with the top of the cell.
+// SPEC: the title sets the top of the row. Its line box carries half the leading above the
+// caps — (line-height − 1) ÷ 2 — pulled off here so the caps, not the box, sit flush with
+// the top of the cell. Change one of these two values and the other follows.
+//
+// FIX: the leading was 1.1. On a title long enough to wrap, the hover underline of one line
+// landed almost on the caps of the next: their tops sit only ~0.37em below the baseline at
+// that leading, and the underline is drawn at 0.2em. 1.2 roughly doubles the clearance.
+// Single-line titles are unaffected — the compensator holds the caps in the same place.
 .brand-index .brand-index__label {
 	color: var(--brand-heading, #{compositions.role-default("heading")});
 	font-family: map.get($font, "display");
 	font-size: map.get($size, "heading-4");
 	font-weight: 700;
-	line-height: 1.1;
-	margin: -0.05em 0 0;
+	line-height: 1.2;
+	margin: -0.1em 0 0;
 	text-transform: uppercase;
 }
 
