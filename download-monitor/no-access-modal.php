@@ -31,16 +31,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 		// dialog a dangling accessible name. Labelling the element directly is the fallback —
 		// inventing a heading would be wrong for the members-lock and error modals this same
 		// template serves.
-		$ucf_gate_has_title = ! empty( $title );
+		$ucf_brand_gate_has_title = ! empty( $title );
 		?>
 		<div class="ucf-gate__panel" role="dialog" aria-modal="true"
-			<?php if ( $ucf_gate_has_title ) : ?>
+			<?php if ( $ucf_brand_gate_has_title ) : ?>
 				aria-labelledby="modal-title"
 			<?php else : ?>
 				aria-label="<?php esc_attr_e( 'Download', 'ucf-brand-block-theme' ); ?>"
 			<?php endif; ?>
 		>
-			<?php if ( $ucf_gate_has_title ) : ?>
+			<?php if ( $ucf_brand_gate_has_title ) : ?>
 				<h2 id="modal-title" class="ucf-gate__title"><?php echo esc_html( $title ); ?></h2>
 			<?php endif; ?>
 
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="ucf-gate__actions">
 				<button type="button" class="dlm-no-access-modal-close ucf-gate__close">
-					<?php echo esc_html__( 'Close', 'download-monitor' ); ?>
+					<?php echo esc_html__( 'Close', 'ucf-brand-block-theme' ); ?>
 				</button>
 			</div>
 		</div>

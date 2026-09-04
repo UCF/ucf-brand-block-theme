@@ -18,20 +18,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! isset( $dlm_download ) || ! $dlm_download ) {
-	return esc_html__( 'No download found', 'download-monitor' );
+	return esc_html__( 'No download found', 'ucf-brand-block-theme' );
 }
 
-$template = __FILE__;
+$ucf_brand_template = __FILE__;
 
 // UPSTREAM: the Gutenberg block passes its own classes through this attribute; without
 // this the block's alignment and style settings are dropped.
 if ( ! empty( $dlm_attributes['className'] ) ) {
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- $attributes is DLM's, passed into this template and read again below.
 	$attributes['link_attributes']['class'][] = $dlm_attributes['className'];
 }
 
 // SYNC: extensions hook these to inject markup around the link. Removing them silently
 // breaks any DLM add-on that renders here.
-do_action( 'dlm_template_content_before_link', $dlm_download, $attributes, $template );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- DLM's hook; extensions listen on this exact name.
+do_action( 'dlm_template_content_before_link', $dlm_download, $attributes, $ucf_brand_template );
 ?>
 
 <div class="wp-block-button">
@@ -41,4 +43,5 @@ do_action( 'dlm_template_content_before_link', $dlm_download, $attributes, $temp
 </div>
 
 <?php
-do_action( 'dlm_template_content_after_link', $dlm_download, $attributes, $template );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- DLM's hook; extensions listen on this exact name.
+do_action( 'dlm_template_content_after_link', $dlm_download, $attributes, $ucf_brand_template );
