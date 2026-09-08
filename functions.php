@@ -36,6 +36,7 @@ $ucf_brand_includes = array(
 	'paste-artifacts',    // Word-processor characters normalized on display.
 	'section-index',      // The on-page index block, built from those H2s.
 	'search',             // Search scoping and subsection deep links.
+	'download-monitor',   // Fallbacks for Download Monitor's shortcodes.
 );
 
 foreach ( $ucf_brand_includes as $ucf_brand_include ) {

@@ -1,0 +1,102 @@
+// ── Download gate ────────────────────────────────────────────────────────────
+//
+// CONTEXT: the terms-acceptance modal Download Monitor shows before serving a protected
+// file. Markup is the theme's own — download-monitor/no-access-modal.php — so these are
+// real classes, not overrides of DLM's Tailwind utilities.
+//
+// WHY: DLM injects the modal into this document, not an iframe, so theme CSS reaches it.
+
+@use "sass:map";
+@use "variables" as *;
+
+.ucf-gate {
+	&__overlay {
+		// SPEC: the drawer's scrim, matched — see .brand-scrim in _drawer.scss.
+		background: rgb(0 0 0 / 60%);
+		inset: 0;
+		position: fixed;
+
+		// FIX: above the University Header, which paints at 10000 and would otherwise bury
+		// the dialog — see $z-university-header in _variables.scss.
+		z-index: $z-university-header + 1;
+	}
+
+	&__window {
+		// FIX: not `align-items: center`. A panel taller than the viewport would overflow
+		// past the top of the scroll container and become unreachable; auto margins on the
+		// panel centre it while keeping every edge scrollable.
+		align-items: flex-start;
+		display: flex;
+		inset: 0;
+		justify-content: center;
+		overflow-y: auto;
+		padding: map.get($space, "30");
+		position: fixed;
+		z-index: $z-university-header + 2;
+	}
+
+	&__panel {
+		background: map.get($color, "white");
+		border-top: 4px solid map.get($color, "gold");
+		color: map.get($color, "text-body");
+		font-family: map.get($font, "body");
+		margin: auto;
+
+		// SPEC: dialog measure, narrower than the reading width — terms are scanned, not
+		// read at length.
+		max-width: min(100%, 34rem);
+		padding: map.get($space, "40");
+		width: 100%;
+	}
+
+	&__title {
+		font-family: map.get($font, "display");
+		font-size: map.get($size, "heading-4");
+		margin: 0 0 map.get($space, "30");
+		text-transform: uppercase;
+	}
+
+	// SYNC: DLM renders the accept control as a bare checkbox and label inside this id
+	// (class-dlm-tc-modal.php). It has no wrapper of its own, so alignment comes from here.
+	//
+	// UPSTREAM: snake_case is the plugin's spelling, so the id pattern rule cannot be met
+	// without giving up the selector.
+	// stylelint-disable-next-line selector-id-pattern
+	#dlm_terms_conditions_form {
+		border-top: 1px solid map.get($color, "line");
+		margin-top: map.get($space, "40");
+		padding-top: map.get($space, "40");
+
+		input[type="checkbox"] {
+			accent-color: map.get($color, "gold");
+			margin-right: map.get($space, "20");
+		}
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: map.get($space, "40");
+	}
+
+	// WHY: secondary to the accept action, so outlined rather than filled — it must not
+	// read as the primary control the way a gold button would.
+	&__close {
+		background: none;
+		border: 1px solid map.get($color, "line");
+		color: map.get($color, "text-secondary");
+		cursor: pointer;
+		font-family: map.get($font, "body");
+		font-size: map.get($size, "ui");
+		font-weight: 800;
+		letter-spacing: 0.02em;
+		padding: map.get($space, "30") map.get($space, "40");
+		text-transform: uppercase;
+
+		&:hover,
+		&:focus {
+			background: map.get($color, "paper-alt");
+			color: map.get($color, "text-body");
+		}
+	}
+}
