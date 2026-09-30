@@ -86,6 +86,11 @@ function ucf_brand_enqueue_assets() {
 
 	// The drawer's sub-nav and scroll-spy. Source: src/js/brand-nav.js.
 	ucf_brand_enqueue_build_script( 'ucf-brand-nav', 'brand-nav' );
+
+	// The 404 template's "Go back" button. Source: src/js/back-link.js.
+	if ( is_404() ) {
+		ucf_brand_enqueue_build_script( 'ucf-brand-back-link', 'back-link' );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'ucf_brand_enqueue_assets' );
 

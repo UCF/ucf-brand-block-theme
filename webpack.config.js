@@ -3,9 +3,9 @@
  *
  * Two departures from the default:
  *
- * 1. **Three extra entries.** Only folders with a block.json are auto-detected, and these
- *    three have none: the editor glue (src/js/editor/), the drawer's front-end script and
- *    the badge rich-text format. Naming them here is what puts them through the same
+ * 1. **Four extra entries.** Only folders with a block.json are auto-detected, and these
+ *    four have none: the editor glue (src/js/editor/), the drawer's front-end script, the
+ *    badge rich-text format and the 404 page's back link. Naming them here is what puts them through the same
  *    pipeline as the blocks — one dialect, one minifier, and a generated *.asset.php per
  *    entry so includes/enqueue.php never restates a dependency list by hand.
  *
@@ -28,6 +28,7 @@ module.exports = {
 		editor: './src/js/editor/index.js',
 		'brand-nav': './src/js/brand-nav.js',
 		'badge-format': './src/js/badge-format.js',
+		'back-link': './src/js/back-link.js',
 	},
 	output: {
 		...defaultConfig.output,

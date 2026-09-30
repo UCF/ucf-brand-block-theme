@@ -1,0 +1,1 @@
+!function(){"use strict";const e=document.querySelector(".brand-back-link"),r=e&&e.querySelector("a");!r||!document.referrer||window.history.length<2||(r.href=document.referrer,r.addEventListener("click",e=>{e.preventDefault(),window.history.back()}),e.classList.add("is-ready"))}();

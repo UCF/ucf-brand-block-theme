@@ -1,0 +1,7 @@
+// ── 404 ──────────────────────────────────────────────────────────────────────
+
+// SYNC: src/js/back-link.js adds `is-ready` once it has a page to go back to. Without it
+// the button has no href and would do nothing.
+.brand-back-link:not(.is-ready) {
+	display: none;
+}

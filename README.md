@@ -19,6 +19,7 @@ is in `build/`, and `assets/` holds only static files that are neither.**
 | `src/js/editor/`         | Block-editor customizations, one job per module, bundled into `build/editor.js`.  |
 | `src/js/brand-nav.js`    | The drawer's sub-navigation, scroll-spy and mobile toggle.                        |
 | `src/js/badge-format.js` | The Badge rich-text format on the editor toolbar.                                 |
+| `src/js/back-link.js`    | The 404 page's "Go back" button, shown only when there is a page to go back to.   |
 | `src/scss/`              | Every stylesheet, one partial per concern, compiled to `build/css/main.css`.      |
 | `build/`                 | **Generated and committed.** Blocks, bundled scripts, the stylesheet. Never edit. |
 | `assets/fonts/`          | Self-hosted webfonts, referenced from `theme.json`.                               |
