@@ -49,6 +49,7 @@ final class SearchTest extends WP_UnitTestCase {
 		self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Pegasus Page',
 				// The page needs a section that matches, or ucf_brand_hide_results_without_sections()
@@ -74,6 +75,28 @@ final class SearchTest extends WP_UnitTestCase {
 
 		$this->assertContains( 'Pegasus Page', $titles );
 		$this->assertNotContains( 'Pegasus Post', $titles );
+	}
+
+	/**
+	 * Search reaches only what the sidebar lists. A published page with no Brand number is
+	 * unfinished, and it shipped surfacing in results on the test site.
+	 *
+	 * @return void
+	 */
+	public function test_a_page_missing_from_the_sidebar_is_not_a_result() {
+		self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Unlisted Pegasus',
+				'post_content' => self::PAGE_CONTENT,
+			)
+		);
+
+		$this->go_to( home_url( '/?s=pegasus' ) );
+
+		$this->assertTrue( is_search() );
+		$this->assertSame( 0, $GLOBALS['wp_query']->post_count );
 	}
 
 	/**
@@ -114,6 +137,7 @@ final class SearchTest extends WP_UnitTestCase {
 		self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_content' => self::PAGE_CONTENT,
@@ -193,6 +217,7 @@ final class SearchTest extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Zebra',
 				'post_content' => '<!-- wp:paragraph --><p>Nothing relevant here.</p><!-- /wp:paragraph -->',
@@ -226,6 +251,7 @@ final class SearchTest extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_content' => self::PAGE_CONTENT,
@@ -250,6 +276,7 @@ final class SearchTest extends WP_UnitTestCase {
 		self::factory()->post->create(
 			array(
 				'post_type'   => 'page',
+				'meta_input'  => array( 'ucf_brand_number' => 1 ),
 				'post_status' => 'publish',
 				'post_title'  => 'Logo Usage',
 			)
@@ -273,6 +300,7 @@ final class SearchTest extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_content' => self::PAGE_CONTENT,
@@ -297,6 +325,7 @@ final class SearchTest extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_content' => self::PAGE_CONTENT,
@@ -319,6 +348,7 @@ final class SearchTest extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_excerpt' => 'Hand-written excerpt.',
@@ -340,6 +370,7 @@ final class SearchTest extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_excerpt' => 'Hand-written excerpt.',
@@ -363,6 +394,7 @@ final class SearchTest extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_content' => self::PAGE_CONTENT,
@@ -386,6 +418,7 @@ final class SearchTest extends WP_UnitTestCase {
 		self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Zebra Crossing',
 				'post_content' => self::PAGE_CONTENT,
@@ -407,6 +440,7 @@ final class SearchTest extends WP_UnitTestCase {
 		self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Logo Usage',
 				'post_content' => self::PAGE_CONTENT,
@@ -415,6 +449,7 @@ final class SearchTest extends WP_UnitTestCase {
 		self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Pegasus Mentioned In The Title Only',
 				'post_content' => '<!-- wp:paragraph --><p>Nothing here.</p><!-- /wp:paragraph -->',
@@ -437,6 +472,7 @@ final class SearchTest extends WP_UnitTestCase {
 		self::factory()->post->create(
 			array(
 				'post_type'    => 'page',
+				'meta_input'   => array( 'ucf_brand_number' => 1 ),
 				'post_status'  => 'publish',
 				'post_title'   => 'Zebra Crossing',
 				'post_content' => self::PAGE_CONTENT,
