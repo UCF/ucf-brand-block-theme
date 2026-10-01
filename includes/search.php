@@ -55,6 +55,11 @@ function ucf_brand_limit_main_search_to_pages( $query ) {
 
 	$query->set( 'post_type', 'page' );
 	$query->set( 'posts_per_page', UCF_BRAND_MAX_SEARCH_RESULTS );
+
+	// FIX: published pages without a Brand number (unfinished drafts) surfaced in results.
+	// SYNC: the drawer's list, so search reaches exactly what the sidebar links to.
+	$section_ids = wp_list_pluck( ucf_brand_get_ordered_sections(), 'id' );
+	$query->set( 'post__in', $section_ids ? $section_ids : array( 0 ) );
 }
 add_action( 'pre_get_posts', 'ucf_brand_limit_main_search_to_pages' );
 

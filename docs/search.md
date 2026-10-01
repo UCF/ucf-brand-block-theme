@@ -68,6 +68,9 @@ Terms come from `ucf_brand_search_terms()`: a double-quoted run is kept whole so
     name and every result would announce as a paragraph of prose.
 -   **`pre_get_posts` constrains the main front-end query to pages,** so a hand-typed or
     shared `?s=…` link resolves the same way the sidebar Search block does.
+-   **Search reaches only the pages the sidebar lists.** The same filter sets `post__in` from
+    `ucf_brand_get_ordered_sections()`, so a published page with no Brand number — an
+    unfinished draft, the front page, a utility page like Contact Us — is never a result.
 
 ## Where the pieces are
 

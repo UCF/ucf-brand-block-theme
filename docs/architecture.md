@@ -176,8 +176,8 @@ one build tool for JS and one for CSS, and no third path.
     `editor` entry. Modules register against a hook or a store, so import order is not
     significant. The shared `section-number.js` helper exists so the three modules that need
     the page's number don't each re-derive it.
--   `src/js/brand-nav.js`, `src/js/badge-format.js` — the drawer script and the Badge
-    rich-text format.
+-   `src/js/brand-nav.js`, `src/js/badge-format.js`, `src/js/back-link.js` — the drawer
+    script, the Badge rich-text format and the 404 page's "Go back" button.
 
 Entries without a `block.json` are named explicitly in `webpack.config.js`. Two things
 there are deliberate:
