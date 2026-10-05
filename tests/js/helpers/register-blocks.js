@@ -137,8 +137,8 @@ export const BLOCK_FIXTURES = [
 				attributes: {
 					colorSlug: 'gold',
 					name: 'Bold Gold',
-					hex: '#EDB80C',
-					rgb: '237 · 184 · 12',
+					hex: '#EDB80D',
+					rgb: '237 · 184 · 13',
 					cmyk: '0 22 95 0',
 					pantone: '7409 C',
 					usage: 'Primary accent',
