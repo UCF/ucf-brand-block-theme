@@ -146,6 +146,8 @@ file added to that array — never appended to `functions.php`.
 | `pattern-categories.php` | The pattern category ladder                                   |
 | `university-header.php`  | The UCF University Header: its script tag and its placeholder |
 | `meta.php`               | Per-page fields                                               |
+| `hero.php`               | The page hero's per-page light/dark treatment                 |
+| `home-hero.php`          | The home hero's video, held back from phones                  |
 | `sections.php`           | Section numbering, ordering, the number binding               |
 | `section-nav.php`        | The drawer's server-rendered block                            |
 | `headings.php`           | H2 anchor ids and section extraction                          |

@@ -91,6 +91,11 @@ function ucf_brand_enqueue_assets() {
 	if ( is_404() ) {
 		ucf_brand_enqueue_build_script( 'ucf-brand-back-link', 'back-link' );
 	}
+
+	// The home hero's pause/play button. Source: src/js/hero-video.js.
+	if ( is_front_page() ) {
+		ucf_brand_enqueue_build_script( 'ucf-brand-hero-video', 'hero-video' );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'ucf_brand_enqueue_assets' );
 
