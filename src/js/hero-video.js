@@ -47,9 +47,13 @@
 		}
 	}
 
-	function sync() {
+	function render() {
 		band.classList.toggle( 'is-video-paused', paused );
 		button.setAttribute( 'aria-label', paused ? LABEL_PLAY : LABEL_PAUSE );
+	}
+
+	function sync() {
+		render();
 
 		// WHY: narrowed after loading, the video is hidden — stop decoding what nobody sees.
 		if ( ! wide.matches ) {
@@ -62,8 +66,14 @@
 		if ( paused ) {
 			video.pause();
 		} else {
-			// WHY: play() rejects when the browser blocks autoplay; the button stays usable.
-			video.play().catch( () => {} );
+			// FIX: a blocked play() left the button saying "Pause" over a stopped video. WHY:
+			// NotAllowedError only — our own pause() aborts play() too, and that is not a block.
+			video.play().catch( ( error ) => {
+				if ( error && 'NotAllowedError' === error.name ) {
+					paused = true;
+					render();
+				}
+			} );
 		}
 	}
 

@@ -142,6 +142,41 @@ describe( 'hero-video', () => {
 		expect( play ).not.toHaveBeenCalled();
 	} );
 
+	it( 'shows the play button when the browser blocks autoplay', async () => {
+		const blocked = new Error( 'blocked' );
+		blocked.name = 'NotAllowedError';
+		play.mockRejectedValue( blocked );
+
+		run();
+		await Promise.resolve();
+
+		expect( band().classList.contains( 'is-video-paused' ) ).toBe( true );
+		expect( button().getAttribute( 'aria-label' ) ).toBe(
+			'Play background video'
+		);
+
+		// The first press plays, rather than switching to a state it is already in.
+		play.mockResolvedValue( undefined );
+		play.mockClear();
+		button().click();
+
+		expect( play ).toHaveBeenCalledTimes( 1 );
+		expect( band().classList.contains( 'is-video-paused' ) ).toBe( false );
+	} );
+
+	it( 'keeps playing state when play() is aborted by a pause', async () => {
+		const aborted = new Error( 'aborted' );
+		aborted.name = 'AbortError';
+		play.mockRejectedValue( aborted );
+
+		run();
+		widthQuery.resize( false );
+		await Promise.resolve();
+
+		// WHY: narrowing aborted the load; widening again must still play.
+		expect( band().classList.contains( 'is-video-paused' ) ).toBe( false );
+	} );
+
 	it( 'shows the first frame but does not play when reduced motion is requested', () => {
 		run( { reduceMotion: true } );
 
