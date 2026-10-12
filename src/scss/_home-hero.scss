@@ -13,11 +13,8 @@
 //   below $breakpoint-video   featured image, then the band's copy stacked underneath it
 //   at and above              core Cover with its background video, copy laid over it
 //
-// CONTEXT: the swap is visual only. Core writes a live `src` into the background iframe, and
-// a hidden iframe is still a downloaded one, so a phone fetches the player it is never
-// shown. Deferring that needs a `render_block` filter to park the `src` in `data-src` plus a
-// script to restore it above the breakpoint — deliberately not carried here, because the
-// layout below is the whole of the design and that pair is a bandwidth optimization.
+// CONTEXT: the swap here is visual only. Phones skip the download because
+// includes/home-hero.php sends no `src` and src/js/hero-video.js restores it when wide.
 //
 // FIX: both blocks are direct children of `.brand-content` and both carry `align: full`,
 // which is what earns them the bleed rule in _drawer.scss. Wrapping them in a group for
@@ -96,9 +93,49 @@
 	display: none;
 }
 
+// The pause/play button src/js/hero-video.js adds. Hidden with the video it controls.
+.brand-home-hero__toggle {
+	align-items: center;
+	appearance: none;
+	background: map.get($color, "black");
+	border: 1px solid map.get($color, "line-dark");
+	bottom: map.get($space, "30");
+	color: map.get($color, "white");
+	cursor: pointer;
+	display: none;
+	height: 44px;
+	justify-content: center;
+	padding: 0;
+	position: absolute;
+	right: map.get($space, "30");
+	width: 44px;
+
+	// UPSTREAM: core stacks the cover's video, overlay and copy at z-index 0–1.
+	z-index: 2;
+
+	svg {
+		fill: currentcolor;
+		height: 20px;
+		width: 20px;
+	}
+}
+
+.brand-home-hero__icon-play,
+.is-video-paused .brand-home-hero__icon-pause {
+	display: none;
+}
+
+.is-video-paused .brand-home-hero__icon-play {
+	display: block;
+}
+
 @media (min-width: $breakpoint-video) {
 	.brand-home-hero__image {
 		display: none;
+	}
+
+	.brand-home-hero__toggle {
+		display: flex;
 	}
 
 	.brand-home-hero__band {
